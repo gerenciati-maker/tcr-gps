@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validación GPS - TCR</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px 20px;
+      background: #f4f6f8;
+    }
+
+    .contenedor {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 3px 15px rgba(0,0,0,.12);
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    #estado {
+      margin: 25px 0;
+      font-size: 18px;
+    }
+
+    .boton {
+      display: inline-block;
+      padding: 15px 25px;
+      background: #1a73e8;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 17px;
+    }
+
+    .boton:disabled {
+      background: #999;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="contenedor">
+
+  <h1>CONTROL DE ASISTENCIA</h1>
+  <h2>TCR</h2>
+
+  <div id="estado">
+    📍 Obteniendo ubicación...
+  </div>
+
+  <div id="resultado"></div>
+
+  <br>
+
+  <a id="formulario"
+     class="boton"
+     href="https://docs.google.com/forms/d/e/1FAIpQLSeKDOEdUlS75ivHlBWG4qVo-PdaL8KLWBa3GM9IYbX6I6ptnQ/viewform?usp=dialog"
+     style="display:none;">
+     CONTINUAR AL REGISTRO
+  </a>
+
+</div>
+
+<script>
+
+const LAT_TCR = 19.025274494954676;
+const LON_TCR = -98.26069346300481;
+const RANGO = 100;
+
+function distanciaMetros(lat1, lon1, lat2, lon2) {
+
+  const R = 6371000;
+
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) *
+    Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) ** 2;
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c;
+}
+
+function obtenerUbicacion() {
+
+  const estado = document.getElementById("estado");
+  const resultado = document.getElementById("resultado");
+  const formulario = document.getElementById("formulario");
+
+  if (!navigator.geolocation) {
+
+    estado.innerHTML = "⚠️ Este navegador no permite obtener ubicación.";
+
+    formulario.style.display = "inline-block";
+
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+
+    function(position) {
+
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const precision = position.coords.accuracy;
+
+      const distancia = distanciaMetros(
+        lat,
+        lon,
+        LAT_TCR,
+        LON_TCR
+      );
+
+      const distanciaRedondeada = Math.round(distancia);
+
+      estado.innerHTML = "📍 Ubicación obtenida";
+
+      if (distancia <= RANGO) {
+
+        resultado.innerHTML =
+          "✅ <strong>DENTRO DEL RANGO</strong><br>" +
+          "Distancia aproximada: " +
+          distanciaRedondeada +
+          " metros<br>" +
+          "Precisión GPS: ±" +
+          Math.round(precision) +
+          " metros";
+
+      } else {
+
+        resultado.innerHTML =
+          "⚠️ <strong>FUERA DEL RANGO</strong><br>" +
+          "Distancia aproximada: " +
+          distanciaRedondeada +
+          " metros<br>" +
+          "Precisión GPS: ±" +
+          Math.round(precision) +
+          " metros";
+
+      }
+
+      /*
+       IMPORTANTE:
+       Nunca bloqueamos el formulario.
+       Tanto dentro como fuera de 100 m
+       se permite continuar.
+      */
+
+      formulario.style.display = "inline-block";
+
+    },
+
+    function(error) {
+
+      estado.innerHTML =
+        "⚠️ No se pudo obtener la ubicación.";
+
+      resultado.innerHTML =
+        "Puedes continuar con el registro.";
+
+      formulario.style.display = "inline-block";
+
+    },
+
+    {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0
+    }
+
+  );
+}
+
+obtenerUbicacion();
+
+</script>
+
+</body>
+</html>
