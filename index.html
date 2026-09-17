@@ -291,11 +291,12 @@ button:disabled {
 
 <label for="numeroApoyo">Número de empleado</label>
 <input
-  type="text"
-  id="numeroApoyo"
-  placeholder="Escribe tu número de empleado"
-  inputmode="numeric"
-  autocomplete="off">
+    type="text"
+    id="numeroApoyo"
+    placeholder="Escribe tu número de empleado"
+    inputmode="numeric"
+    autocomplete="off"
+    oninput="reconocerApoyo()">
 
 <div class="origen">
   <strong>Servicio de origen:</strong>
@@ -1365,6 +1366,84 @@ function actualizarApoyo() {
 
 }
 
+      function reconocerApoyo() {
+
+    const numero =
+        document.getElementById("numeroApoyo").value.trim();
+
+    const servicioOrigen =
+        document.getElementById("servicioOrigen");
+
+    if (numero === "") {
+
+        servicioOrigen.textContent = "-";
+
+        return;
+    }
+
+
+    /*
+       Buscar todas las coincidencias
+       del número de empleado
+    */
+
+    const coincidencias =
+        empleados.filter(function(empleado) {
+
+            return String(empleado.numero).trim() === numero;
+
+        });
+
+
+    /*
+       No encontrado
+    */
+
+    if (coincidencias.length === 0) {
+
+        servicioOrigen.textContent =
+            "Empleado no encontrado";
+
+        return;
+    }
+
+
+    /*
+       Duplicidad
+    */
+
+    if (coincidencias.length > 1) {
+
+        const servicios =
+            coincidencias
+            .map(function(empleado) {
+
+                return empleado.servicio;
+
+            })
+            .filter(function(servicio, indice, lista) {
+
+                return lista.indexOf(servicio) === indice;
+
+            });
+
+
+        servicioOrigen.textContent =
+            "DUPLICIDAD: " +
+            servicios.join(" / ");
+
+        return;
+    }
+
+
+    /*
+       Un solo registro
+    */
+
+    servicioOrigen.textContent =
+        coincidencias[0].servicio;
+
+}
 
 
 /* ============================================================
