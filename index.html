@@ -1298,25 +1298,19 @@ function seleccionarTipo(
        APOYO
     */
 
-    if (
-        tipo === "APOYO"
-    ) {
+ if (
+    tipo === "APOYO"
+) {
 
+    cargarPersonalApoyo();
 
-        cargarPersonalApoyo();
+    const seccionApoyo =
+        document.getElementById("seccionApoyo");
 
-
-        document.getElementById(
-            "seccionApoyo"
-        )
-        .classList.remove(
-            "oculto"
-        );
-
-    }
+    seccionApoyo.classList.remove("oculto");
+    seccionApoyo.style.display = "block";
 
 }
-
 
 
 /* ============================================================
@@ -1449,7 +1443,15 @@ function actualizarNumeroPersonal() {
 /* ============================================================
    CARGAR PERSONAL PARA APOYO
    ============================================================ */
+function cargarPersonalApoyo() {
 
+    document.getElementById("nombreApoyo").value = "";
+
+    document.getElementById("numeroApoyo").value = "";
+
+    document.getElementById("servicioOrigen").textContent = "-";
+
+}
 
 function reconocerServicioApoyo() {
   const numero =
@@ -1482,86 +1484,8 @@ function reconocerServicioApoyo() {
 
 
 function actualizarApoyo() {
-
-
-    const indice =
-        document.getElementById(
-            "nombreApoyo"
-        ).value;
-
-
-    const numeroSelect =
-        document.getElementById(
-            "numeroApoyo"
-        );
-
-
-    const origen =
-        document.getElementById(
-            "servicioOrigen"
-        );
-
-
-
-    numeroSelect.innerHTML =
-        '<option value="">Selecciona tu número</option>';
-
-
-    origen.textContent =
-        "-";
-
-
-
-    if (
-        indice === ""
-    ) {
-
-        return;
-
-    }
-
-
-
-    const empleado =
-        empleados[
-            indice
-        ];
-
-
-
-    /*
-       Número
-    */
-
-    const opcion =
-        document.createElement(
-            "option"
-        );
-
-
-    opcion.value =
-        empleado.numero;
-
-
-    opcion.textContent =
-        empleado.numero;
-
-
-    numeroSelect.appendChild(
-        opcion
-    );
-
-
-
-    /*
-       Servicio de origen
-    */
-
-    origen.textContent =
-        empleado.servicio;
-
+    return;
 }
-
 
 
 /* ============================================================
