@@ -282,64 +282,27 @@ button:disabled {
         </div>
 
 
-        <label for="nombreApoyo">
+       <label for="nombreApoyo">Nombre</label>
+<input
+  type="text"
+  id="nombreApoyo"
+  placeholder="Escribe tu nombre"
+  autocomplete="off">
 
-            Nombre
+<label for="numeroApoyo">Número de empleado</label>
+<input
+  type="text"
+  id="numeroApoyo"
+  placeholder="Escribe tu número de empleado"
+  inputmode="numeric"
+  autocomplete="off">
 
-        </label>
+<div class="origen">
+  <strong>Servicio de origen:</strong>
+  <span id="servicioOrigen">-</span>
+</div>
 
-
-        <select
-            id="nombreApoyo"
-            onchange="actualizarApoyo()">
-
-            <option value="">
-
-                Selecciona tu nombre
-
-            </option>
-
-        </select>
-
-
-        <label for="numeroApoyo">
-
-            Número de empleado
-
-        </label>
-
-
-        <select
-            id="numeroApoyo">
-
-            <option value="">
-
-                Selecciona tu número
-
-            </option>
-
-        </select>
-
-
-        <div class="origen">
-
-            <strong>
-                Servicio de origen:
-            </strong>
-
-            <span id="servicioOrigen">
-                -
-            </span>
-
-        </div>
-
-
-        <button
-            onclick="continuarApoyo()">
-
-            CONTINUAR
-
-        </button>
+<button onclick="continuarApoyo()">CONTINUAR</button>
 
 
     </div>
@@ -1485,76 +1448,9 @@ function actualizarNumeroPersonal() {
 
 
 function cargarPersonalApoyo() {
-
-
-    const nombreSelect =
-        document.getElementById(
-            "nombreApoyo"
-        );
-
-
-    nombreSelect.innerHTML =
-        '<option value="">Selecciona tu nombre</option>';
-
-
-
-    /*
-       Para APOYO usamos todos los
-       empleados ACTIVO de la base.
-
-       No importa cuál sea su servicio
-       de origen.
-    */
-
-    empleados.forEach(
-        function(
-            empleado,
-            indice
-        ) {
-
-
-            const opcion =
-                document.createElement(
-                    "option"
-                );
-
-
-            opcion.value =
-                indice;
-
-
-            opcion.textContent =
-
-                empleado.nombre +
-                " - " +
-                empleado.numero;
-
-
-            nombreSelect.appendChild(
-                opcion
-            );
-
-        }
-    );
-
-
-
-    /*
-       Limpiar datos
-    */
-
-    document.getElementById(
-        "numeroApoyo"
-    ).innerHTML =
-
-        '<option value="">Selecciona tu número</option>';
-
-
-    document.getElementById(
-        "servicioOrigen"
-    ).textContent =
-        "-";
-
+  document.getElementById("nombreApoyo").value = "";
+  document.getElementById("numeroApoyo").value = "";
+  document.getElementById("servicioOrigen").textContent = "-";
 }
 
 
@@ -1714,59 +1610,21 @@ function continuarPersonal() {
 
 
 function continuarApoyo() {
+  const nombre = document.getElementById("nombreApoyo").value.trim();
+  const numero = document.getElementById("numeroApoyo").value.trim();
 
+  if (nombre === "" || numero === "") {
+    alert("Escribe tu nombre y número de empleado.");
+    return;
+  }
 
-    const indice =
-        document.getElementById(
-            "nombreApoyo"
-        ).value;
-
-
-    const numero =
-        document.getElementById(
-            "numeroApoyo"
-        ).value;
-
-
-
-    if (
-        indice === "" ||
-        numero === ""
-    ) {
-
-
-        alert(
-            "Selecciona tu nombre y número de empleado."
-        );
-
-
-        return;
-
-    }
-
-
-
-    const empleado =
-        empleados[
-            indice
-        ];
-
-
-
-    abrirFormulario(
-
-        empleado.nombre,
-
-        empleado.numero,
-
-        "APOYO",
-
-        empleado.servicio
-
-    );
-
+  abrirFormulario(
+    nombre,
+    numero,
+    "APOYO",
+    document.getElementById("servicioOrigen").textContent
+  );
 }
-
 
 
 /* ============================================================
