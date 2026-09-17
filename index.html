@@ -289,17 +289,11 @@ button:disabled {
         </label>
 
 
-        <select
+        <input
+            type="text"
             id="nombreApoyo"
-            onchange="actualizarApoyo()">
-
-            <option value="">
-
-                Selecciona tu nombre
-
-            </option>
-
-        </select>
+            placeholder="Escribe tu nombre"
+            autocomplete="off">
 
 
         <label for="numeroApoyo">
@@ -309,16 +303,12 @@ button:disabled {
         </label>
 
 
-        <select
-            id="numeroApoyo">
-
-            <option value="">
-
-                Selecciona tu número
-
-            </option>
-
-        </select>
+        <input
+            type="text"
+            id="numeroApoyo"
+            placeholder="Escribe tu número de empleado"
+            inputmode="numeric"
+            autocomplete="off">
 
 
         <div class="origen">
@@ -1487,67 +1477,24 @@ function actualizarNumeroPersonal() {
 function cargarPersonalApoyo() {
 
 
-    const nombreSelect =
-        document.getElementById(
-            "nombreApoyo"
-        );
-
-
-    nombreSelect.innerHTML =
-        '<option value="">Selecciona tu nombre</option>';
-
-
-
     /*
-       Para APOYO usamos todos los
-       empleados ACTIVO de la base.
+        APOYO se captura MANUALMENTE.
 
-       No importa cuál sea su servicio
-       de origen.
-    */
-
-    empleados.forEach(
-        function(
-            empleado,
-            indice
-        ) {
-
-
-            const opcion =
-                document.createElement(
-                    "option"
-                );
-
-
-            opcion.value =
-                indice;
-
-
-            opcion.textContent =
-
-                empleado.nombre +
-                " - " +
-                empleado.numero;
-
-
-            nombreSelect.appendChild(
-                opcion
-            );
-
-        }
-    );
-
-
-
-    /*
-       Limpiar datos
+        En esta primera etapa:
+        - Nombre = captura manual
+        - Número de empleado = captura manual
+        - Servicio de origen = pendiente de automatizar
+          mediante el número de empleado.
     */
 
     document.getElementById(
-        "numeroApoyo"
-    ).innerHTML =
+        "nombreApoyo"
+    ).value = "";
 
-        '<option value="">Selecciona tu número</option>';
+
+    document.getElementById(
+        "numeroApoyo"
+    ).value = "";
 
 
     document.getElementById(
@@ -1564,84 +1511,16 @@ function cargarPersonalApoyo() {
    ============================================================ */
 
 
+/*
+    Por ahora NO hacemos búsqueda automática.
+
+    En la siguiente etapa:
+    Número de empleado → BASE_QR → Servicio de origen.
+*/
+
 function actualizarApoyo() {
 
-
-    const indice =
-        document.getElementById(
-            "nombreApoyo"
-        ).value;
-
-
-    const numeroSelect =
-        document.getElementById(
-            "numeroApoyo"
-        );
-
-
-    const origen =
-        document.getElementById(
-            "servicioOrigen"
-        );
-
-
-
-    numeroSelect.innerHTML =
-        '<option value="">Selecciona tu número</option>';
-
-
-    origen.textContent =
-        "-";
-
-
-
-    if (
-        indice === ""
-    ) {
-
-        return;
-
-    }
-
-
-
-    const empleado =
-        empleados[
-            indice
-        ];
-
-
-
-    /*
-       Número
-    */
-
-    const opcion =
-        document.createElement(
-            "option"
-        );
-
-
-    opcion.value =
-        empleado.numero;
-
-
-    opcion.textContent =
-        empleado.numero;
-
-
-    numeroSelect.appendChild(
-        opcion
-    );
-
-
-
-    /*
-       Servicio de origen
-    */
-
-    origen.textContent =
-        empleado.servicio;
+    return;
 
 }
 
@@ -1649,6 +1528,8 @@ function actualizarApoyo() {
 
 /* ============================================================
    CONTINUAR PERSONAL
+   ============================================================ */
+
    ============================================================ */
 
 
@@ -1716,27 +1597,27 @@ function continuarPersonal() {
 function continuarApoyo() {
 
 
-    const indice =
+    const nombre =
         document.getElementById(
             "nombreApoyo"
-        ).value;
+        ).value.trim();
 
 
     const numero =
         document.getElementById(
             "numeroApoyo"
-        ).value;
+        ).value.trim();
 
 
 
     if (
-        indice === "" ||
+        nombre === "" ||
         numero === ""
     ) {
 
 
         alert(
-            "Selecciona tu nombre y número de empleado."
+            "Escribe tu nombre y número de empleado."
         );
 
 
@@ -1746,22 +1627,22 @@ function continuarApoyo() {
 
 
 
-    const empleado =
-        empleados[
-            indice
-        ];
-
-
+    /*
+        En esta primera etapa el servicio de origen
+        todavía no se obtiene automáticamente.
+    */
 
     abrirFormulario(
 
-        empleado.nombre,
+        nombre,
 
-        empleado.numero,
+        numero,
 
         "APOYO",
 
-        empleado.servicio
+        document.getElementById(
+            "servicioOrigen"
+        ).textContent
 
     );
 
@@ -1771,6 +1652,8 @@ function continuarApoyo() {
 
 /* ============================================================
    ABRIR GOOGLE FORMS
+   ============================================================ */
+
    ============================================================ */
 
 
