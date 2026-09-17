@@ -5,18 +5,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Control de Asistencia - TCR</title>
+  <title>Validando ubicación...</title>
 
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 30px 15px;
+      padding: 40px 20px;
       background: #f4f6f8;
     }
 
     .contenedor {
-      max-width: 500px;
+      max-width: 450px;
       margin: auto;
       background: white;
       padding: 30px;
@@ -25,43 +25,23 @@
     }
 
     h1 {
-      margin-bottom: 5px;
-    }
-
-    h2 {
-      margin-top: 0;
-    }
-
-    .servicio {
-      margin: 25px 0;
-      padding: 15px;
-      background: #eef3f8;
-      border-radius: 10px;
-    }
-
-    .servicio strong {
-      font-size: 20px;
+      margin-bottom: 10px;
     }
 
     #estado {
-      margin: 25px 0;
-      font-size: 18px;
-    }
-
-    #resultado {
-      margin: 20px 0;
-      font-size: 18px;
+      margin-top: 30px;
+      font-size: 20px;
       line-height: 1.6;
     }
 
-    .boton {
-      display: inline-block;
-      padding: 15px 25px;
-      background: #1a73e8;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
+    #resultado {
+      margin-top: 20px;
       font-size: 17px;
+      line-height: 1.6;
+    }
+
+    .error {
+      font-weight: bold;
     }
   </style>
 </head>
@@ -70,26 +50,10 @@
 
 <div class="contenedor">
 
-  <h1>CONTROL DE ASISTENCIA</h1>
-  <h2>TCR</h2>
+  <h1>TCR</h1>
 
-  <div class="servicio">
-
-    <div>SERVICIO</div>
-
-    <strong id="nombreServicio">
-      TCR
-    </strong>
-
-    <br><br>
-
-    <div>
-      RADIO PERMITIDO:
-      <strong id="rango">
-        100 metros
-      </strong>
-    </div>
-
+  <div>
+    Validación de ubicación
   </div>
 
   <div id="estado">
@@ -98,59 +62,43 @@
 
   <div id="resultado"></div>
 
-  <br>
-
-  <a
-    id="formulario"
-    class="boton"
-    href="#"
-    style="display:none;"
-  >
-    CONTINUAR AL REGISTRO
-  </a>
-
 </div>
 
 
 <script>
 
 /* =====================================================
-   SERVICIO TCR
+   CONFIGURACIÓN DEL SERVICIO TCR
    ===================================================== */
 
 const SERVICIO = {
   nombre: "TCR",
+
   lat: 19.025274494954676,
+
   lon: -98.26069346300481,
+
   rango: 100
 };
 
 
 /* =====================================================
-   ELEMENTOS DE PANTALLA
+   GOOGLE FORMS
    ===================================================== */
 
-const nombreServicio =
-  document.getElementById("nombreServicio");
+const URL_FORMULARIO =
+  "https://docs.google.com/forms/d/e/1FAIpQLSeKDOEdUlS75ivHlBWG4qVo-PdaL8KLWBa3GM9IYbX6I6ptnQ/viewform?usp=dialog";
 
-const rango =
-  document.getElementById("rango");
+
+/* =====================================================
+   ELEMENTOS
+   ===================================================== */
 
 const estado =
   document.getElementById("estado");
 
 const resultado =
   document.getElementById("resultado");
-
-const formulario =
-  document.getElementById("formulario");
-
-
-nombreServicio.textContent =
-  SERVICIO.nombre;
-
-rango.textContent =
-  SERVICIO.rango + " metros";
 
 
 /* =====================================================
@@ -192,21 +140,18 @@ function distanciaMetros(
 
 
 /* =====================================================
-   OBTENER UBICACIÓN
+   VALIDAR UBICACIÓN
    ===================================================== */
 
-function obtenerUbicacion() {
+function validarUbicacion() {
 
   if (!navigator.geolocation) {
 
     estado.innerHTML =
-      "⚠️ Este navegador no permite obtener ubicación.";
+      "❌ Ubicación no disponible";
 
     resultado.innerHTML =
-      "No es posible validar la ubicación.";
-
-    formulario.style.display =
-      "none";
+      "Este dispositivo no permite obtener la ubicación.";
 
     return;
   }
@@ -226,7 +171,9 @@ function obtenerUbicacion() {
         position.coords.accuracy;
 
 
-      /* Calcular distancia */
+      /* ---------------------------------------------
+         CALCULAR DISTANCIA
+         --------------------------------------------- */
 
       const distancia =
         distanciaMetros(
@@ -241,103 +188,92 @@ function obtenerUbicacion() {
         Math.round(distancia);
 
 
-      estado.innerHTML =
-        "📍 Ubicación obtenida";
-
-
-      /* =================================================
+      /* ---------------------------------------------
          DENTRO DEL RANGO
-         ================================================= */
+         --------------------------------------------- */
 
       if (distancia <= SERVICIO.rango) {
 
-        resultado.innerHTML =
-
-          "✅ <strong>DENTRO DEL RANGO</strong><br>" +
-
-          "Distancia aproximada: " +
-
-          distanciaRedondeada +
-
-          " metros<br>" +
-
-          "Precisión GPS: ±" +
-
-          Math.round(precision) +
-
-          " metros";
-
-
-        formulario.style.display =
-          "inline-block";
-
-      }
-
-
-      /* =================================================
-         FUERA DEL RANGO
-         ================================================= */
-
-      else {
+        estado.innerHTML =
+          "✅ Ubicación validada";
 
         resultado.innerHTML =
+          "Servicio: <strong>" +
+          SERVICIO.nombre +
+          "</strong><br>" +
 
-          "⚠️ <strong>FUERA DEL RANGO</strong><br>" +
-
-          "Distancia aproximada: " +
-
+          "Distancia: " +
           distanciaRedondeada +
-
-          " metros<br>" +
-
-          "Radio permitido: " +
-
-          SERVICIO.rango +
-
-          " metros<br>" +
-
-          "Precisión GPS: ±" +
-
-          Math.round(precision) +
-
           " metros";
 
 
         /*
-         * DURANTE EL PILOTO:
-         * dejamos continuar aunque esté fuera
-         * para poder comprobar el funcionamiento.
+         * ESPERA MUY CORTA PARA QUE EL USUARIO
+         * PUEDA VER QUE LA UBICACIÓN FUE VALIDADA.
          */
 
-        formulario.style.display =
-          "inline-block";
+        setTimeout(function() {
+
+          window.location.href =
+            URL_FORMULARIO;
+
+        }, 700);
+
+      }
+
+
+      /* ---------------------------------------------
+         FUERA DEL RANGO
+         --------------------------------------------- */
+
+      else {
+
+        estado.innerHTML =
+          "❌ FUERA DEL RANGO";
+
+        resultado.innerHTML =
+
+          "No es posible realizar el registro.<br><br>" +
+
+          "Distancia detectada: <strong>" +
+          distanciaRedondeada +
+          " metros</strong><br>" +
+
+          "Radio permitido: <strong>" +
+          SERVICIO.rango +
+          " metros</strong><br><br>" +
+
+          "Acércate al servicio e inténtalo nuevamente.";
 
       }
 
     },
 
 
-    /* =================================================
-       ERROR DE UBICACIÓN
-       ================================================= */
+    /* ---------------------------------------------
+       ERROR DE GPS
+       --------------------------------------------- */
 
     function(error) {
 
       estado.innerHTML =
-        "⚠️ No se pudo obtener la ubicación.";
+        "❌ No se pudo validar la ubicación";
 
       resultado.innerHTML =
-        "Activa la ubicación del teléfono y vuelve a intentarlo.";
-
-      formulario.style.display =
-        "none";
+        "Activa la ubicación del teléfono y vuelve a escanear el QR.";
 
     },
 
 
+    /* ---------------------------------------------
+       CONFIGURACIÓN GPS
+       --------------------------------------------- */
+
     {
       enableHighAccuracy: true,
+
       timeout: 15000,
+
       maximumAge: 0
     }
 
@@ -347,22 +283,10 @@ function obtenerUbicacion() {
 
 
 /* =====================================================
-   GOOGLE FORMS
+   INICIAR
    ===================================================== */
 
-const urlFormulario =
-  "https://docs.google.com/forms/d/e/1FAIpQLSeKDOEdUlS75ivHlBWG4qVo-PdaL8KLWBa3GM9IYbX6I6ptnQ/viewform?usp=dialog";
-
-
-formulario.href =
-  urlFormulario;
-
-
-/* =====================================================
-   INICIAR VALIDACIÓN
-   ===================================================== */
-
-obtenerUbicacion();
+validarUbicacion();
 
 </script>
 
