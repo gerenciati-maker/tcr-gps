@@ -289,11 +289,17 @@ button:disabled {
         </label>
 
 
-        <input
-            type="text"
+        <select
             id="nombreApoyo"
-            placeholder="Escribe tu nombre"
-            autocomplete="off">
+            onchange="actualizarApoyo()">
+
+            <option value="">
+
+                Selecciona tu nombre
+
+            </option>
+
+        </select>
 
 
         <label for="numeroApoyo">
@@ -303,12 +309,16 @@ button:disabled {
         </label>
 
 
-        <input
-            type="text"
-            id="numeroApoyo"
-            placeholder="Escribe tu número de empleado"
-            inputmode="numeric"
-            autocomplete="off">
+        <select
+            id="numeroApoyo">
+
+            <option value="">
+
+                Selecciona tu número
+
+            </option>
+
+        </select>
 
 
         <div class="origen">
@@ -353,6 +363,7 @@ button:disabled {
 
 /* ============================================================
    CONFIGURACIÓN GOOGLE SHEETS
+   ============================================================ */
 
 
 const ID_ARCHIVO =
@@ -366,6 +377,7 @@ const ID_BASE_QR =
 
 /* ============================================================
    VARIABLES DEL SISTEMA
+   ============================================================ */
 
 
 let empleados = [];
@@ -378,6 +390,7 @@ let personalServicio = [];
 
 /* ============================================================
    OBTENER SERVICIO DEL QR
+   ============================================================ */
 
 
 const parametros =
@@ -403,6 +416,7 @@ if (codigoServicio) {
 
 /* ============================================================
    CARGAR BASE QR DESDE GOOGLE SHEETS
+   ============================================================ */
 
 
 function cargarBaseQR() {
@@ -877,6 +891,7 @@ function cargarBaseQR() {
 
 /* ============================================================
    INICIAR SISTEMA
+   ============================================================ */
 
 
 function iniciarSistema() {
@@ -978,6 +993,7 @@ function iniciarSistema() {
 
 /* ============================================================
    CALCULAR DISTANCIA
+   ============================================================ */
 
 
 function calcularDistancia(
@@ -1057,6 +1073,7 @@ function calcularDistancia(
 
 /* ============================================================
    VALIDAR GPS
+   ============================================================ */
 
 
 function validarGPS() {
@@ -1258,6 +1275,7 @@ function validarGPS() {
 
 /* ============================================================
    SELECCIONAR TIPO
+   ============================================================ */
 
 
 function seleccionarTipo(
@@ -1336,6 +1354,7 @@ function seleccionarTipo(
 
 /* ============================================================
    CARGAR PERSONAL DEL SERVICIO
+   ============================================================ */
 
 
 function cargarPersonalServicio() {
@@ -1398,6 +1417,7 @@ function cargarPersonalServicio() {
 
 /* ============================================================
    ACTUALIZAR NÚMERO PERSONAL
+   ============================================================ */
 
 
 function actualizarNumeroPersonal() {
@@ -1461,29 +1481,73 @@ function actualizarNumeroPersonal() {
 
 /* ============================================================
    CARGAR PERSONAL PARA APOYO
+   ============================================================ */
 
 
 function cargarPersonalApoyo() {
 
 
-    /*
-        APOYO se captura MANUALMENTE.
+    const nombreSelect =
+        document.getElementById(
+            "nombreApoyo"
+        );
 
-        En esta primera etapa:
-        - Nombre = captura manual
-        - Número de empleado = captura manual
-        - Servicio de origen = pendiente de automatizar
-          mediante el número de empleado.
+
+    nombreSelect.innerHTML =
+        '<option value="">Selecciona tu nombre</option>';
+
+
+
+    /*
+       Para APOYO usamos todos los
+       empleados ACTIVO de la base.
+
+       No importa cuál sea su servicio
+       de origen.
+    */
+
+    empleados.forEach(
+        function(
+            empleado,
+            indice
+        ) {
+
+
+            const opcion =
+                document.createElement(
+                    "option"
+                );
+
+
+            opcion.value =
+                indice;
+
+
+            opcion.textContent =
+
+                empleado.nombre +
+                " - " +
+                empleado.numero;
+
+
+            nombreSelect.appendChild(
+                opcion
+            );
+
+        }
+    );
+
+
+
+    /*
+       Limpiar datos
     */
 
     document.getElementById(
-        "nombreApoyo"
-    ).value = "";
-
-
-    document.getElementById(
         "numeroApoyo"
-    ).value = "";
+    ).innerHTML =
+
+        '<option value="">Selecciona tu número</option>';
 
 
     document.getElementById(
@@ -1497,18 +1561,87 @@ function cargarPersonalApoyo() {
 
 /* ============================================================
    ACTUALIZAR INFORMACIÓN DE APOYO
+   ============================================================ */
 
-
-/*
-    Por ahora NO hacemos búsqueda automática.
-
-    En la siguiente etapa:
-    Número de empleado → BASE_QR → Servicio de origen.
-*/
 
 function actualizarApoyo() {
 
-    return;
+
+    const indice =
+        document.getElementById(
+            "nombreApoyo"
+        ).value;
+
+
+    const numeroSelect =
+        document.getElementById(
+            "numeroApoyo"
+        );
+
+
+    const origen =
+        document.getElementById(
+            "servicioOrigen"
+        );
+
+
+
+    numeroSelect.innerHTML =
+        '<option value="">Selecciona tu número</option>';
+
+
+    origen.textContent =
+        "-";
+
+
+
+    if (
+        indice === ""
+    ) {
+
+        return;
+
+    }
+
+
+
+    const empleado =
+        empleados[
+            indice
+        ];
+
+
+
+    /*
+       Número
+    */
+
+    const opcion =
+        document.createElement(
+            "option"
+        );
+
+
+    opcion.value =
+        empleado.numero;
+
+
+    opcion.textContent =
+        empleado.numero;
+
+
+    numeroSelect.appendChild(
+        opcion
+    );
+
+
+
+    /*
+       Servicio de origen
+    */
+
+    origen.textContent =
+        empleado.servicio;
 
 }
 
@@ -1516,7 +1649,7 @@ function actualizarApoyo() {
 
 /* ============================================================
    CONTINUAR PERSONAL
-
+   ============================================================ */
 
 
 function continuarPersonal() {
@@ -1577,32 +1710,33 @@ function continuarPersonal() {
 
 /* ============================================================
    CONTINUAR APOYO
+   ============================================================ */
 
 
 function continuarApoyo() {
 
 
-    const nombre =
+    const indice =
         document.getElementById(
             "nombreApoyo"
-        ).value.trim();
+        ).value;
 
 
     const numero =
         document.getElementById(
             "numeroApoyo"
-        ).value.trim();
+        ).value;
 
 
 
     if (
-        nombre === "" ||
+        indice === "" ||
         numero === ""
     ) {
 
 
         alert(
-            "Escribe tu nombre y número de empleado."
+            "Selecciona tu nombre y número de empleado."
         );
 
 
@@ -1612,22 +1746,22 @@ function continuarApoyo() {
 
 
 
-    /*
-        En esta primera etapa el servicio de origen
-        todavía no se obtiene automáticamente.
-    */
+    const empleado =
+        empleados[
+            indice
+        ];
+
+
 
     abrirFormulario(
 
-        nombre,
+        empleado.nombre,
 
-        numero,
+        empleado.numero,
 
         "APOYO",
 
-        document.getElementById(
-            "servicioOrigen"
-        ).textContent
+        empleado.servicio
 
     );
 
@@ -1637,7 +1771,7 @@ function continuarApoyo() {
 
 /* ============================================================
    ABRIR GOOGLE FORMS
-
+   ============================================================ */
 
 
 function abrirFormulario(
@@ -1734,6 +1868,7 @@ function abrirFormulario(
 
 /* ============================================================
    INICIAR CARGA DE BASE
+   ============================================================ */
 
 
 cargarBaseQR();
