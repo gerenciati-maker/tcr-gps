@@ -295,7 +295,9 @@ button:disabled {
   id="numeroApoyo"
   placeholder="Escribe tu número de empleado"
   inputmode="numeric"
-  autocomplete="off">
+  autocomplete="off"
+  oninput="reconocerServicioApoyo()">
+          
 
 <div class="origen">
   <strong>Servicio de origen:</strong>
@@ -1447,10 +1449,27 @@ function actualizarNumeroPersonal() {
    ============================================================ */
 
 
-function cargarPersonalApoyo() {
-  document.getElementById("nombreApoyo").value = "";
-  document.getElementById("numeroApoyo").value = "";
-  document.getElementById("servicioOrigen").textContent = "-";
+function reconocerServicioApoyo() {
+  const numero =
+    document.getElementById("numeroApoyo").value.trim();
+
+  const servicioOrigen =
+    document.getElementById("servicioOrigen");
+
+  if (numero === "") {
+    servicioOrigen.textContent = "-";
+    return;
+  }
+
+  const empleado = empleados.find(function(persona) {
+    return String(persona.numero).trim() === numero;
+  });
+
+  if (empleado) {
+    servicioOrigen.textContent = empleado.servicio;
+  } else {
+    servicioOrigen.textContent = "Empleado no encontrado";
+  }
 }
 
 
