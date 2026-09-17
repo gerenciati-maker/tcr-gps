@@ -1,4 +1,4 @@
-      <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -53,7 +53,8 @@ label {
     margin-bottom: 6px;
 }
 
-select {
+select,
+input {
     width: 100%;
     padding: 12px;
     border: 1px solid #ccc;
@@ -282,29 +283,56 @@ button:disabled {
         </div>
 
 
-       <label for="nombreApoyo">Nombre</label>
-<input
-  type="text"
-  id="nombreApoyo"
-  placeholder="Escribe tu nombre"
-  autocomplete="off">
+        <label for="nombreApoyo">
 
-<label for="numeroApoyo">Número de empleado</label>
-<input
-  type="text"
-  id="numeroApoyo"
-  placeholder="Escribe tu número de empleado"
-  inputmode="numeric"
-  autocomplete="off"
-  oninput="reconocerServicioApoyo()">
-          
+            Nombre
 
-<div class="origen">
-  <strong>Servicio de origen:</strong>
-  <span id="servicioOrigen">-</span>
-</div>
+        </label>
 
-<button onclick="continuarApoyo()">CONTINUAR</button>
+
+        <input
+            type="text"
+            id="nombreApoyo"
+            placeholder="Escribe tu nombre"
+            autocomplete="off">
+
+
+        <label for="numeroApoyo">
+
+            Número de empleado
+
+        </label>
+
+
+        <input
+            type="text"
+            id="numeroApoyo"
+            placeholder="Escribe tu número de empleado"
+            inputmode="numeric"
+            autocomplete="off"
+            oninput="reconocerServicioApoyo()">
+
+
+
+        <div class="origen">
+
+            <strong>
+                Servicio de origen:
+            </strong>
+
+            <span id="servicioOrigen">
+                -
+            </span>
+
+        </div>
+
+
+        <button
+            onclick="continuarApoyo()">
+
+            CONTINUAR
+
+        </button>
 
 
     </div>
@@ -393,21 +421,11 @@ function cargarBaseQR() {
         "Cargando personal...";
 
 
-    /*
-       Creamos un nombre único para recibir
-       la respuesta de Google.
-    */
-
     const callbackName =
         "recibirBaseQR_" +
         Date.now();
 
 
-
-    /*
-       Esta función será llamada directamente
-       por Google Sheets.
-    */
 
     window[callbackName] =
         function(datos) {
@@ -421,10 +439,6 @@ function cargarBaseQR() {
                     datos
                 );
 
-
-                /*
-                   Validar respuesta
-                */
 
                 if (
                     !datos ||
@@ -440,10 +454,6 @@ function cargarBaseQR() {
                 }
 
 
-
-                /*
-                   Obtener encabezados
-                */
 
                 const encabezados =
                     datos.table.cols.map(
@@ -464,10 +474,6 @@ function cargarBaseQR() {
                 );
 
 
-
-                /*
-                   Buscar columnas
-                */
 
                 const indiceNombre =
                     encabezados.indexOf(
@@ -512,10 +518,6 @@ function cargarBaseQR() {
 
 
 
-                /*
-                   Verificar columnas
-                */
-
                 if (
 
                     indiceNombre === -1 ||
@@ -541,12 +543,6 @@ function cargarBaseQR() {
                 }
 
 
-
-                /*
-                   Convertir filas
-                   de Google Sheets
-                   a empleados
-                */
 
                 empleados =
                     datos.table.rows
@@ -579,10 +575,6 @@ function cargarBaseQR() {
 
 
 
-                            /*
-                               Coordenadas
-                            */
-
                             const textoCoordenadas =
                                 columnas[
                                     indiceCoordenadas
@@ -596,10 +588,6 @@ function cargarBaseQR() {
                                 );
 
 
-
-                            /*
-                               Crear empleado
-                            */
 
                             return {
 
@@ -655,11 +643,6 @@ function cargarBaseQR() {
                         }
                     )
 
-
-                    /*
-                       SOLO ACTIVOS
-                    */
-
                     .filter(
                         function(empleado) {
 
@@ -682,10 +665,6 @@ function cargarBaseQR() {
 
 
 
-                /*
-                   Verificar que haya personal
-                */
-
                 if (
                     empleados.length === 0
                 ) {
@@ -697,10 +676,6 @@ function cargarBaseQR() {
                 }
 
 
-
-                /*
-                   Iniciar sistema
-                */
 
                 iniciarSistema();
 
@@ -731,9 +706,6 @@ function cargarBaseQR() {
             }
 
 
-            /*
-               Limpiar callback
-            */
 
             delete window[
                 callbackName
@@ -757,14 +729,6 @@ function cargarBaseQR() {
 
 
 
-    /*
-       URL DE GOOGLE SHEETS
-
-       IMPORTANTE:
-       Aquí usamos el ID REAL DEL ARCHIVO,
-       NO el 2PACX.
-    */
-
     const url =
         "https://docs.google.com/spreadsheets/d/" +
         ID_ARCHIVO +
@@ -787,13 +751,6 @@ function cargarBaseQR() {
 
 
 
-    /*
-       Crear script dinámico
-
-       Esto evita el problema CORS
-       que teníamos con fetch().
-    */
-
     const script =
         document.createElement(
             "script"
@@ -808,10 +765,6 @@ function cargarBaseQR() {
         url;
 
 
-
-    /*
-       Error de conexión
-    */
 
     script.onerror =
         function() {
@@ -833,7 +786,7 @@ function cargarBaseQR() {
             ).textContent =
                 "No se pudo conectar con BASE_QR.";
 
-            
+
             delete window[
                 callbackName
             ];
@@ -862,10 +815,6 @@ function cargarBaseQR() {
 function iniciarSistema() {
 
 
-    /*
-       Verificar QR
-    */
-
     if (
         !codigoServicio
     ) {
@@ -889,10 +838,6 @@ function iniciarSistema() {
 
 
 
-    /*
-       Buscar personal del servicio
-    */
-
     personalServicio =
         empleados.filter(
             function(empleado) {
@@ -906,11 +851,6 @@ function iniciarSistema() {
         );
 
 
-
-    /*
-       Verificar que exista
-       el servicio
-    */
 
     if (
         personalServicio.length === 0
@@ -935,20 +875,12 @@ function iniciarSistema() {
 
 
 
-    /*
-       Mostrar servicio
-    */
-
     document.getElementById(
         "servicioTexto"
     ).textContent =
         personalServicio[0].servicio;
 
 
-
-    /*
-       Validar GPS
-    */
 
     validarGPS();
 
@@ -1044,11 +976,6 @@ function calcularDistancia(
 function validarGPS() {
 
 
-    /*
-       Tomar coordenadas
-       del servicio
-    */
-
     const servicio =
         personalServicio[0];
 
@@ -1077,10 +1004,6 @@ function validarGPS() {
 
 
 
-    /*
-       Solicitar ubicación
-    */
-
     navigator.geolocation.getCurrentPosition(
 
 
@@ -1095,10 +1018,6 @@ function validarGPS() {
                 posicion.coords.longitude;
 
 
-
-            /*
-               Calcular distancia
-            */
 
             const distancia =
                 calcularDistancia(
@@ -1134,10 +1053,6 @@ function validarGPS() {
 
 
 
-            /*
-               Validar rango
-            */
-
             if (
                 distancia <=
                 servicio.rango
@@ -1161,13 +1076,27 @@ function validarGPS() {
                     "Ubicación validada correctamente.";
 
 
-          const tipoRegistro =
-    document.getElementById("seleccionTipo");
+                const tipoRegistro =
+                    document.getElementById(
+                        "seleccionTipo"
+                    );
 
-tipoRegistro.classList.remove("oculto");
-tipoRegistro.style.display = "block";
-tipoRegistro.style.visibility = "visible";
-tipoRegistro.style.opacity = "1";
+
+                tipoRegistro.classList.remove(
+                    "oculto"
+                );
+
+
+                tipoRegistro.style.display =
+                    "block";
+
+
+                tipoRegistro.style.visibility =
+                    "visible";
+
+
+                tipoRegistro.style.opacity =
+                    "1";
 
 
             }
@@ -1250,10 +1179,6 @@ function seleccionarTipo(
 ) {
 
 
-    /*
-       Ocultar ambas secciones
-    */
-
     document.getElementById(
         "seccionPersonal"
     )
@@ -1298,19 +1223,32 @@ function seleccionarTipo(
        APOYO
     */
 
- if (
-    tipo === "APOYO"
-) {
+    if (
+        tipo === "APOYO"
+    ) {
 
-    cargarPersonalApoyo();
 
-    const seccionApoyo =
-        document.getElementById("seccionApoyo");
+        cargarPersonalApoyo();
 
-    seccionApoyo.classList.remove("oculto");
-    seccionApoyo.style.display = "block";
+
+        const seccionApoyo =
+            document.getElementById(
+                "seccionApoyo"
+            );
+
+
+        seccionApoyo.classList.remove(
+            "oculto"
+        );
+
+
+        seccionApoyo.style.display =
+            "block";
+
+    }
 
 }
+
 
 
 /* ============================================================
@@ -1361,10 +1299,6 @@ function cargarPersonalServicio() {
     );
 
 
-
-    /*
-       Limpiar número
-    */
 
     document.getElementById(
         "numeroPersonal"
@@ -1444,27 +1378,24 @@ function actualizarNumeroPersonal() {
    CARGAR PERSONAL PARA APOYO
    ============================================================ */
 
-function reconocerServicioApoyo() {
-  const numero =
-    document.getElementById("numeroApoyo").value.trim();
 
-  const servicioOrigen =
-    document.getElementById("servicioOrigen");
+function cargarPersonalApoyo() {
 
-  if (numero === "") {
-    servicioOrigen.textContent = "-";
-    return;
-  }
+    document.getElementById(
+        "nombreApoyo"
+    ).value = "";
 
-  const empleado = empleados.find(function(persona) {
-    return String(persona.numero).trim() === numero;
-  });
 
-  if (empleado) {
-    servicioOrigen.textContent = empleado.servicio;
-  } else {
-    servicioOrigen.textContent = "Empleado no encontrado";
-  }
+    document.getElementById(
+        "numeroApoyo"
+    ).value = "";
+
+
+    document.getElementById(
+        "servicioOrigen"
+    ).textContent =
+        "-";
+
 }
 
 
@@ -1475,8 +1406,81 @@ function reconocerServicioApoyo() {
 
 
 function actualizarApoyo() {
+
     return;
+
 }
+
+
+
+/* ============================================================
+   RECONOCER SERVICIO DE ORIGEN DEL APOYO
+   ============================================================ */
+
+
+function reconocerServicioApoyo() {
+
+
+    const numero =
+        document.getElementById(
+            "numeroApoyo"
+        ).value.trim();
+
+
+    const servicioOrigen =
+        document.getElementById(
+            "servicioOrigen"
+        );
+
+
+
+    if (
+        numero === ""
+    ) {
+
+        servicioOrigen.textContent =
+            "-";
+
+        return;
+
+    }
+
+
+
+    const empleado =
+        empleados.find(
+            function(persona) {
+
+                return (
+                    String(
+                        persona.numero
+                    ).trim() ===
+                    numero
+                );
+
+            }
+        );
+
+
+
+    if (
+        empleado
+    ) {
+
+        servicioOrigen.textContent =
+            empleado.servicio;
+
+    }
+
+    else {
+
+        servicioOrigen.textContent =
+            "Empleado no encontrado";
+
+    }
+
+}
+
 
 
 /* ============================================================
@@ -1546,21 +1550,83 @@ function continuarPersonal() {
 
 
 function continuarApoyo() {
-  const nombre = document.getElementById("nombreApoyo").value.trim();
-  const numero = document.getElementById("numeroApoyo").value.trim();
 
-  if (nombre === "" || numero === "") {
-    alert("Escribe tu nombre y número de empleado.");
-    return;
-  }
 
-  abrirFormulario(
-    nombre,
-    numero,
-    "APOYO",
-    document.getElementById("servicioOrigen").textContent
-  );
+    const nombre =
+        document.getElementById(
+            "nombreApoyo"
+        ).value.trim();
+
+
+    const numero =
+        document.getElementById(
+            "numeroApoyo"
+        ).value.trim();
+
+
+
+    if (
+        nombre === "" ||
+        numero === ""
+    ) {
+
+
+        alert(
+            "Escribe tu nombre y número de empleado."
+        );
+
+
+        return;
+
+    }
+
+
+
+    const empleado =
+        empleados.find(
+            function(persona) {
+
+                return (
+                    String(
+                        persona.numero
+                    ).trim() ===
+                    numero
+                );
+
+            }
+        );
+
+
+
+    let servicioOrigen = "";
+
+
+
+    if (
+        empleado
+    ) {
+
+        servicioOrigen =
+            empleado.servicio;
+
+    }
+
+
+
+    abrirFormulario(
+
+        nombre,
+
+        numero,
+
+        "APOYO",
+
+        servicioOrigen
+
+    );
+
 }
+
 
 
 /* ============================================================
@@ -1599,10 +1665,6 @@ function abrirFormulario(
         personalServicio[0].servicio;
 
 
-
-    /*
-       Construir URL
-    */
 
     const url =
 
@@ -1648,10 +1710,6 @@ function abrirFormulario(
     );
 
 
-
-    /*
-       Abrir formulario
-    */
 
     window.location.href =
         url;
