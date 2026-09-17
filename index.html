@@ -334,102 +334,252 @@ function analizarCSV(texto) {
    CARGAR BASE_QR
    ============================================================ */
 
-async function cargarBaseQR() {
+function cargarBaseQR() {
 
-    try {
+    document.getElementById("servicioTexto").textContent =
+        "Cargando personal...";
 
-        document.getElementById("servicioTexto").textContent =
-            "Cargando personal...";
+    const callbackName =
+        "recibirBaseQR_" + Date.now();
 
-        const url =
-            "https://docs.google.com/spreadsheets/d/e/" +
-            "2PACX-1vSde0lhh-i84we-Q36h-rW1VWSV9IcKkZyKJoPkaV7Uvst0_MGL9D7MXsR2SF6n4gqBVtC0_aqga82_" +
-            "/gviz/tq?tqx=out:json&gid=1356101945";
+    window[callbackName] = function(datos) {
 
-        const respuesta = await fetch(url);
+        try {
 
-        if (!respuesta.ok) {
-            throw new Error("No se pudo consultar Google Sheets.");
-        }
+            console.log("Respuesta recibida de Google Sheets:", datos);
 
-        const texto = await respuesta.text();
+            if (
+                !datos ||
+                !datos.table ||
+                !datos.table.cols ||
+                !datos.table.rows
+            ) {
+                throw new Error(
+                    "Google Sheets no devolvió la información esperada."
+                );
+            }
 
-        /*
-         * Google devuelve:
-         * google.visualization.Query.setResponse({...});
-         *
-         * Quitamos esa envoltura para obtener el JSON.
-         */
-
-        const inicio = texto.indexOf("{");
-        const fin = texto.lastIndexOf("}");
-
-        if (inicio === -1 || fin === -1) {
-            throw new Error("Respuesta inválida de Google Sheets.");
-        }
-
-        const datos = JSON.parse(
-            texto.substring(inicio, fin + 1)
-        );
-
-        if (
-            !datos.table ||
-            !datos.table.cols ||
-            !datos.table.rows
-        ) {
-            throw new Error("No se encontró la información de BASE_QR.");
-        }
-
-        const encabezados =
-            datos.table.cols.map(function(columna) {
-
-                return (columna.label || "").trim();
-
-            });
-
-
-        const indiceNombre =
-            encabezados.indexOf("Nombre");
-
-        const indiceNumero =
-            encabezados.indexOf("No. empleado");
-
-        const indiceServicio =
-            encabezados.indexOf("Servicio");
-
-        const indiceCodigo =
-            encabezados.indexOf("Código servicio");
-
-        const indiceCoordenadas =
-            encabezados.indexOf("Coordenadas");
-
-        const indiceRango =
-            encabezados.indexOf("Rango");
-
-        const indiceEstatus =
-            encabezados.indexOf("Estatus");
-
-
-        if (
-            indiceNombre === -1 ||
-            indiceNumero === -1 ||
-            indiceServicio === -1 ||
-            indiceCodigo === -1 ||
-            indiceCoordenadas === -1 ||
-            indiceRango === -1 ||
-            indiceEstatus === -1
-        ) {
+            const encabezados =
+                datos.table.cols.map(function(columna) {
+                    return (columna.label || "").trim();
+                });
 
             console.log(
                 "Encabezados encontrados:",
                 encabezados
             );
 
-            throw new Error(
-                "Los encabezados de BASE_QR no coinciden."
+            const indiceNombre =
+                encabezados.indexOf("Nombre");
+
+            const indiceNumero =
+                encabezados.indexOf("No. empleado");
+
+            const indiceServicio =
+                encabezados.indexOf("Servicio");
+
+            const indiceCodigo =
+                encabezados.indexOf("Código servicio");
+
+            const indiceCoordenadas =
+                encabezados.indexOf("Coordenadas");
+
+            const indiceRango =
+                encabezados.indexOf("Rango");
+
+            const indiceEstatus =
+                encabezados.indexOf("Estatus");
+
+            if (
+                indiceNombre === -1 ||
+                indiceNumero === -1 ||
+                indiceServicio === -1 ||
+                indiceCodigo === -1 ||
+                indiceCoordenadas === -1 ||
+                indiceRango === -1 ||
+                indiceEstatus === -1
+            ) {
+
+                throw new Error(
+                    "Los encabezados de BASE_QR no coinciden."
+                );
+            }
+
+            empleados =
+                datos.table.rows
+                .map(function(fila) {
+
+                    const columnas =
+                        fila.c.map(function(celda) {
+
+                            if (
+                                celda &&
+                                celda.v !== undefined
+                            ) {
+                                return String(celda.v).trim();
+                            }
+
+                            return "";
+                        });
+
+                    const coordenadasTexto =
+                        columnas[indiceCoordenadas];
+
+                    const coordenadas =
+                        coordenadasTexto.split(/\s*,\s*/);
+
+                    return {
+
+                        nombre:
+                            columnas[indiceNombre],
+
+                        numero:
+                            columnas[indiceNumero],
+
+                        servicio:
+                            columnas[indiceServicio],
+
+                        codigoServicio:
+                            columnas[indiceCodigo]
+                            .toUpperCase(),
+
+                        lat:
+                            parseFloat(coordenadas[0]),
+
+                        lon:
+                            parseFloat(coordenadas[1]),
+
+                        rango:
+                            parseFloat(
+                                columnas[indiceRango]
+                            ),
+
+                        estatus:
+                            columnas[indiceEstatus]
+                            .toUpperCase()
+
+                    };
+
+                })
+                .filter(function(empleado) {
+
+                    return (
+
+                        empleado.estatus === "ACTIVO" &&
+
+                        !isNaN(empleado.lat) &&
+
+                        !isNaN(empleado.lon) &&
+
+                        !isNaN(empleado.rango)
+
+                    );
+
+                });
+
+            console.log(
+                "Empleados cargados:",
+                empleados
             );
 
+            if (empleados.length === 0) {
+
+                throw new Error(
+                    "No existen empleados ACTIVO en BASE_QR."
+                );
+
+            }
+
+            // Continuar con el sistema
+            iniciarSistema();
+
         }
+
+        catch(error) {
+
+            console.error(
+                "Error procesando BASE_QR:",
+                error
+            );
+
+            document.getElementById(
+                "servicioTexto"
+            ).textContent =
+                "Error al cargar la base";
+
+            document.getElementById(
+                "mensaje"
+            ).textContent =
+                "La información de BASE_QR no tiene el formato esperado.";
+
+        }
+
+        // Limpiar callback
+        delete window[callbackName];
+
+        const script =
+            document.getElementById(
+                "scriptBaseQR"
+            );
+
+        if (script) {
+            script.remove();
+        }
+
+    };
+
+    const url =
+        "https://docs.google.com/spreadsheets/d/e/" +
+        "2PACX-1vSde0lhh-i84we-Q36h-rW1VWSV9IcKkZyKJoPkaV7Uvst0_MGL9D7MXsR2SF6n4gqBVtC0_aqga82_" +
+        "/gviz/tq" +
+        "?gid=1356101945" +
+        "&tqx=out:json" +
+        "&tqx=responseHandler:" + callbackName;
+
+    console.log(
+        "Consultando BASE_QR..."
+    );
+
+    console.log(
+        "URL:",
+        url
+    );
+
+    const script =
+        document.createElement("script");
+
+    script.id =
+        "scriptBaseQR";
+
+    script.src =
+        url;
+
+    script.onerror =
+        function() {
+
+            console.error(
+                "No se pudo cargar BASE_QR."
+            );
+
+            document.getElementById(
+                "servicioTexto"
+            ).textContent =
+                "Error al cargar la base";
+
+            document.getElementById(
+                "mensaje"
+            ).textContent =
+                "No se pudo consultar BASE_QR. Verifica que la hoja esté publicada en la web.";
+
+            delete window[callbackName];
+
+            script.remove();
+
+        };
+
+    document.body.appendChild(script);
+
+}
 
 
         empleados =
