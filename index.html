@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -31,14 +32,14 @@
       margin-top: 0;
     }
 
-    .empleado {
+    .servicio {
       margin: 25px 0;
       padding: 15px;
       background: #eef3f8;
       border-radius: 10px;
     }
 
-    .empleado strong {
+    .servicio strong {
       font-size: 20px;
     }
 
@@ -72,11 +73,23 @@
   <h1>CONTROL DE ASISTENCIA</h1>
   <h2>TCR</h2>
 
-  <div class="empleado">
-    <div>EMPLEADO</div>
-    <strong id="nombre">Cargando...</strong>
+  <div class="servicio">
+
+    <div>SERVICIO</div>
+
+    <strong id="nombreServicio">
+      TCR
+    </strong>
+
     <br><br>
-    <div>NÚMERO: <strong id="numero">---</strong></div>
+
+    <div>
+      RADIO PERMITIDO:
+      <strong id="rango">
+        100 metros
+      </strong>
+    </div>
+
   </div>
 
   <div id="estado">
@@ -87,11 +100,13 @@
 
   <br>
 
-  <a id="formulario"
-     class="boton"
-     href="#"
-     style="display:none;">
-     CONTINUAR AL REGISTRO
+  <a
+    id="formulario"
+    class="boton"
+    href="#"
+    style="display:none;"
+  >
+    CONTINUAR AL REGISTRO
   </a>
 
 </div>
@@ -99,47 +114,71 @@
 
 <script>
 
-const LAT_TCR = 19.025274494954676;
-const LON_TCR = -98.26069346300481;
-const RANGO = 100;
+/* =====================================================
+   SERVICIO TCR
+   ===================================================== */
+
+const SERVICIO = {
+  nombre: "TCR",
+  lat: 19.025274494954676,
+  lon: -98.26069346300481,
+  rango: 100
+};
 
 
-/* =========================
-   LEER DATOS DEL QR
-========================= */
+/* =====================================================
+   ELEMENTOS DE PANTALLA
+   ===================================================== */
 
-const parametros = new URLSearchParams(window.location.search);
+const nombreServicio =
+  document.getElementById("nombreServicio");
 
-const numeroEmpleado = parametros.get("empleado");
-const nombreEmpleado = parametros.get("nombre");
+const rango =
+  document.getElementById("rango");
+
+const estado =
+  document.getElementById("estado");
+
+const resultado =
+  document.getElementById("resultado");
+
+const formulario =
+  document.getElementById("formulario");
 
 
-/* =========================
-   MOSTRAR EMPLEADO
-========================= */
+nombreServicio.textContent =
+  SERVICIO.nombre;
 
-document.getElementById("numero").textContent =
-  numeroEmpleado || "NO IDENTIFICADO";
-
-document.getElementById("nombre").textContent =
-  nombreEmpleado || "EMPLEADO NO IDENTIFICADO";
+rango.textContent =
+  SERVICIO.rango + " metros";
 
 
-/* =========================
+/* =====================================================
    CALCULAR DISTANCIA
-========================= */
+   ===================================================== */
 
-function distanciaMetros(lat1, lon1, lat2, lon2) {
+function distanciaMetros(
+  lat1,
+  lon1,
+  lat2,
+  lon2
+) {
 
   const R = 6371000;
 
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const dLat =
+    (lat2 - lat1) * Math.PI / 180;
+
+  const dLon =
+    (lon2 - lon1) * Math.PI / 180;
 
   const a =
     Math.sin(dLat / 2) ** 2 +
+
     Math.cos(lat1 * Math.PI / 180) *
+
     Math.cos(lat2 * Math.PI / 180) *
+
     Math.sin(dLon / 2) ** 2;
 
   const c =
@@ -152,23 +191,22 @@ function distanciaMetros(lat1, lon1, lat2, lon2) {
 }
 
 
-/* =========================
-   OBTENER GPS
-========================= */
+/* =====================================================
+   OBTENER UBICACIÓN
+   ===================================================== */
 
 function obtenerUbicacion() {
-
-  const estado = document.getElementById("estado");
-  const resultado = document.getElementById("resultado");
-  const formulario = document.getElementById("formulario");
-
 
   if (!navigator.geolocation) {
 
     estado.innerHTML =
       "⚠️ Este navegador no permite obtener ubicación.";
 
-    formulario.style.display = "inline-block";
+    resultado.innerHTML =
+      "No es posible validar la ubicación.";
+
+    formulario.style.display =
+      "none";
 
     return;
   }
@@ -178,18 +216,25 @@ function obtenerUbicacion() {
 
     function(position) {
 
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
+      const lat =
+        position.coords.latitude;
 
-      const precision = position.coords.accuracy;
+      const lon =
+        position.coords.longitude;
+
+      const precision =
+        position.coords.accuracy;
 
 
-      const distancia = distanciaMetros(
-        lat,
-        lon,
-        LAT_TCR,
-        LON_TCR
-      );
+      /* Calcular distancia */
+
+      const distancia =
+        distanciaMetros(
+          lat,
+          lon,
+          SERVICIO.lat,
+          SERVICIO.lon
+        );
 
 
       const distanciaRedondeada =
@@ -200,40 +245,81 @@ function obtenerUbicacion() {
         "📍 Ubicación obtenida";
 
 
-      if (distancia <= RANGO) {
+      /* =================================================
+         DENTRO DEL RANGO
+         ================================================= */
+
+      if (distancia <= SERVICIO.rango) {
 
         resultado.innerHTML =
+
           "✅ <strong>DENTRO DEL RANGO</strong><br>" +
+
           "Distancia aproximada: " +
+
           distanciaRedondeada +
+
           " metros<br>" +
+
           "Precisión GPS: ±" +
+
           Math.round(precision) +
+
           " metros";
 
-      } else {
 
-        resultado.innerHTML =
-          "⚠️ <strong>FUERA DEL RANGO</strong><br>" +
-          "Distancia aproximada: " +
-          distanciaRedondeada +
-          " metros<br>" +
-          "Precisión GPS: ±" +
-          Math.round(precision) +
-          " metros";
+        formulario.style.display =
+          "inline-block";
+
       }
 
 
-      /*
-       IMPORTANTE:
-       NO bloqueamos el registro.
-      */
+      /* =================================================
+         FUERA DEL RANGO
+         ================================================= */
 
-      formulario.style.display =
-        "inline-block";
+      else {
+
+        resultado.innerHTML =
+
+          "⚠️ <strong>FUERA DEL RANGO</strong><br>" +
+
+          "Distancia aproximada: " +
+
+          distanciaRedondeada +
+
+          " metros<br>" +
+
+          "Radio permitido: " +
+
+          SERVICIO.rango +
+
+          " metros<br>" +
+
+          "Precisión GPS: ±" +
+
+          Math.round(precision) +
+
+          " metros";
+
+
+        /*
+         * DURANTE EL PILOTO:
+         * dejamos continuar aunque esté fuera
+         * para poder comprobar el funcionamiento.
+         */
+
+        formulario.style.display =
+          "inline-block";
+
+      }
 
     },
 
+
+    /* =================================================
+       ERROR DE UBICACIÓN
+       ================================================= */
 
     function(error) {
 
@@ -241,10 +327,10 @@ function obtenerUbicacion() {
         "⚠️ No se pudo obtener la ubicación.";
 
       resultado.innerHTML =
-        "Puedes continuar con el registro.";
+        "Activa la ubicación del teléfono y vuelve a intentarlo.";
 
       formulario.style.display =
-        "inline-block";
+        "none";
 
     },
 
@@ -256,31 +342,30 @@ function obtenerUbicacion() {
     }
 
   );
+
 }
 
 
-/* =========================
-   INICIAR
-========================= */
-
-obtenerUbicacion();
-
-
-/* =========================
-   FORMULARIO
-========================= */
-
-const formulario =
-  document.getElementById("formulario");
-
+/* =====================================================
+   GOOGLE FORMS
+   ===================================================== */
 
 const urlFormulario =
   "https://docs.google.com/forms/d/e/1FAIpQLSeKDOEdUlS75ivHlBWG4qVo-PdaL8KLWBa3GM9IYbX6I6ptnQ/viewform?usp=dialog";
 
 
-formulario.href = urlFormulario;
+formulario.href =
+  urlFormulario;
+
+
+/* =====================================================
+   INICIAR VALIDACIÓN
+   ===================================================== */
+
+obtenerUbicacion();
 
 </script>
 
 </body>
 </html>
+```
