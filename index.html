@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Registro TCR</title>
+  <title>Registro de Personal</title>
 
   <style>
     * {
@@ -24,28 +24,31 @@
 
     .contenedor {
       width: 100%;
-      max-width: 420px;
+      max-width: 430px;
       background: white;
       border-radius: 18px;
       padding: 30px 25px;
       box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+
+    .encabezado {
       text-align: center;
     }
 
-    .logo {
+    .icono {
       font-size: 42px;
       margin-bottom: 10px;
     }
 
     h1 {
       margin: 0;
-      font-size: 28px;
+      font-size: 27px;
       color: #222;
     }
 
     .servicio {
       margin-top: 8px;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: bold;
       color: #555;
     }
@@ -54,19 +57,10 @@
       margin-top: 25px;
       padding: 18px;
       border-radius: 12px;
-      background: #f1f3f5;
+      text-align: center;
       font-size: 16px;
       line-height: 1.5;
-    }
-
-    .distancia {
-      margin-top: 15px;
-      font-size: 15px;
-      color: #555;
-    }
-
-    .cargando {
-      font-weight: bold;
+      background: #f1f3f5;
     }
 
     .correcto {
@@ -84,21 +78,60 @@
       color: #e65100;
     }
 
-    .boton {
-      display: inline-block;
+    .seleccion {
       margin-top: 20px;
-      padding: 14px 25px;
-      border-radius: 10px;
-      background: #555;
-      color: white;
-      text-decoration: none;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
       font-weight: bold;
+      color: #333;
+    }
+
+    select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ccc;
+      border-radius: 9px;
+      font-size: 16px;
+      background: white;
+    }
+
+    .boton {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #333;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .boton:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+
+    .distancia {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 14px;
+      color: #666;
     }
 
     .pie {
       margin-top: 25px;
+      text-align: center;
       font-size: 12px;
       color: #888;
+    }
+
+    #registro {
+      display: none;
     }
   </style>
 </head>
@@ -107,22 +140,82 @@
 
   <div class="contenedor">
 
-    <div class="logo">📍</div>
+    <div class="encabezado">
 
-    <h1>Registro de Personal</h1>
+      <div class="icono">📍</div>
 
-    <div class="servicio">
-      Servicio: TCR
+      <h1>Registro de Personal</h1>
+
+      <div id="nombreServicio" class="servicio">
+        Verificando servicio...
+      </div>
+
     </div>
 
-    <div id="estado" class="estado cargando">
+
+    <!-- ============================= -->
+    <!-- ESTADO GPS -->
+    <!-- ============================= -->
+
+    <div id="estado" class="estado">
       📡 Verificando ubicación...
     </div>
 
     <div id="distancia" class="distancia"></div>
 
+
+    <!-- ============================= -->
+    <!-- SELECCIÓN DE PERSONAL -->
+    <!-- ============================= -->
+
+    <div id="registro">
+
+      <div class="seleccion">
+
+        <label for="nombre">
+          Nombre
+        </label>
+
+        <select id="nombre">
+          <option value="">
+            Selecciona tu nombre
+          </option>
+        </select>
+
+      </div>
+
+
+      <div class="seleccion">
+
+        <label for="numero">
+          Número de empleado
+        </label>
+
+        <select id="numero">
+
+          <option value="">
+            Selecciona tu número
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <button
+        id="continuar"
+        class="boton"
+        disabled
+        onclick="irAForms()"
+      >
+        CONTINUAR
+      </button>
+
+    </div>
+
+
     <div class="pie">
-      La ubicación debe estar dentro del área autorizada para continuar.
+      Registro sujeto a validación de ubicación.
     </div>
 
   </div>
@@ -130,67 +223,221 @@
 
   <script>
 
-    // ==========================================
-    // CONFIGURACIÓN DEL SERVICIO TCR
-    // ==========================================
+    // =====================================================
+    // BASE DE DATOS DE PRUEBA
+    // =====================================================
 
-    const SERVICIO = "TCR";
+    const empleados = [
 
-    // Coordenadas del servicio TCR
-    const LATITUD_TCR = 19.025274494954676;
-    const LONGITUD_TCR = -98.26069346300481;
+      {
+        nombre: "ZAFRA ZAPATA FABIOLA",
+        numero: "2911",
+        servicio: "ID-00000 - TCR",
+        latitud: 19.025264352182592,
+        longitud: -98.26070419184016,
+        rango: 100
+      },
 
-    // Radio permitido en metros
-    const RADIO_PERMITIDO = 100;
+      {
+        nombre: "LINOS AMADOR BEATRIZ",
+        numero: "2842",
+        servicio: "ID-00000 - TCR",
+        latitud: 19.025264352182592,
+        longitud: -98.26070419184016,
+        rango: 100
+      },
+
+      {
+        nombre: "RIVERA AGUILAR CAROLINA",
+        numero: "2923",
+        servicio: "ID-00000 - TCR",
+        latitud: 19.025264352182592,
+        longitud: -98.26070419184016,
+        rango: 100
+      },
+
+      {
+        nombre: "ROBLES TORRES VICTOR",
+        numero: "1925",
+        servicio: "ID-00167 - OFICINAS CENTRALES",
+        latitud: 19.04531982190356,
+        longitud: -98.2050086979645,
+        rango: 100
+      }
+
+    ];
 
 
-    // ==========================================
-    // FORMS ACTUAL - TCR PRELLENADO
-    // ==========================================
+    // =====================================================
+    // FORMS
+    // =====================================================
 
-    const FORMS_URL =
-      "https://docs.google.com/forms/d/e/1FAIpQLSeKDOEdUlS75ivHlBWG4qVo-PdaL8KLWBa3GM9IYbX6I6ptnQ/viewform?usp=pp_url&entry.1973773208=ID-00000+-+TCR";
-
-
-    // ==========================================
-    // ELEMENTOS DE LA PÁGINA
-    // ==========================================
-
-    const estado = document.getElementById("estado");
-    const distanciaElemento = document.getElementById("distancia");
+    const FORMS_BASE =
+      "https://docs.google.com/forms/d/e/1FAIpQLSeKDOEdUlS75ivHlBWG4qVo-PdaL8KLWBa3GM9IYbX6I6ptnQ/viewform";
 
 
-    // ==========================================
-    // CÁLCULO DE DISTANCIA
-    // ==========================================
+    // =====================================================
+    // OBTENER SERVICIO DEL QR
+    // =====================================================
 
-    function calcularDistancia(lat1, lon1, lat2, lon2) {
+    const parametros = new URLSearchParams(
+      window.location.search
+    );
+
+    const servicioQR = parametros.get("servicio");
+
+
+    // =====================================================
+    // ELEMENTOS
+    // =====================================================
+
+    const nombreServicio =
+      document.getElementById("nombreServicio");
+
+    const estado =
+      document.getElementById("estado");
+
+    const distanciaElemento =
+      document.getElementById("distancia");
+
+    const registro =
+      document.getElementById("registro");
+
+    const nombreSelect =
+      document.getElementById("nombre");
+
+    const numeroSelect =
+      document.getElementById("numero");
+
+    const botonContinuar =
+      document.getElementById("continuar");
+
+
+    let servicioActual = null;
+    let empleadosServicio = [];
+
+
+    // =====================================================
+    // BUSCAR SERVICIO
+    // =====================================================
+
+    function buscarServicio() {
+
+      if (!servicioQR) {
+
+        mostrarError(
+          "Este QR no tiene un servicio identificado."
+        );
+
+        return;
+      }
+
+
+      if (servicioQR === "TCR") {
+
+        empleadosServicio =
+          empleados.filter(
+            empleado =>
+              empleado.servicio === "ID-00000 - TCR"
+          );
+
+        servicioActual =
+          empleadosServicio[0];
+
+        nombreServicio.innerHTML =
+          "Servicio: ID-00000 - TCR";
+
+      }
+
+
+      else if (servicioQR === "CENTRAL") {
+
+        empleadosServicio =
+          empleados.filter(
+            empleado =>
+              empleado.servicio ===
+              "ID-00167 - OFICINAS CENTRALES"
+          );
+
+        servicioActual =
+          empleadosServicio[0];
+
+        nombreServicio.innerHTML =
+          "Servicio: ID-00167 - OFICINAS CENTRALES";
+
+      }
+
+
+      else {
+
+        mostrarError(
+          "El servicio de este QR no está configurado."
+        );
+
+        return;
+      }
+
+
+      if (!servicioActual) {
+
+        mostrarError(
+          "No hay personal configurado para este servicio."
+        );
+
+        return;
+      }
+
+
+      verificarUbicacion();
+    }
+
+
+    // =====================================================
+    // DISTANCIA
+    // =====================================================
+
+    function calcularDistancia(
+      lat1,
+      lon1,
+      lat2,
+      lon2
+    ) {
 
       const R = 6371000;
 
-      const rad = Math.PI / 180;
+      const rad =
+        Math.PI / 180;
 
-      const diferenciaLatitud = (lat2 - lat1) * rad;
-      const diferenciaLongitud = (lon2 - lon1) * rad;
+      const dLat =
+        (lat2 - lat1) * rad;
+
+      const dLon =
+        (lon2 - lon1) * rad;
 
       const a =
-        Math.sin(diferenciaLatitud / 2) *
-        Math.sin(diferenciaLatitud / 2) +
+        Math.sin(dLat / 2) *
+        Math.sin(dLat / 2) +
+
         Math.cos(lat1 * rad) *
         Math.cos(lat2 * rad) *
-        Math.sin(diferenciaLongitud / 2) *
-        Math.sin(diferenciaLongitud / 2);
+
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
 
       const c =
-        2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        2 *
+        Math.atan2(
+          Math.sqrt(a),
+          Math.sqrt(1 - a)
+        );
 
       return R * c;
     }
 
 
-    // ==========================================
-    // OBTENER UBICACIÓN
-    // ==========================================
+    // =====================================================
+    // GPS
+    // =====================================================
 
     function verificarUbicacion() {
 
@@ -208,18 +455,23 @@
 
         function(position) {
 
-          const latitud = position.coords.latitude;
-          const longitud = position.coords.longitude;
-          const precision = position.coords.accuracy;
+          const latitud =
+            position.coords.latitude;
+
+          const longitud =
+            position.coords.longitude;
 
 
-          // Calcular distancia hasta TCR
-          const distancia = calcularDistancia(
-            latitud,
-            longitud,
-            LATITUD_TCR,
-            LONGITUD_TCR
-          );
+          const distancia =
+            calcularDistancia(
+
+              latitud,
+              longitud,
+
+              servicioActual.latitud,
+              servicioActual.longitud
+
+            );
 
 
           distanciaElemento.innerHTML =
@@ -228,43 +480,31 @@
             " metros</strong>";
 
 
-          // ==========================================
-          // VALIDACIÓN DEL RADIO
-          // ==========================================
+          if (
+            distancia <=
+            servicioActual.rango
+          ) {
 
-          if (distancia <= RADIO_PERMITIDO) {
-
-            estado.className = "estado correcto";
+            estado.className =
+              "estado correcto";
 
             estado.innerHTML =
               "✅ <strong>Ubicación validada</strong><br>" +
-              "Se encuentra dentro del área autorizada.<br>" +
-              "<small>Abriendo registro...</small>";
+              "Estás dentro del área autorizada.";
 
 
-            // Pequeño retraso para que el usuario
-            // pueda ver que la validación fue correcta.
+            cargarEmpleados();
 
-            setTimeout(function() {
+          }
 
-              window.location.href = FORMS_URL;
+          else {
 
-            }, 1000);
-
-
-          } else {
-
-            estado.className = "estado incorrecto";
+            estado.className =
+              "estado incorrecto";
 
             estado.innerHTML =
               "❌ <strong>Fuera del área autorizada</strong><br>" +
-              "No es posible realizar el registro desde esta ubicación.";
-
-
-            distanciaElemento.innerHTML +=
-              "<br><strong>Radio permitido: " +
-              RADIO_PERMITIDO +
-              " metros</strong>";
+              "No es posible realizar el registro.";
 
           }
 
@@ -273,33 +513,30 @@
 
         function(error) {
 
-          let mensaje = "";
+          let mensaje;
 
           switch(error.code) {
 
             case error.PERMISSION_DENIED:
 
               mensaje =
-                "Debes permitir el acceso a la ubicación para continuar.";
+                "Debes permitir el acceso a la ubicación.";
 
               break;
-
 
             case error.POSITION_UNAVAILABLE:
 
               mensaje =
-                "No fue posible obtener tu ubicación. Verifica el GPS.";
+                "No fue posible obtener tu ubicación.";
 
               break;
-
 
             case error.TIMEOUT:
 
               mensaje =
-                "La ubicación tardó demasiado en responder. Intenta nuevamente.";
+                "La ubicación tardó demasiado.";
 
               break;
-
 
             default:
 
@@ -307,7 +544,6 @@
                 "Ocurrió un error al obtener la ubicación.";
 
           }
-
 
           mostrarError(mensaje);
 
@@ -325,26 +561,150 @@
     }
 
 
-    // ==========================================
-    // MOSTRAR ERROR
-    // ==========================================
+    // =====================================================
+    // MOSTRAR PERSONAL
+    // =====================================================
+
+    function cargarEmpleados() {
+
+      registro.style.display =
+        "block";
+
+
+      empleadosServicio.forEach(
+        empleado => {
+
+          const opcionNombre =
+            document.createElement("option");
+
+          opcionNombre.value =
+            empleado.nombre;
+
+          opcionNombre.textContent =
+            empleado.nombre;
+
+          nombreSelect.appendChild(
+            opcionNombre
+          );
+
+
+          const opcionNumero =
+            document.createElement("option");
+
+          opcionNumero.value =
+            empleado.numero;
+
+          opcionNumero.textContent =
+            empleado.numero;
+
+          numeroSelect.appendChild(
+            opcionNumero
+          );
+
+        }
+      );
+
+    }
+
+
+    // =====================================================
+    // VALIDAR SELECCIÓN
+    // =====================================================
+
+    nombreSelect.addEventListener(
+      "change",
+      validarFormulario
+    );
+
+    numeroSelect.addEventListener(
+      "change",
+      validarFormulario
+    );
+
+
+    function validarFormulario() {
+
+      if (
+        nombreSelect.value !== "" &&
+        numeroSelect.value !== ""
+      ) {
+
+        botonContinuar.disabled =
+          false;
+
+      }
+
+      else {
+
+        botonContinuar.disabled =
+          true;
+
+      }
+
+    }
+
+
+    // =====================================================
+    // IR AL FORMS
+    // =====================================================
+
+    function irAForms() {
+
+      const nombre =
+        encodeURIComponent(
+          nombreSelect.value
+        );
+
+      const numero =
+        encodeURIComponent(
+          numeroSelect.value
+        );
+
+
+      let servicio =
+        encodeURIComponent(
+          servicioActual.servicio
+        );
+
+
+      const url =
+        FORMS_BASE +
+        "?usp=pp_url" +
+        "&entry.1973773208=" +
+        servicio +
+        "&entry.612785713=" +
+        nombre +
+        "&entry.2013854503=" +
+        numero;
+
+
+      window.location.href =
+        url;
+
+    }
+
+
+    // =====================================================
+    // ERROR
+    // =====================================================
 
     function mostrarError(mensaje) {
 
-      estado.className = "estado error";
+      estado.className =
+        "estado error";
 
       estado.innerHTML =
-        "⚠️ <strong>No se pudo validar la ubicación</strong><br><br>" +
+        "⚠️ <strong>Error</strong><br><br>" +
         mensaje;
 
     }
 
 
-    // ==========================================
-    // INICIAR VALIDACIÓN
-    // ==========================================
+    // =====================================================
+    // INICIAR
+    // =====================================================
 
-    verificarUbicacion();
+    buscarServicio();
 
   </script>
 
