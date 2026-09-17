@@ -1161,7 +1161,13 @@ function validarGPS() {
                     "Ubicación validada correctamente.";
 
 
-           document.getElementById("seleccionTipo").style.display = "block";
+          const tipoRegistro =
+    document.getElementById("seleccionTipo");
+
+tipoRegistro.classList.remove("oculto");
+tipoRegistro.style.display = "block";
+tipoRegistro.style.visibility = "visible";
+tipoRegistro.style.opacity = "1";
 
 
             }
