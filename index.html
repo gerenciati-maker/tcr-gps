@@ -219,87 +219,84 @@
    BASE DE PERSONAL - PROTOTIPO
    ============================================================ */
 
-const empleados = [
+const empleados = 
+    /* ============================================================
+   BASE DE PERSONAL - GOOGLE SHEETS
+   ============================================================ */
 
-    {
-        nombre: "ZAFRA ZAPATA FABIOLA",
-        numero: "2911",
-        servicio: "ID-00000 - TCR",
-        codigoServicio: "TCR",
-        lat: 19.025264352182592,
-        lon: -98.26070419184016,
-        rango: 100
-    },
+const URL_BASE_QR =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vSde0lhh-i84we-Q36h-rW1VWSV9IcKkZyKJoPkaV7Uvst0_MGL9D7MXsR2SF6n4gqBVtC0_aqga82_/pub?gid=1356101945&single=true&output=csv";
 
-    {
-        nombre: "LINOS AMADOR BEATRIZ",
-        numero: "2842",
-        servicio: "ID-00000 - TCR",
-        codigoServicio: "TCR",
-        lat: 19.025264352182592,
-        lon: -98.26070419184016,
-        rango: 100
-    },
+let empleados = [];
 
-    {
-        nombre: "RIVERA AGUILAR CAROLINA",
-        numero: "2923",
-        servicio: "ID-00000 - TCR",
-        codigoServicio: "TCR",
-        lat: 19.025264352182592,
-        lon: -98.26070419184016,
-        rango: 100
-    },
 
-    {
-        nombre: "ROBLES TORRES VICTOR",
-        numero: "1925",
-        servicio: "ID-00167 - OFICINAS CENTRALES",
-        codigoServicio: "CENTRAL",
-        lat: 19.04531982190356,
-        lon: -98.2050086979645,
-        rango: 100
+/* ============================================================
+   INICIAR SISTEMA DESPUÉS DE CARGAR BASE_QR
+   ============================================================ */
+
+let codigoServicio = "";
+let personalServicio = [];
+
+
+function iniciarSistema() {
+
+    const parametros =
+        new URLSearchParams(window.location.search);
+
+    codigoServicio =
+        parametros.get("servicio");
+
+
+    /* ========================================================
+       OBTENER PERSONAL DEL SERVICIO
+       ======================================================== */
+
+    personalServicio =
+        empleados.filter(
+            empleado =>
+                empleado.codigoServicio === codigoServicio
+        );
+
+
+    /* ========================================================
+       VALIDAR QUE EL SERVICIO EXISTA
+       ======================================================== */
+
+    if (personalServicio.length === 0) {
+
+        document.getElementById("servicioTexto").textContent =
+            "Servicio no identificado";
+
+        document.getElementById("mensaje").textContent =
+            "El QR no corresponde a un servicio válido.";
+
+        return;
+
     }
 
-];
 
-
-/* ============================================================
-   IDENTIFICAR SERVICIO DEL QR
-   ============================================================ */
-
-const parametros = new URLSearchParams(window.location.search);
-
-const codigoServicio = parametros.get("servicio");
-
-
-/* ============================================================
-   OBTENER PERSONAL DEL SERVICIO
-   ============================================================ */
-
-const personalServicio = empleados.filter(
-    empleado => empleado.codigoServicio === codigoServicio
-);
-
-
-/* ============================================================
-   VALIDAR QUE EL SERVICIO EXISTA
-   ============================================================ */
-
-if (personalServicio.length === 0) {
-
-    document.getElementById("servicioTexto").textContent =
-        "Servicio no identificado";
-
-    document.getElementById("mensaje").textContent =
-        "El QR no corresponde a un servicio válido.";
-
-} else {
+    /* ========================================================
+       MOSTRAR SERVICIO
+       ======================================================== */
 
     document.getElementById("servicioTexto").textContent =
         personalServicio[0].servicio;
 
+
+    /* ========================================================
+       VALIDAR GPS
+       ======================================================== */
+
     validarGPS();
+
+}
+
+
+/* ============================================================
+   INICIAR CARGA DE BASE
+   ============================================================ */
+
+cargarBaseQR();
 
 }
 
