@@ -1,712 +1,692 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Registro de Personal</title>
+<title>Registro Torre de Control</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
+<style>
     body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
+        font-family: Arial, sans-serif;
+        background: #f4f6f8;
+        margin: 0;
+        padding: 20px;
     }
 
     .contenedor {
-      width: 100%;
-      max-width: 430px;
-      background: white;
-      border-radius: 18px;
-      padding: 30px 25px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-    }
-
-    .encabezado {
-      text-align: center;
-    }
-
-    .icono {
-      font-size: 42px;
-      margin-bottom: 10px;
+        max-width: 500px;
+        margin: auto;
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.12);
     }
 
     h1 {
-      margin: 0;
-      font-size: 27px;
-      color: #222;
+        text-align: center;
+        font-size: 24px;
+        margin-bottom: 20px;
     }
 
-    .servicio {
-      margin-top: 8px;
-      font-size: 17px;
-      font-weight: bold;
-      color: #555;
+    .dato {
+        background: #f1f3f5;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 12px;
     }
 
-    .estado {
-      margin-top: 25px;
-      padding: 18px;
-      border-radius: 12px;
-      text-align: center;
-      font-size: 16px;
-      line-height: 1.5;
-      background: #f1f3f5;
-    }
-
-    .correcto {
-      background: #e8f5e9;
-      color: #1b5e20;
-    }
-
-    .incorrecto {
-      background: #ffebee;
-      color: #b71c1c;
-    }
-
-    .error {
-      background: #fff3e0;
-      color: #e65100;
-    }
-
-    .seleccion {
-      margin-top: 20px;
+    .dato strong {
+        display: block;
+        margin-bottom: 5px;
     }
 
     label {
-      display: block;
-      margin-bottom: 7px;
-      font-weight: bold;
-      color: #333;
+        display: block;
+        font-weight: bold;
+        margin-top: 15px;
+        margin-bottom: 6px;
     }
 
     select {
-      width: 100%;
-      padding: 13px;
-      border: 1px solid #ccc;
-      border-radius: 9px;
-      font-size: 16px;
-      background: white;
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 16px;
+        background: white;
     }
 
-    .boton {
-      width: 100%;
-      margin-top: 20px;
-      padding: 14px;
-      border: none;
-      border-radius: 10px;
-      background: #333;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
+    button {
+        width: 100%;
+        margin-top: 20px;
+        padding: 14px;
+        border: none;
+        border-radius: 8px;
+        background: #198754;
+        color: white;
+        font-size: 17px;
+        font-weight: bold;
+        cursor: pointer;
     }
 
-    .boton:disabled {
-      background: #aaa;
-      cursor: not-allowed;
+    button:disabled {
+        background: #999;
+        cursor: not-allowed;
     }
 
-    .distancia {
-      margin-top: 12px;
-      text-align: center;
-      font-size: 14px;
-      color: #666;
+    .tipo {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
     }
 
-    .pie {
-      margin-top: 25px;
-      text-align: center;
-      font-size: 12px;
-      color: #888;
+    .tipo button {
+        margin-top: 0;
+        background: #6c757d;
     }
 
-    #registro {
-      display: none;
+    .tipo button:hover {
+        background: #495057;
     }
-  </style>
+
+    .mensaje {
+        text-align: center;
+        margin-top: 15px;
+        font-weight: bold;
+    }
+
+    .oculto {
+        display: none;
+    }
+
+    .origen {
+        background: #fff3cd;
+        border: 1px solid #ffe69c;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 15px;
+    }
+</style>
 </head>
 
 <body>
 
-  <div class="contenedor">
+<div class="contenedor">
 
-    <div class="encabezado">
+    <h1>Registro de Personal</h1>
 
-      <div class="icono">📍</div>
+    <div class="dato">
+        <strong>Servicio donde registra:</strong>
+        <span id="servicioTexto">Validando...</span>
+    </div>
 
-      <h1>Registro de Personal</h1>
+    <div class="dato">
+        <strong>Ubicación:</strong>
+        <span id="ubicacion">Validando GPS...</span>
+    </div>
 
-      <div id="nombreServicio" class="servicio">
-        Verificando servicio...
-      </div>
+    <!-- SECCIÓN TIPO DE REGISTRO -->
+    <div id="seleccionTipo" class="oculto">
+
+        <label>Tipo de registro:</label>
+
+        <div class="tipo">
+            <button onclick="seleccionarTipo('PERSONAL')">
+                PERSONAL DEL SERVICIO
+            </button>
+
+            <button onclick="seleccionarTipo('APOYO')">
+                APOYO
+            </button>
+        </div>
 
     </div>
 
 
-    <!-- ============================= -->
-    <!-- ESTADO GPS -->
-    <!-- ============================= -->
+    <!-- SECCIÓN PERSONAL DEL SERVICIO -->
+    <div id="seccionPersonal" class="oculto">
 
-    <div id="estado" class="estado">
-      📡 Verificando ubicación...
-    </div>
+        <div class="dato">
+            <strong>Tipo:</strong>
+            PERSONAL DEL SERVICIO
+        </div>
 
-    <div id="distancia" class="distancia"></div>
+        <label for="nombrePersonal">Nombre</label>
 
-
-    <!-- ============================= -->
-    <!-- SELECCIÓN DE PERSONAL -->
-    <!-- ============================= -->
-
-    <div id="registro">
-
-      <div class="seleccion">
-
-        <label for="nombre">
-          Nombre
-        </label>
-
-        <select id="nombre">
-          <option value="">
-            Selecciona tu nombre
-          </option>
+        <select id="nombrePersonal" onchange="actualizarNumeroPersonal()">
+            <option value="">Selecciona tu nombre</option>
         </select>
 
-      </div>
 
+        <label for="numeroPersonal">Número de empleado</label>
 
-      <div class="seleccion">
-
-        <label for="numero">
-          Número de empleado
-        </label>
-
-        <select id="numero">
-
-          <option value="">
-            Selecciona tu número
-          </option>
-
+        <select id="numeroPersonal">
+            <option value="">Selecciona tu número</option>
         </select>
 
-      </div>
 
-
-      <button
-        id="continuar"
-        class="boton"
-        disabled
-        onclick="irAForms()"
-      >
-        CONTINUAR
-      </button>
+        <button onclick="continuarPersonal()">
+            CONTINUAR
+        </button>
 
     </div>
 
 
-    <div class="pie">
-      Registro sujeto a validación de ubicación.
+    <!-- SECCIÓN APOYO -->
+    <div id="seccionApoyo" class="oculto">
+
+        <div class="dato">
+            <strong>Tipo:</strong>
+            APOYO
+        </div>
+
+        <label for="nombreApoyo">Nombre</label>
+
+        <select id="nombreApoyo" onchange="actualizarApoyo()">
+            <option value="">Selecciona tu nombre</option>
+        </select>
+
+
+        <label for="numeroApoyo">Número de empleado</label>
+
+        <select id="numeroApoyo">
+            <option value="">Selecciona tu número</option>
+        </select>
+
+
+        <div class="origen">
+            <strong>Servicio de origen:</strong>
+            <span id="servicioOrigen">-</span>
+        </div>
+
+
+        <button onclick="continuarApoyo()">
+            CONTINUAR
+        </button>
+
     </div>
 
-  </div>
+
+    <div id="mensaje" class="mensaje"></div>
+
+</div>
 
 
-  <script>
+<script>
 
-    // =====================================================
-    // BASE DE DATOS DE PRUEBA
-    // =====================================================
+/* ============================================================
+   BASE DE PERSONAL - PROTOTIPO
+   ============================================================ */
 
-    const empleados = [
+const empleados = [
 
-      {
+    {
         nombre: "ZAFRA ZAPATA FABIOLA",
         numero: "2911",
         servicio: "ID-00000 - TCR",
-        latitud: 19.025264352182592,
-        longitud: -98.26070419184016,
+        codigoServicio: "TCR",
+        lat: 19.025264352182592,
+        lon: -98.26070419184016,
         rango: 100
-      },
+    },
 
-      {
+    {
         nombre: "LINOS AMADOR BEATRIZ",
         numero: "2842",
         servicio: "ID-00000 - TCR",
-        latitud: 19.025264352182592,
-        longitud: -98.26070419184016,
+        codigoServicio: "TCR",
+        lat: 19.025264352182592,
+        lon: -98.26070419184016,
         rango: 100
-      },
+    },
 
-      {
+    {
         nombre: "RIVERA AGUILAR CAROLINA",
         numero: "2923",
         servicio: "ID-00000 - TCR",
-        latitud: 19.025264352182592,
-        longitud: -98.26070419184016,
+        codigoServicio: "TCR",
+        lat: 19.025264352182592,
+        lon: -98.26070419184016,
         rango: 100
-      },
+    },
 
-      {
+    {
         nombre: "ROBLES TORRES VICTOR",
         numero: "1925",
         servicio: "ID-00167 - OFICINAS CENTRALES",
-        latitud: 19.04531982190356,
-        longitud: -98.2050086979645,
+        codigoServicio: "CENTRAL",
+        lat: 19.04531982190356,
+        lon: -98.2050086979645,
         rango: 100
-      }
-
-    ];
-
-
-    // =====================================================
-    // FORMS
-    // =====================================================
-
-    const FORMS_BASE =
-      "https://docs.google.com/forms/d/e/1FAIpQLSeKDOEdUlS75ivHlBWG4qVo-PdaL8KLWBa3GM9IYbX6I6ptnQ/viewform";
-
-
-    // =====================================================
-    // OBTENER SERVICIO DEL QR
-    // =====================================================
-
-    const parametros = new URLSearchParams(
-      window.location.search
-    );
-
-    const servicioQR = parametros.get("servicio");
-
-
-    // =====================================================
-    // ELEMENTOS
-    // =====================================================
-
-    const nombreServicio =
-      document.getElementById("nombreServicio");
-
-    const estado =
-      document.getElementById("estado");
-
-    const distanciaElemento =
-      document.getElementById("distancia");
-
-    const registro =
-      document.getElementById("registro");
-
-    const nombreSelect =
-      document.getElementById("nombre");
-
-    const numeroSelect =
-      document.getElementById("numero");
-
-    const botonContinuar =
-      document.getElementById("continuar");
-
-
-    let servicioActual = null;
-    let empleadosServicio = [];
-
-
-    // =====================================================
-    // BUSCAR SERVICIO
-    // =====================================================
-
-    function buscarServicio() {
-
-      if (!servicioQR) {
-
-        mostrarError(
-          "Este QR no tiene un servicio identificado."
-        );
-
-        return;
-      }
-
-
-      if (servicioQR === "TCR") {
-
-        empleadosServicio =
-          empleados.filter(
-            empleado =>
-              empleado.servicio === "ID-00000 - TCR"
-          );
-
-        servicioActual =
-          empleadosServicio[0];
-
-        nombreServicio.innerHTML =
-          "Servicio: ID-00000 - TCR";
-
-      }
-
-
-      else if (servicioQR === "CENTRAL") {
-
-        empleadosServicio =
-          empleados.filter(
-            empleado =>
-              empleado.servicio ===
-              "ID-00167 - OFICINAS CENTRALES"
-          );
-
-        servicioActual =
-          empleadosServicio[0];
-
-        nombreServicio.innerHTML =
-          "Servicio: ID-00167 - OFICINAS CENTRALES";
-
-      }
-
-
-      else {
-
-        mostrarError(
-          "El servicio de este QR no está configurado."
-        );
-
-        return;
-      }
-
-
-      if (!servicioActual) {
-
-        mostrarError(
-          "No hay personal configurado para este servicio."
-        );
-
-        return;
-      }
-
-
-      verificarUbicacion();
     }
 
+];
 
-    // =====================================================
-    // DISTANCIA
-    // =====================================================
 
-    function calcularDistancia(
-      lat1,
-      lon1,
-      lat2,
-      lon2
-    ) {
+/* ============================================================
+   IDENTIFICAR SERVICIO DEL QR
+   ============================================================ */
 
-      const R = 6371000;
+const parametros = new URLSearchParams(window.location.search);
 
-      const rad =
-        Math.PI / 180;
+const codigoServicio = parametros.get("servicio");
 
-      const dLat =
-        (lat2 - lat1) * rad;
 
-      const dLon =
-        (lon2 - lon1) * rad;
+/* ============================================================
+   OBTENER PERSONAL DEL SERVICIO
+   ============================================================ */
 
-      const a =
-        Math.sin(dLat / 2) *
-        Math.sin(dLat / 2) +
+const personalServicio = empleados.filter(
+    empleado => empleado.codigoServicio === codigoServicio
+);
 
+
+/* ============================================================
+   VALIDAR QUE EL SERVICIO EXISTA
+   ============================================================ */
+
+if (personalServicio.length === 0) {
+
+    document.getElementById("servicioTexto").textContent =
+        "Servicio no identificado";
+
+    document.getElementById("mensaje").textContent =
+        "El QR no corresponde a un servicio válido.";
+
+} else {
+
+    document.getElementById("servicioTexto").textContent =
+        personalServicio[0].servicio;
+
+    validarGPS();
+
+}
+
+
+/* ============================================================
+   DISTANCIA ENTRE DOS COORDENADAS
+   ============================================================ */
+
+function calcularDistancia(lat1, lon1, lat2, lon2) {
+
+    const R = 6371000;
+
+    const rad = Math.PI / 180;
+
+    const dLat = (lat2 - lat1) * rad;
+
+    const dLon = (lon2 - lon1) * rad;
+
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
         Math.cos(lat1 * rad) *
         Math.cos(lat2 * rad) *
-
         Math.sin(dLon / 2) *
         Math.sin(dLon / 2);
 
-      const c =
-        2 *
-        Math.atan2(
-          Math.sqrt(a),
-          Math.sqrt(1 - a)
-        );
+    const c = 2 * Math.atan2(
+        Math.sqrt(a),
+        Math.sqrt(1 - a)
+    );
 
-      return R * c;
-    }
+    return R * c;
+}
 
 
-    // =====================================================
-    // GPS
-    // =====================================================
+/* ============================================================
+   VALIDACIÓN GPS
+   ============================================================ */
 
-    function verificarUbicacion() {
+function validarGPS() {
 
-      if (!navigator.geolocation) {
+    const servicio = personalServicio[0];
 
-        mostrarError(
-          "Este dispositivo no permite obtener la ubicación."
-        );
+    if (!navigator.geolocation) {
+
+        document.getElementById("mensaje").textContent =
+            "Este dispositivo no permite obtener ubicación.";
 
         return;
-      }
+    }
 
+    navigator.geolocation.getCurrentPosition(
 
-      navigator.geolocation.getCurrentPosition(
+        function(posicion) {
 
-        function(position) {
+            const latUsuario = posicion.coords.latitude;
 
-          const latitud =
-            position.coords.latitude;
+            const lonUsuario = posicion.coords.longitude;
 
-          const longitud =
-            position.coords.longitude;
-
-
-          const distancia =
-            calcularDistancia(
-
-              latitud,
-              longitud,
-
-              servicioActual.latitud,
-              servicioActual.longitud
-
+            const distancia = calcularDistancia(
+                latUsuario,
+                lonUsuario,
+                servicio.lat,
+                servicio.lon
             );
 
-
-          distanciaElemento.innerHTML =
-            "Distancia aproximada: <strong>" +
-            Math.round(distancia) +
-            " metros</strong>";
+            document.getElementById("ubicacion").textContent =
+                "Distancia: " + Math.round(distancia) + " metros";
 
 
-          if (
-            distancia <=
-            servicioActual.rango
-          ) {
+            if (distancia <= servicio.rango) {
 
-            estado.className =
-              "estado correcto";
+                document.getElementById("ubicacion").textContent =
+                    "Ubicación válida (" +
+                    Math.round(distancia) +
+                    " m)";
 
-            estado.innerHTML =
-              "✅ <strong>Ubicación validada</strong><br>" +
-              "Estás dentro del área autorizada.";
+                document.getElementById("mensaje").textContent =
+                    "Ubicación validada correctamente.";
 
+                document
+                    .getElementById("seleccionTipo")
+                    .classList.remove("oculto");
 
-            cargarEmpleados();
+            } else {
 
-          }
+                document.getElementById("ubicacion").textContent =
+                    "Fuera del rango permitido (" +
+                    Math.round(distancia) +
+                    " m)";
 
-          else {
+                document.getElementById("mensaje").textContent =
+                    "No puedes realizar el registro desde esta ubicación.";
 
-            estado.className =
-              "estado incorrecto";
-
-            estado.innerHTML =
-              "❌ <strong>Fuera del área autorizada</strong><br>" +
-              "No es posible realizar el registro.";
-
-          }
+            }
 
         },
-
 
         function(error) {
 
-          let mensaje;
+            document.getElementById("ubicacion").textContent =
+                "No fue posible obtener el GPS.";
 
-          switch(error.code) {
-
-            case error.PERMISSION_DENIED:
-
-              mensaje =
-                "Debes permitir el acceso a la ubicación.";
-
-              break;
-
-            case error.POSITION_UNAVAILABLE:
-
-              mensaje =
-                "No fue posible obtener tu ubicación.";
-
-              break;
-
-            case error.TIMEOUT:
-
-              mensaje =
-                "La ubicación tardó demasiado.";
-
-              break;
-
-            default:
-
-              mensaje =
-                "Ocurrió un error al obtener la ubicación.";
-
-          }
-
-          mostrarError(mensaje);
+            document.getElementById("mensaje").textContent =
+                "Activa la ubicación del dispositivo y vuelve a intentarlo.";
 
         },
 
-
         {
-          enableHighAccuracy: true,
-          timeout: 15000,
-          maximumAge: 0
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
         }
 
-      );
-
-    }
-
-
-    // =====================================================
-    // MOSTRAR PERSONAL
-    // =====================================================
-
-    function cargarEmpleados() {
-
-      registro.style.display =
-        "block";
-
-
-      empleadosServicio.forEach(
-        empleado => {
-
-          const opcionNombre =
-            document.createElement("option");
-
-          opcionNombre.value =
-            empleado.nombre;
-
-          opcionNombre.textContent =
-            empleado.nombre;
-
-          nombreSelect.appendChild(
-            opcionNombre
-          );
-
-
-          const opcionNumero =
-            document.createElement("option");
-
-          opcionNumero.value =
-            empleado.numero;
-
-          opcionNumero.textContent =
-            empleado.numero;
-
-          numeroSelect.appendChild(
-            opcionNumero
-          );
-
-        }
-      );
-
-    }
-
-
-    // =====================================================
-    // VALIDAR SELECCIÓN
-    // =====================================================
-
-    nombreSelect.addEventListener(
-      "change",
-      validarFormulario
     );
 
-    numeroSelect.addEventListener(
-      "change",
-      validarFormulario
-    );
+}
 
 
-    function validarFormulario() {
+/* ============================================================
+   SELECCIONAR TIPO
+   ============================================================ */
 
-      if (
-        nombreSelect.value !== "" &&
-        numeroSelect.value !== ""
-      ) {
+function seleccionarTipo(tipo) {
 
-        botonContinuar.disabled =
-          false;
+    document
+        .getElementById("seccionPersonal")
+        .classList.add("oculto");
 
-      }
+    document
+        .getElementById("seccionApoyo")
+        .classList.add("oculto");
 
-      else {
 
-        botonContinuar.disabled =
-          true;
+    if (tipo === "PERSONAL") {
 
-      }
+        cargarPersonalServicio();
+
+        document
+            .getElementById("seccionPersonal")
+            .classList.remove("oculto");
 
     }
 
 
-    // =====================================================
-    // IR AL FORMS
-    // =====================================================
+    if (tipo === "APOYO") {
 
-    function irAForms() {
+        cargarPersonalApoyo();
 
-      const nombre =
-        encodeURIComponent(
-          nombreSelect.value
-        );
+        document
+            .getElementById("seccionApoyo")
+            .classList.remove("oculto");
 
-      const numero =
-        encodeURIComponent(
-          numeroSelect.value
-        );
+    }
+
+}
 
 
-      let servicio =
-        encodeURIComponent(
-          servicioActual.servicio
-        );
+/* ============================================================
+   CARGAR PERSONAL DEL SERVICIO
+   ============================================================ */
+
+function cargarPersonalServicio() {
+
+    const nombreSelect =
+        document.getElementById("nombrePersonal");
+
+    nombreSelect.innerHTML =
+        '<option value="">Selecciona tu nombre</option>';
 
 
-      const url =
-        FORMS_BASE +
+    personalServicio.forEach(function(empleado, indice) {
+
+        const opcion = document.createElement("option");
+
+        opcion.value = indice;
+
+        opcion.textContent = empleado.nombre;
+
+        nombreSelect.appendChild(opcion);
+
+    });
+
+}
+
+
+/* ============================================================
+   ACTUALIZAR NÚMERO DE EMPLEADO
+   ============================================================ */
+
+function actualizarNumeroPersonal() {
+
+    const indice =
+        document.getElementById("nombrePersonal").value;
+
+    const numeroSelect =
+        document.getElementById("numeroPersonal");
+
+    numeroSelect.innerHTML =
+        '<option value="">Selecciona tu número</option>';
+
+
+    if (indice === "") return;
+
+
+    const empleado =
+        personalServicio[indice];
+
+
+    const opcion = document.createElement("option");
+
+    opcion.value = empleado.numero;
+
+    opcion.textContent = empleado.numero;
+
+    numeroSelect.appendChild(opcion);
+
+}
+
+
+/* ============================================================
+   CARGAR PERSONAL PARA APOYO
+   ============================================================ */
+
+function cargarPersonalApoyo() {
+
+    const nombreSelect =
+        document.getElementById("nombreApoyo");
+
+    nombreSelect.innerHTML =
+        '<option value="">Selecciona tu nombre</option>';
+
+
+    empleados.forEach(function(empleado, indice) {
+
+        const opcion = document.createElement("option");
+
+        opcion.value = indice;
+
+        opcion.textContent =
+            empleado.nombre +
+            " - " +
+            empleado.numero;
+
+        nombreSelect.appendChild(opcion);
+
+    });
+
+}
+
+
+/* ============================================================
+   ACTUALIZAR INFORMACIÓN DE APOYO
+   ============================================================ */
+
+function actualizarApoyo() {
+
+    const indice =
+        document.getElementById("nombreApoyo").value;
+
+    const numeroSelect =
+        document.getElementById("numeroApoyo");
+
+    const origen =
+        document.getElementById("servicioOrigen");
+
+
+    numeroSelect.innerHTML =
+        '<option value="">Selecciona tu número</option>';
+
+    origen.textContent = "-";
+
+
+    if (indice === "") return;
+
+
+    const empleado = empleados[indice];
+
+
+    const opcion = document.createElement("option");
+
+    opcion.value = empleado.numero;
+
+    opcion.textContent = empleado.numero;
+
+    numeroSelect.appendChild(opcion);
+
+
+    origen.textContent =
+        empleado.servicio;
+
+}
+
+
+/* ============================================================
+   CONTINUAR PERSONAL
+   ============================================================ */
+
+function continuarPersonal() {
+
+    const indice =
+        document.getElementById("nombrePersonal").value;
+
+    const numero =
+        document.getElementById("numeroPersonal").value;
+
+
+    if (indice === "" || numero === "") {
+
+        alert("Selecciona tu nombre y número de empleado.");
+
+        return;
+    }
+
+
+    const empleado =
+        personalServicio[indice];
+
+
+    abrirFormulario(
+        empleado.nombre,
+        empleado.numero
+    );
+
+}
+
+
+/* ============================================================
+   CONTINUAR APOYO
+   ============================================================ */
+
+function continuarApoyo() {
+
+    const indice =
+        document.getElementById("nombreApoyo").value;
+
+    const numero =
+        document.getElementById("numeroApoyo").value;
+
+
+    if (indice === "" || numero === "") {
+
+        alert("Selecciona tu nombre y número de empleado.");
+
+        return;
+    }
+
+
+    const empleado =
+        empleados[indice];
+
+
+    abrirFormulario(
+        empleado.nombre,
+        empleado.numero
+    );
+
+}
+
+
+/* ============================================================
+   ABRIR GOOGLE FORMS
+   ============================================================ */
+
+function abrirFormulario(nombre, numero) {
+
+    const formulario =
+        "https://docs.google.com/forms/d/e/" +
+        "1FAIpQLSeKDOEdUlS75ivHlBWG4qVo-PdaL8KLWBa3GM9IYbX6I6ptnQ" +
+        "/viewform";
+
+
+    const url =
+        formulario +
         "?usp=pp_url" +
         "&entry.1973773208=" +
-        servicio +
+        encodeURIComponent(personalServicio[0].servicio) +
         "&entry.612785713=" +
-        nombre +
+        encodeURIComponent(nombre) +
         "&entry.2013854503=" +
-        numero;
+        encodeURIComponent(numero);
 
 
-      window.location.href =
-        url;
+    window.location.href = url;
 
-    }
+}
 
-
-    // =====================================================
-    // ERROR
-    // =====================================================
-
-    function mostrarError(mensaje) {
-
-      estado.className =
-        "estado error";
-
-      estado.innerHTML =
-        "⚠️ <strong>Error</strong><br><br>" +
-        mensaje;
-
-    }
-
-
-    // =====================================================
-    // INICIAR
-    // =====================================================
-
-    buscarServicio();
-
-  </script>
+</script>
 
 </body>
 </html>
