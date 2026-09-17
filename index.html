@@ -1,295 +1,352 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Validando ubicación...</title>
+  <title>Registro TCR</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
+      margin: 0;
+      min-height: 100vh;
       font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 40px 20px;
       background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
     }
 
     .contenedor {
-      max-width: 450px;
-      margin: auto;
+      width: 100%;
+      max-width: 420px;
       background: white;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 3px 15px rgba(0,0,0,.12);
+      border-radius: 18px;
+      padding: 30px 25px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+      text-align: center;
     }
 
-    h1 {
+    .logo {
+      font-size: 42px;
       margin-bottom: 10px;
     }
 
-    #estado {
-      margin-top: 30px;
-      font-size: 20px;
-      line-height: 1.6;
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      color: #222;
     }
 
-    #resultado {
-      margin-top: 20px;
-      font-size: 17px;
-      line-height: 1.6;
+    .servicio {
+      margin-top: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    .estado {
+      margin-top: 25px;
+      padding: 18px;
+      border-radius: 12px;
+      background: #f1f3f5;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .distancia {
+      margin-top: 15px;
+      font-size: 15px;
+      color: #555;
+    }
+
+    .cargando {
+      font-weight: bold;
+    }
+
+    .correcto {
+      background: #e8f5e9;
+      color: #1b5e20;
+    }
+
+    .incorrecto {
+      background: #ffebee;
+      color: #b71c1c;
     }
 
     .error {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    .boton {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 14px 25px;
+      border-radius: 10px;
+      background: #555;
+      color: white;
+      text-decoration: none;
       font-weight: bold;
+    }
+
+    .pie {
+      margin-top: 25px;
+      font-size: 12px;
+      color: #888;
     }
   </style>
 </head>
 
 <body>
 
-<div class="contenedor">
+  <div class="contenedor">
 
-  <h1>TCR</h1>
+    <div class="logo">📍</div>
 
-  <div>
-    Validación de ubicación
+    <h1>Registro de Personal</h1>
+
+    <div class="servicio">
+      Servicio: TCR
+    </div>
+
+    <div id="estado" class="estado cargando">
+      📡 Verificando ubicación...
+    </div>
+
+    <div id="distancia" class="distancia"></div>
+
+    <div class="pie">
+      La ubicación debe estar dentro del área autorizada para continuar.
+    </div>
+
   </div>
 
-  <div id="estado">
-    📍 Obteniendo ubicación...
-  </div>
 
-  <div id="resultado"></div>
+  <script>
 
-</div>
+    // ==========================================
+    // CONFIGURACIÓN DEL SERVICIO TCR
+    // ==========================================
 
+    const SERVICIO = "TCR";
 
-<script>
+    // Coordenadas del servicio TCR
+    const LATITUD_TCR = 19.025274494954676;
+    const LONGITUD_TCR = -98.26069346300481;
 
-/* =====================================================
-   CONFIGURACIÓN DEL SERVICIO TCR
-   ===================================================== */
+    // Radio permitido en metros
+    const RADIO_PERMITIDO = 100;
 
-const SERVICIO = {
-  nombre: "TCR",
 
-  lat: 19.025274494954676,
+    // ==========================================
+    // FORMS ACTUAL - TCR PRELLENADO
+    // ==========================================
 
-  lon: -98.26069346300481,
+    const FORMS_URL =
+      "https://docs.google.com/forms/d/e/1FAIpQLSeKDOEdUlS75ivHlBWG4qVo-PdaL8KLWBa3GM9IYbX6I6ptnQ/viewform?usp=pp_url&entry.1973773208=ID-00000+-+TCR";
 
-  rango: 100
-};
 
+    // ==========================================
+    // ELEMENTOS DE LA PÁGINA
+    // ==========================================
 
-/* =====================================================
-   GOOGLE FORMS
-   ===================================================== */
+    const estado = document.getElementById("estado");
+    const distanciaElemento = document.getElementById("distancia");
 
-const URL_FORMULARIO =
-  "https://docs.google.com/forms/d/e/1FAIpQLSeKDOEdUlS75ivHlBWG4qVo-PdaL8KLWBa3GM9IYbX6I6ptnQ/viewform?usp=dialog";
 
+    // ==========================================
+    // CÁLCULO DE DISTANCIA
+    // ==========================================
 
-/* =====================================================
-   ELEMENTOS
-   ===================================================== */
+    function calcularDistancia(lat1, lon1, lat2, lon2) {
 
-const estado =
-  document.getElementById("estado");
+      const R = 6371000;
 
-const resultado =
-  document.getElementById("resultado");
+      const rad = Math.PI / 180;
 
+      const diferenciaLatitud = (lat2 - lat1) * rad;
+      const diferenciaLongitud = (lon2 - lon1) * rad;
 
-/* =====================================================
-   CALCULAR DISTANCIA
-   ===================================================== */
+      const a =
+        Math.sin(diferenciaLatitud / 2) *
+        Math.sin(diferenciaLatitud / 2) +
+        Math.cos(lat1 * rad) *
+        Math.cos(lat2 * rad) *
+        Math.sin(diferenciaLongitud / 2) *
+        Math.sin(diferenciaLongitud / 2);
 
-function distanciaMetros(
-  lat1,
-  lon1,
-  lat2,
-  lon2
-) {
+      const c =
+        2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-  const R = 6371000;
-
-  const dLat =
-    (lat2 - lat1) * Math.PI / 180;
-
-  const dLon =
-    (lon2 - lon1) * Math.PI / 180;
-
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-
-    Math.cos(lat1 * Math.PI / 180) *
-
-    Math.cos(lat2 * Math.PI / 180) *
-
-    Math.sin(dLon / 2) ** 2;
-
-  const c =
-    2 * Math.atan2(
-      Math.sqrt(a),
-      Math.sqrt(1 - a)
-    );
-
-  return R * c;
-}
-
-
-/* =====================================================
-   VALIDAR UBICACIÓN
-   ===================================================== */
-
-function validarUbicacion() {
-
-  if (!navigator.geolocation) {
-
-    estado.innerHTML =
-      "❌ Ubicación no disponible";
-
-    resultado.innerHTML =
-      "Este dispositivo no permite obtener la ubicación.";
-
-    return;
-  }
-
-
-  navigator.geolocation.getCurrentPosition(
-
-    function(position) {
-
-      const lat =
-        position.coords.latitude;
-
-      const lon =
-        position.coords.longitude;
-
-      const precision =
-        position.coords.accuracy;
-
-
-      /* ---------------------------------------------
-         CALCULAR DISTANCIA
-         --------------------------------------------- */
-
-      const distancia =
-        distanciaMetros(
-          lat,
-          lon,
-          SERVICIO.lat,
-          SERVICIO.lon
-        );
-
-
-      const distanciaRedondeada =
-        Math.round(distancia);
-
-
-      /* ---------------------------------------------
-         DENTRO DEL RANGO
-         --------------------------------------------- */
-
-      if (distancia <= SERVICIO.rango) {
-
-        estado.innerHTML =
-          "✅ Ubicación validada";
-
-        resultado.innerHTML =
-          "Servicio: <strong>" +
-          SERVICIO.nombre +
-          "</strong><br>" +
-
-          "Distancia: " +
-          distanciaRedondeada +
-          " metros";
-
-
-        /*
-         * ESPERA MUY CORTA PARA QUE EL USUARIO
-         * PUEDA VER QUE LA UBICACIÓN FUE VALIDADA.
-         */
-
-        setTimeout(function() {
-
-          window.location.href =
-            URL_FORMULARIO;
-
-        }, 700);
-
-      }
-
-
-      /* ---------------------------------------------
-         FUERA DEL RANGO
-         --------------------------------------------- */
-
-      else {
-
-        estado.innerHTML =
-          "❌ FUERA DEL RANGO";
-
-        resultado.innerHTML =
-
-          "No es posible realizar el registro.<br><br>" +
-
-          "Distancia detectada: <strong>" +
-          distanciaRedondeada +
-          " metros</strong><br>" +
-
-          "Radio permitido: <strong>" +
-          SERVICIO.rango +
-          " metros</strong><br><br>" +
-
-          "Acércate al servicio e inténtalo nuevamente.";
-
-      }
-
-    },
-
-
-    /* ---------------------------------------------
-       ERROR DE GPS
-       --------------------------------------------- */
-
-    function(error) {
-
-      estado.innerHTML =
-        "❌ No se pudo validar la ubicación";
-
-      resultado.innerHTML =
-        "Activa la ubicación del teléfono y vuelve a escanear el QR.";
-
-    },
-
-
-    /* ---------------------------------------------
-       CONFIGURACIÓN GPS
-       --------------------------------------------- */
-
-    {
-      enableHighAccuracy: true,
-
-      timeout: 15000,
-
-      maximumAge: 0
+      return R * c;
     }
 
-  );
 
-}
+    // ==========================================
+    // OBTENER UBICACIÓN
+    // ==========================================
+
+    function verificarUbicacion() {
+
+      if (!navigator.geolocation) {
+
+        mostrarError(
+          "Este dispositivo no permite obtener la ubicación."
+        );
+
+        return;
+      }
 
 
-/* =====================================================
-   INICIAR
-   ===================================================== */
+      navigator.geolocation.getCurrentPosition(
 
-validarUbicacion();
+        function(position) {
 
-</script>
+          const latitud = position.coords.latitude;
+          const longitud = position.coords.longitude;
+          const precision = position.coords.accuracy;
+
+
+          // Calcular distancia hasta TCR
+          const distancia = calcularDistancia(
+            latitud,
+            longitud,
+            LATITUD_TCR,
+            LONGITUD_TCR
+          );
+
+
+          distanciaElemento.innerHTML =
+            "Distancia aproximada: <strong>" +
+            Math.round(distancia) +
+            " metros</strong>";
+
+
+          // ==========================================
+          // VALIDACIÓN DEL RADIO
+          // ==========================================
+
+          if (distancia <= RADIO_PERMITIDO) {
+
+            estado.className = "estado correcto";
+
+            estado.innerHTML =
+              "✅ <strong>Ubicación validada</strong><br>" +
+              "Se encuentra dentro del área autorizada.<br>" +
+              "<small>Abriendo registro...</small>";
+
+
+            // Pequeño retraso para que el usuario
+            // pueda ver que la validación fue correcta.
+
+            setTimeout(function() {
+
+              window.location.href = FORMS_URL;
+
+            }, 1000);
+
+
+          } else {
+
+            estado.className = "estado incorrecto";
+
+            estado.innerHTML =
+              "❌ <strong>Fuera del área autorizada</strong><br>" +
+              "No es posible realizar el registro desde esta ubicación.";
+
+
+            distanciaElemento.innerHTML +=
+              "<br><strong>Radio permitido: " +
+              RADIO_PERMITIDO +
+              " metros</strong>";
+
+          }
+
+        },
+
+
+        function(error) {
+
+          let mensaje = "";
+
+          switch(error.code) {
+
+            case error.PERMISSION_DENIED:
+
+              mensaje =
+                "Debes permitir el acceso a la ubicación para continuar.";
+
+              break;
+
+
+            case error.POSITION_UNAVAILABLE:
+
+              mensaje =
+                "No fue posible obtener tu ubicación. Verifica el GPS.";
+
+              break;
+
+
+            case error.TIMEOUT:
+
+              mensaje =
+                "La ubicación tardó demasiado en responder. Intenta nuevamente.";
+
+              break;
+
+
+            default:
+
+              mensaje =
+                "Ocurrió un error al obtener la ubicación.";
+
+          }
+
+
+          mostrarError(mensaje);
+
+        },
+
+
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0
+        }
+
+      );
+
+    }
+
+
+    // ==========================================
+    // MOSTRAR ERROR
+    // ==========================================
+
+    function mostrarError(mensaje) {
+
+      estado.className = "estado error";
+
+      estado.innerHTML =
+        "⚠️ <strong>No se pudo validar la ubicación</strong><br><br>" +
+        mensaje;
+
+    }
+
+
+    // ==========================================
+    // INICIAR VALIDACIÓN
+    // ==========================================
+
+    verificarUbicacion();
+
+  </script>
 
 </body>
 </html>
-```
