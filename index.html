@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 
-<head>
+<head> 
 
 <meta charset="UTF-8">
 
@@ -282,57 +282,27 @@ button:disabled {
 
         </div>
 
+<label for="nombreApoyo">Nombre</label>
+<input
+  type="text"
+  id="nombreApoyo"
+  placeholder="Escribe tu nombre"
+  autocomplete="off">
 
-        <label for="nombreApoyo">
+<label for="numeroApoyo">Número de empleado</label>
+<input
+  type="text"
+  id="numeroApoyo"
+  placeholder="Escribe tu número de empleado"
+  inputmode="numeric"
+  autocomplete="off">
 
-            Nombre
+<div class="origen">
+  <strong>Servicio de origen:</strong>
+  <span id="servicioOrigen">-</span>
+</div>
 
-        </label>
-
-
-        <input
-            type="text"
-            id="nombreApoyo"
-            placeholder="Escribe tu nombre"
-            autocomplete="off">
-
-
-        <label for="numeroApoyo">
-
-            Número de empleado
-
-        </label>
-
-
-        <input
-            type="text"
-            id="numeroApoyo"
-            placeholder="Escribe tu número de empleado"
-            inputmode="numeric"
-            autocomplete="off"
-            oninput="reconocerServicioApoyo()">
-
-
-
-        <div class="origen">
-
-            <strong>
-                Servicio de origen:
-            </strong>
-
-            <span id="servicioOrigen">
-                -
-            </span>
-
-        </div>
-
-
-        <button
-            onclick="continuarApoyo()">
-
-            CONTINUAR
-
-        </button>
+<button onclick="continuarApoyo()">CONTINUAR</button>
 
 
     </div>
@@ -1378,27 +1348,11 @@ function actualizarNumeroPersonal() {
    CARGAR PERSONAL PARA APOYO
    ============================================================ */
 
-
 function cargarPersonalApoyo() {
-
-    document.getElementById(
-        "nombreApoyo"
-    ).value = "";
-
-
-    document.getElementById(
-        "numeroApoyo"
-    ).value = "";
-
-
-    document.getElementById(
-        "servicioOrigen"
-    ).textContent =
-        "-";
-
+  document.getElementById("nombreApoyo").value = "";
+  document.getElementById("numeroApoyo").value = "";
+  document.getElementById("servicioOrigen").textContent = "-";
 }
-
-
 
 /* ============================================================
    ACTUALIZAR INFORMACIÓN DE APOYO
@@ -1550,81 +1504,20 @@ function continuarPersonal() {
 
 
 function continuarApoyo() {
+  const nombre = document.getElementById("nombreApoyo").value.trim();
+  const numero = document.getElementById("numeroApoyo").value.trim();
 
+  if (nombre === "" || numero === "") {
+    alert("Escribe tu nombre y número de empleado.");
+    return;
+  }
 
-    const nombre =
-        document.getElementById(
-            "nombreApoyo"
-        ).value.trim();
-
-
-    const numero =
-        document.getElementById(
-            "numeroApoyo"
-        ).value.trim();
-
-
-
-    if (
-        nombre === "" ||
-        numero === ""
-    ) {
-
-
-        alert(
-            "Escribe tu nombre y número de empleado."
-        );
-
-
-        return;
-
-    }
-
-
-
-    const empleado =
-        empleados.find(
-            function(persona) {
-
-                return (
-                    String(
-                        persona.numero
-                    ).trim() ===
-                    numero
-                );
-
-            }
-        );
-
-
-
-    let servicioOrigen = "";
-
-
-
-    if (
-        empleado
-    ) {
-
-        servicioOrigen =
-            empleado.servicio;
-
-    }
-
-
-
-    abrirFormulario(
-
-        nombre,
-
-        numero,
-
-        "APOYO",
-
-        servicioOrigen
-
-    );
-
+  abrirFormulario(
+    nombre,
+    numero,
+    "APOYO",
+    document.getElementById("servicioOrigen").textContent
+  );
 }
 
 
