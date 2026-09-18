@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 
-<head> 
+<head>
 
 <meta charset="UTF-8">
 
@@ -62,6 +62,10 @@ input {
     font-size: 16px;
     background: white;
     box-sizing: border-box;
+}
+
+input[readonly] {
+    background: #f1f3f5;
 }
 
 button {
@@ -266,57 +270,92 @@ button:disabled {
 
 
 
-  <!-- APOYO -->
+    <!-- APOYO -->
 
-<div id="seccionApoyo"
-     class="oculto">
+    <div id="seccionApoyo"
+         class="oculto">
 
-    <div class="dato">
 
-        <strong>
-            Tipo:
-        </strong>
+        <div class="dato">
 
-        APOYO
+            <strong>
+                Tipo:
+            </strong>
+
+            APOYO
+
+        </div>
+
+
+        <label for="nombreApoyo">
+
+            Nombre
+
+        </label>
+
+
+        <input
+            type="text"
+            id="nombreApoyo"
+            placeholder="Nombre automático"
+            autocomplete="off"
+            readonly>
+
+
+        <label for="numeroApoyo">
+
+            Número de empleado
+
+        </label>
+
+
+        <input
+            type="text"
+            id="numeroApoyo"
+            placeholder="Número de empleado"
+            inputmode="numeric"
+            autocomplete="off"
+            oninput="reconocerApoyo()">
+
+
+        <div class="origen">
+
+            <strong>
+                Servicio de origen:
+            </strong>
+
+            <span id="servicioOrigen">
+                -
+            </span>
+
+        </div>
+
+
+        <button
+            onclick="continuarApoyo()">
+
+            CONTINUAR
+
+        </button>
+
 
     </div>
 
-    <label for="nombre">
-        Nombre
-    </label>
 
-    <input
-        type="text"
-        id="nombre"
-        placeholder="Nombre automático"
-        autocomplete="off"
-        readonly>
 
-    <label for="numeroApoyo">
-        Número de empleado
-    </label>
+    <!-- MENSAJE -->
 
-    <input
-        type="text"
-        id="numeroApoyo"
-        placeholder="Número de empleado"
-        oninput="reconocerApoyo()">
-
-    <div class="origen">
-
-        <strong>
-            Servicio de origen:
-        </strong>
-
-        <span id="servicioOrigen">
-            -
-        </span>
+    <div id="mensaje"
+         class="mensaje">
 
     </div>
 
-    <button onclick="continuarApoyo()">
-        CONTINUAR
-    </button>
+
+</div>
+
+
+
+<script>
 
 
 /* ============================================================
@@ -343,6 +382,10 @@ let empleados = [];
 let codigoServicio = "";
 
 let personalServicio = [];
+
+let nombreApoyo = "";
+
+let servicioOrigenApoyo = "";
 
 
 
@@ -420,6 +463,8 @@ function cargarBaseQR() {
 
 
 
+                /* ENCABEZADOS */
+
                 const encabezados =
                     datos.table.cols.map(
                         function(columna) {
@@ -439,6 +484,8 @@ function cargarBaseQR() {
                 );
 
 
+
+                /* ÍNDICES */
 
                 const indiceNombre =
                     encabezados.indexOf(
@@ -509,6 +556,11 @@ function cargarBaseQR() {
 
 
 
+                /* =================================================
+                   CONVERTIR FILAS
+                   ================================================= */
+
+
                 empleados =
                     datos.table.rows
 
@@ -519,7 +571,6 @@ function cargarBaseQR() {
                             const columnas =
                                 fila.c.map(
                                     function(celda) {
-
 
                                         if (
                                             celda &&
@@ -532,13 +583,14 @@ function cargarBaseQR() {
 
                                         }
 
-
                                         return "";
 
                                     }
                                 );
 
 
+
+                            /* COORDENADAS */
 
                             const textoCoordenadas =
                                 columnas[
@@ -608,14 +660,13 @@ function cargarBaseQR() {
                         }
                     )
 
+
                     .filter(
                         function(empleado) {
 
                             return (
-
                                 empleado.estatus ===
                                 "ACTIVO"
-
                             );
 
                         }
@@ -694,6 +745,11 @@ function cargarBaseQR() {
 
 
 
+    /* ============================================================
+       URL GOOGLE SHEETS
+       ============================================================ */
+
+
     const url =
         "https://docs.google.com/spreadsheets/d/" +
         ID_ARCHIVO +
@@ -702,17 +758,6 @@ function cargarBaseQR() {
         ID_BASE_QR +
         "&tqx=out:json;responseHandler:" +
         callbackName;
-
-
-
-    console.log(
-        "Consultando BASE_QR..."
-    );
-
-
-    console.log(
-        url
-    );
 
 
 
@@ -784,7 +829,6 @@ function iniciarSistema() {
         !codigoServicio
     ) {
 
-
         document.getElementById(
             "servicioTexto"
         ).textContent =
@@ -795,7 +839,6 @@ function iniciarSistema() {
             "mensaje"
         ).textContent =
             "El QR no contiene un servicio válido.";
-
 
         return;
 
@@ -821,7 +864,6 @@ function iniciarSistema() {
         personalServicio.length === 0
     ) {
 
-
         document.getElementById(
             "servicioTexto"
         ).textContent =
@@ -832,7 +874,6 @@ function iniciarSistema() {
             "mensaje"
         ).textContent =
             "El QR no corresponde a un servicio válido.";
-
 
         return;
 
@@ -918,7 +959,6 @@ function calcularDistancia(
         );
 
 
-
     const c =
         2 *
         Math.atan2(
@@ -945,11 +985,9 @@ function validarGPS() {
         personalServicio[0];
 
 
-
     if (
         !navigator.geolocation
     ) {
-
 
         document.getElementById(
             "ubicacion"
@@ -962,7 +1000,6 @@ function validarGPS() {
         ).textContent =
             "Este dispositivo no permite obtener ubicación.";
 
-
         return;
 
     }
@@ -970,7 +1007,6 @@ function validarGPS() {
 
 
     navigator.geolocation.getCurrentPosition(
-
 
         function(posicion) {
 
@@ -996,13 +1032,6 @@ function validarGPS() {
                     servicio.lon
 
                 );
-
-
-
-            console.log(
-                "Distancia:",
-                distancia
-            );
 
 
 
@@ -1041,27 +1070,11 @@ function validarGPS() {
                     "Ubicación validada correctamente.";
 
 
-                const tipoRegistro =
-                    document.getElementById(
-                        "seleccionTipo"
-                    );
-
-
-                tipoRegistro.classList.remove(
+                document.getElementById(
+                    "seleccionTipo"
+                ).classList.remove(
                     "oculto"
                 );
-
-
-                tipoRegistro.style.display =
-                    "block";
-
-
-                tipoRegistro.style.visibility =
-                    "visible";
-
-
-                tipoRegistro.style.opacity =
-                    "1";
 
 
             }
@@ -1161,10 +1174,6 @@ function seleccionarTipo(
 
 
 
-    /*
-       PERSONAL
-    */
-
     if (
         tipo === "PERSONAL"
     ) {
@@ -1184,10 +1193,6 @@ function seleccionarTipo(
 
 
 
-    /*
-       APOYO
-    */
-
     if (
         tipo === "APOYO"
     ) {
@@ -1196,19 +1201,12 @@ function seleccionarTipo(
         cargarPersonalApoyo();
 
 
-        const seccionApoyo =
-            document.getElementById(
-                "seccionApoyo"
-            );
-
-
-        seccionApoyo.classList.remove(
+        document.getElementById(
+            "seccionApoyo"
+        )
+        .classList.remove(
             "oculto"
         );
-
-
-        seccionApoyo.style.display =
-            "block";
 
     }
 
@@ -1340,19 +1338,27 @@ function actualizarNumeroPersonal() {
 
 
 /* ============================================================
-   CARGAR PERSONAL PARA APOYO
+   CARGAR APOYO
    ============================================================ */
 
 
 function cargarPersonalApoyo() {
 
+
+    nombreApoyo = "";
+
+    servicioOrigenApoyo = "";
+
+
     document.getElementById(
         "nombreApoyo"
     ).value = "";
 
+
     document.getElementById(
         "numeroApoyo"
     ).value = "";
+
 
     document.getElementById(
         "servicioOrigen"
@@ -1363,55 +1369,140 @@ function cargarPersonalApoyo() {
 
 
 /* ============================================================
-   RECONOCER APOYO
+   RECONOCER APOYO POR NÚMERO
    ============================================================ */
+
 
 function reconocerApoyo() {
 
-    const numero = document.getElementById("numeroApoyo").value.trim();
-    const nombreCampo = document.getElementById("nombre");
-    const servicioCampo = document.getElementById("servicioOrigen");
 
-    if (!numero) {
+    const numero =
+        document.getElementById(
+            "numeroApoyo"
+        ).value.trim();
+
+
+    const nombreCampo =
+        document.getElementById(
+            "nombreApoyo"
+        );
+
+
+    const servicioCampo =
+        document.getElementById(
+            "servicioOrigen"
+        );
+
+
+
+    if (
+        numero === ""
+    ) {
+
         nombreApoyo = "";
+
         servicioOrigenApoyo = "";
 
         nombreCampo.value = "";
+
         servicioCampo.textContent = "-";
 
         return;
+
     }
 
-    const coincidencias = baseQR.filter(p =>
-        String(p.numero).trim() === numero &&
-        String(p.estatus).trim().toUpperCase() === "ACTIVO"
-    );
 
-    if (coincidencias.length === 0) {
+
+    /* =========================================================
+       BUSCAR EN TODA LA BASE
+       ========================================================= */
+
+
+    const coincidencias =
+        empleados.filter(
+            function(empleado) {
+
+                return (
+                    String(
+                        empleado.numero
+                    ).trim() === numero &&
+
+                    empleado.estatus ===
+                    "ACTIVO"
+                );
+
+            }
+        );
+
+
+
+    /* =========================================================
+       NO ENCONTRADO
+       ========================================================= */
+
+
+    if (
+        coincidencias.length === 0
+    ) {
 
         nombreApoyo = "";
+
         servicioOrigenApoyo = "";
 
         nombreCampo.value = "";
-        servicioCampo.textContent = "Empleado no encontrado";
+
+        servicioCampo.textContent =
+            "Empleado no encontrado";
 
         return;
+
     }
 
-    const empleado = coincidencias[0];
 
-    nombreApoyo = empleado.nombre;
 
-    nombreCampo.value = empleado.nombre;
+    /* =========================================================
+       NOMBRE AUTOMÁTICO
+       ========================================================= */
+
+
+    nombreApoyo =
+        coincidencias[0].nombre;
+
+
+    nombreCampo.value =
+        nombreApoyo;
+
+
+
+    /* =========================================================
+       SERVICIO DE ORIGEN
+       ========================================================= */
+
 
     const servicios = [
-        ...new Set(coincidencias.map(p => p.servicio))
+        ...new Set(
+            coincidencias.map(
+                function(empleado) {
+
+                    return empleado.servicio;
+
+                }
+            )
+        )
     ];
 
-    servicioOrigenApoyo = servicios.join(" / ");
 
-    servicioCampo.textContent = servicioOrigenApoyo;
+    servicioOrigenApoyo =
+        servicios.join(
+            " / "
+        );
+
+
+    servicioCampo.textContent =
+        servicioOrigenApoyo;
+
 }
+
 
 
 /* ============================================================
@@ -1440,11 +1531,9 @@ function continuarPersonal() {
         numero === ""
     ) {
 
-
         alert(
             "Selecciona tu nombre y número de empleado."
         );
-
 
         return;
 
@@ -1495,6 +1584,12 @@ function continuarApoyo() {
         ).value.trim();
 
 
+    const servicioOrigen =
+        document.getElementById(
+            "servicioOrigen"
+        ).textContent;
+
+
 
     if (
         nombre === "" ||
@@ -1502,7 +1597,23 @@ function continuarApoyo() {
     ) {
 
         alert(
-            "Escribe tu nombre y número de empleado."
+            "Escribe un número de empleado válido."
+        );
+
+        return;
+
+    }
+
+
+
+    if (
+        servicioOrigen === "-" ||
+        servicioOrigen ===
+        "Empleado no encontrado"
+    ) {
+
+        alert(
+            "No se pudo reconocer el empleado."
         );
 
         return;
@@ -1519,9 +1630,7 @@ function continuarApoyo() {
 
         "APOYO",
 
-        document.getElementById(
-            "servicioOrigen"
-        ).textContent
+        servicioOrigen
 
     );
 
@@ -1547,10 +1656,6 @@ function abrirFormulario(
 ) {
 
 
-    /*
-       NUEVO GOOGLE FORMS
-    */
-
     const formulario =
 
         "https://docs.google.com/forms/d/e/" +
@@ -1561,27 +1666,20 @@ function abrirFormulario(
 
 
 
-    /*
-       Servicio donde está registrando
-    */
+    /* =========================================================
+       SERVICIO DONDE ESTÁ REGISTRANDO
+       ========================================================= */
+
 
     const servicioRegistro =
+
         personalServicio[0].servicio;
 
 
 
-    /*
-       NUEVOS CAMPOS DEL FORMULARIO
-
-       Nombre:
-       entry.737145468
-
-       Número:
-       entry.1351159631
-
-       Servicio:
-       entry.1698343083
-    */
+    /* =========================================================
+       URL PREFILL DEL FORMS NUEVO
+       ========================================================= */
 
 
     const url =
@@ -1617,26 +1715,8 @@ function abrirFormulario(
 
 
     console.log(
-        "Servicio donde registra:",
-        servicioRegistro
-    );
-
-
-    console.log(
         "Servicio origen:",
         servicioOrigen
-    );
-
-
-    console.log(
-        "Nombre:",
-        nombre
-    );
-
-
-    console.log(
-        "Número:",
-        numero
     );
 
 
@@ -1655,7 +1735,7 @@ function abrirFormulario(
 
 
 /* ============================================================
-   INICIAR CARGA DE BASE
+   INICIAR CARGA
    ============================================================ */
 
 
