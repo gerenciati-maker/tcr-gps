@@ -266,7 +266,7 @@ button:disabled {
 
 
 
-   <!-- APOYO -->
+  <!-- APOYO -->
 
 <div id="seccionApoyo"
      class="oculto">
@@ -1366,74 +1366,52 @@ function cargarPersonalApoyo() {
    RECONOCER APOYO
    ============================================================ */
 
-const numero = document.getElementById("numeroApoyo").value.trim();
+function reconocerApoyo() {
+
+    const numero = document.getElementById("numeroApoyo").value.trim();
     const nombreCampo = document.getElementById("nombre");
     const servicioCampo = document.getElementById("servicioOrigen");
-    const resultado = document.getElementById("resultadoApoyo");
 
-    // Limpiar cuando no hay número
     if (!numero) {
-
         nombreApoyo = "";
         servicioOrigenApoyo = "";
 
         nombreCampo.value = "";
         servicioCampo.textContent = "-";
 
-        if (resultado) {
-            resultado.innerHTML = "";
-        }
-
         return;
     }
 
-    // Buscar empleado por número
     const coincidencias = baseQR.filter(p =>
         String(p.numero).trim() === numero &&
-        p.estatus === "ACTIVO"
+        String(p.estatus).trim().toUpperCase() === "ACTIVO"
     );
 
-    // No encontrado
     if (coincidencias.length === 0) {
 
         nombreApoyo = "";
         servicioOrigenApoyo = "";
 
         nombreCampo.value = "";
-        servicioCampo.textContent = "-";
-
-        if (resultado) {
-            resultado.innerHTML =
-                '<span style="color:red;">Empleado no encontrado</span>';
-        }
+        servicioCampo.textContent = "Empleado no encontrado";
 
         return;
     }
 
-    // Obtener nombre automáticamente
-    nombreApoyo = coincidencias[0].nombre;
+    const empleado = coincidencias[0];
 
-    // Colocar nombre en el campo
-    nombreCampo.value = nombreApoyo;
+    nombreApoyo = empleado.nombre;
 
-    // Obtener servicios de origen
+    nombreCampo.value = empleado.nombre;
+
     const servicios = [
         ...new Set(coincidencias.map(p => p.servicio))
     ];
 
     servicioOrigenApoyo = servicios.join(" / ");
 
-    // Mostrar servicio de origen
     servicioCampo.textContent = servicioOrigenApoyo;
-
-    // Mostrar resultado si existe el elemento
-    if (resultado) {
-        resultado.innerHTML =
-            "<b>Empleado:</b> " + nombreApoyo +
-            "<br><b>Servicio de origen:</b> " +
-            servicioOrigenApoyo;
-    }
-
+}
 
 
 /* ============================================================
