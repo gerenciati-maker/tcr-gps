@@ -282,28 +282,47 @@ button:disabled {
 
         </div>
 
-<label for="nombreApoyo">Nombre</label>
-<input
-  type="text"
-  id="nombreApoyo"
-  placeholder="Escribe tu nombre"
-  autocomplete="off">
 
-<label for="numeroApoyo">Número de empleado</label>
-<input
-    type="text"
-    id="numeroApoyo"
-    placeholder="Escribe tu número de empleado"
-    inputmode="numeric"
-    autocomplete="off"
-    oninput="reconocerApoyo()">
+        <label for="nombreApoyo">
+            Nombre
+        </label>
 
-<div class="origen">
-  <strong>Servicio de origen:</strong>
-  <span id="servicioOrigen">-</span>
-</div>
+        <input
+            type="text"
+            id="nombreApoyo"
+            placeholder="Escribe tu nombre"
+            autocomplete="off">
 
-<button onclick="continuarApoyo()">CONTINUAR</button>
+
+        <label for="numeroApoyo">
+            Número de empleado
+        </label>
+
+        <input
+            type="text"
+            id="numeroApoyo"
+            placeholder="Escribe tu número de empleado"
+            inputmode="numeric"
+            autocomplete="off"
+            oninput="reconocerApoyo()">
+
+
+        <div class="origen">
+
+            <strong>
+                Servicio de origen:
+            </strong>
+
+            <span id="servicioOrigen">
+                -
+            </span>
+
+        </div>
+
+
+        <button onclick="continuarApoyo()">
+            CONTINUAR
+        </button>
 
 
     </div>
@@ -331,11 +350,11 @@ button:disabled {
 
 
 const ID_ARCHIVO =
-    "1QS_J7UI6j5vvebIior7pKrhMKljjF8nEU_I5It3-znc";
+    "1zdYovCmbhHOyMVy-huWqzgB6Q5x1XgL8dghe263TTbU";
 
 
 const ID_BASE_QR =
-    "1356101945";
+    "1049929211";
 
 
 
@@ -1349,109 +1368,31 @@ function actualizarNumeroPersonal() {
    CARGAR PERSONAL PARA APOYO
    ============================================================ */
 
+
 function cargarPersonalApoyo() {
-  document.getElementById("nombreApoyo").value = "";
-  document.getElementById("numeroApoyo").value = "";
-  document.getElementById("servicioOrigen").textContent = "-";
-}
 
-/* ============================================================
-   ACTUALIZAR INFORMACIÓN DE APOYO
-   ============================================================ */
+    document.getElementById(
+        "nombreApoyo"
+    ).value = "";
 
+    document.getElementById(
+        "numeroApoyo"
+    ).value = "";
 
-function actualizarApoyo() {
-
-    return;
-
-}
-
-      function reconocerApoyo() {
-
-    const numero =
-        document.getElementById("numeroApoyo").value.trim();
-
-    const servicioOrigen =
-        document.getElementById("servicioOrigen");
-
-    if (numero === "") {
-
-        servicioOrigen.textContent = "-";
-
-        return;
-    }
-
-
-    /*
-       Buscar todas las coincidencias
-       del número de empleado
-    */
-
-    const coincidencias =
-        empleados.filter(function(empleado) {
-
-            return String(empleado.numero).trim() === numero;
-
-        });
-
-
-    /*
-       No encontrado
-    */
-
-    if (coincidencias.length === 0) {
-
-        servicioOrigen.textContent =
-            "Empleado no encontrado";
-
-        return;
-    }
-
-
-    /*
-       Duplicidad
-    */
-
-    if (coincidencias.length > 1) {
-
-        const servicios =
-            coincidencias
-            .map(function(empleado) {
-
-                return empleado.servicio;
-
-            })
-            .filter(function(servicio, indice, lista) {
-
-                return lista.indexOf(servicio) === indice;
-
-            });
-
-
-        servicioOrigen.textContent =
-            "DUPLICIDAD: " +
-            servicios.join(" / ");
-
-        return;
-    }
-
-
-    /*
-       Un solo registro
-    */
-
-    servicioOrigen.textContent =
-        coincidencias[0].servicio;
+    document.getElementById(
+        "servicioOrigen"
+    ).textContent = "-";
 
 }
+
 
 
 /* ============================================================
-   RECONOCER SERVICIO DE ORIGEN DEL APOYO
+   RECONOCER APOYO
    ============================================================ */
 
 
-function reconocerServicioApoyo() {
+function reconocerApoyo() {
 
 
     const numero =
@@ -1466,7 +1407,6 @@ function reconocerServicioApoyo() {
         );
 
 
-
     if (
         numero === ""
     ) {
@@ -1479,14 +1419,18 @@ function reconocerServicioApoyo() {
     }
 
 
+    /*
+       Buscar todas las coincidencias
+       del número de empleado
+    */
 
-    const empleado =
-        empleados.find(
-            function(persona) {
+    const coincidencias =
+        empleados.filter(
+            function(empleado) {
 
                 return (
                     String(
-                        persona.numero
+                        empleado.numero
                     ).trim() ===
                     numero
                 );
@@ -1495,22 +1439,71 @@ function reconocerServicioApoyo() {
         );
 
 
+    /*
+       No encontrado
+    */
 
     if (
-        empleado
+        coincidencias.length === 0
     ) {
-
-        servicioOrigen.textContent =
-            empleado.servicio;
-
-    }
-
-    else {
 
         servicioOrigen.textContent =
             "Empleado no encontrado";
 
+        return;
+
     }
+
+
+    /*
+       Duplicidad
+    */
+
+    if (
+        coincidencias.length > 1
+    ) {
+
+        const servicios =
+            coincidencias
+            .map(
+                function(empleado) {
+
+                    return empleado.servicio;
+
+                }
+            )
+            .filter(
+                function(
+                    servicio,
+                    indice,
+                    lista
+                ) {
+
+                    return (
+                        lista.indexOf(
+                            servicio
+                        ) === indice
+                    );
+
+                }
+            );
+
+
+        servicioOrigen.textContent =
+            "DUPLICIDAD: " +
+            servicios.join(" / ");
+
+        return;
+
+    }
+
+
+    /*
+       Un solo registro
+    */
+
+    servicioOrigen.textContent =
+        coincidencias[0].servicio;
 
 }
 
@@ -1583,20 +1576,50 @@ function continuarPersonal() {
 
 
 function continuarApoyo() {
-  const nombre = document.getElementById("nombreApoyo").value.trim();
-  const numero = document.getElementById("numeroApoyo").value.trim();
 
-  if (nombre === "" || numero === "") {
-    alert("Escribe tu nombre y número de empleado.");
-    return;
-  }
 
-  abrirFormulario(
-    nombre,
-    numero,
-    "APOYO",
-    document.getElementById("servicioOrigen").textContent
-  );
+    const nombre =
+        document.getElementById(
+            "nombreApoyo"
+        ).value.trim();
+
+
+    const numero =
+        document.getElementById(
+            "numeroApoyo"
+        ).value.trim();
+
+
+
+    if (
+        nombre === "" ||
+        numero === ""
+    ) {
+
+        alert(
+            "Escribe tu nombre y número de empleado."
+        );
+
+        return;
+
+    }
+
+
+
+    abrirFormulario(
+
+        nombre,
+
+        numero,
+
+        "APOYO",
+
+        document.getElementById(
+            "servicioOrigen"
+        ).textContent
+
+    );
+
 }
 
 
@@ -1619,11 +1642,15 @@ function abrirFormulario(
 ) {
 
 
+    /*
+       NUEVO GOOGLE FORMS
+    */
+
     const formulario =
 
         "https://docs.google.com/forms/d/e/" +
 
-        "1FAIpQLSeKDOEdUlS75ivHlBWG4qVo-PdaL8KLWBa3GM9IYbX6I6ptnQ" +
+        "1FAIpQLSdY4MOdaUuv3wIN0JKWovq3Hu-3tKy_kXAYVtnOyRFZXBDvgQ" +
 
         "/viewform";
 
@@ -1638,28 +1665,42 @@ function abrirFormulario(
 
 
 
+    /*
+       NUEVOS CAMPOS DEL FORMULARIO
+
+       Nombre:
+       entry.737145468
+
+       Número:
+       entry.1351159631
+
+       Servicio:
+       entry.1698343083
+    */
+
+
     const url =
 
         formulario +
 
         "?usp=pp_url" +
 
-        "&entry.1973773208=" +
-
-        encodeURIComponent(
-            servicioRegistro
-        ) +
-
-        "&entry.612785713=" +
+        "&entry.737145468=" +
 
         encodeURIComponent(
             nombre
         ) +
 
-        "&entry.2013854503=" +
+        "&entry.1351159631=" +
 
         encodeURIComponent(
             numero
+        ) +
+
+        "&entry.1698343083=" +
+
+        encodeURIComponent(
+            servicioRegistro
         );
 
 
@@ -1671,8 +1712,26 @@ function abrirFormulario(
 
 
     console.log(
+        "Servicio donde registra:",
+        servicioRegistro
+    );
+
+
+    console.log(
         "Servicio origen:",
         servicioOrigen
+    );
+
+
+    console.log(
+        "Nombre:",
+        nombre
+    );
+
+
+    console.log(
+        "Número:",
+        numero
     );
 
 
