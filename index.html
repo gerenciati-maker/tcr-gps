@@ -1391,120 +1391,67 @@ function cargarPersonalApoyo() {
    RECONOCER APOYO
    ============================================================ */
 
-
 function reconocerApoyo() {
 
+    const numero = document.getElementById("numeroApoyo").value.trim();
+    const resultado = document.getElementById("resultadoApoyo");
 
-    const numero =
-        document.getElementById(
-            "numeroApoyo"
-        ).value.trim();
-
-
-    const servicioOrigen =
-        document.getElementById(
-            "servicioOrigen"
-        );
-
-
-    if (
-        numero === ""
-    ) {
-
-        servicioOrigen.textContent =
-            "-";
-
+    if (!numero) {
+        resultado.innerHTML = "";
+        nombreApoyo = "";
+        servicioOrigenApoyo = "";
         return;
-
     }
 
+    // Buscar el número de empleado en toda la base
+    const coincidencias = baseQR.filter(p =>
+        String(p.numero).trim() === numero &&
+        p.estatus === "ACTIVO"
+    );
 
-    /*
-       Buscar todas las coincidencias
-       del número de empleado
-    */
+    if (coincidencias.length === 0) {
 
-    const coincidencias =
-        empleados.filter(
-            function(empleado) {
+        nombreApoyo = "";
+        servicioOrigenApoyo = "";
 
-                return (
-                    String(
-                        empleado.numero
-                    ).trim() ===
-                    numero
-                );
-
-            }
-        );
-
-
-    /*
-       No encontrado
-    */
-
-    if (
-        coincidencias.length === 0
-    ) {
-
-        servicioOrigen.textContent =
-            "Empleado no encontrado";
+        resultado.innerHTML =
+            '<span style="color:red;">Empleado no encontrado</span>';
 
         return;
-
     }
 
+    // Si existe más de un registro con el mismo número
+    if (coincidencias.length > 1) {
 
-    /*
-       Duplicidad
-    */
+        nombreApoyo = coincidencias[0].nombre;
 
-    if (
-        coincidencias.length > 1
-    ) {
+        const servicios = [
+            ...new Set(coincidencias.map(p => p.servicio))
+        ];
 
-        const servicios =
-            coincidencias
-            .map(
-                function(empleado) {
+        servicioOrigenApoyo = servicios.join(" / ");
 
-                    return empleado.servicio;
-
-                }
-            )
-            .filter(
-                function(
-                    servicio,
-                    indice,
-                    lista
-                ) {
-
-                    return (
-                        lista.indexOf(
-                            servicio
-                        ) === indice
-                    );
-
-                }
-            );
-
-
-        servicioOrigen.textContent =
-            "DUPLICIDAD: " +
-            servicios.join(" / ");
+        resultado.innerHTML =
+            "<b>Empleado:</b> " + nombreApoyo +
+            "<br><b>Servicio de origen:</b> " +
+            servicioOrigenApoyo;
 
         return;
-
     }
 
+    // Coincidencia única
+    const empleado = coincidencias[0];
 
-    /*
-       Un solo registro
-    */
+    // El nombre ahora se obtiene automáticamente del número
+    nombreApoyo = empleado.nombre;
 
-    servicioOrigen.textContent =
-        coincidencias[0].servicio;
+    // Servicio de origen también se obtiene automáticamente
+    servicioOrigenApoyo = empleado.servicio;
 
+    resultado.innerHTML =
+        "<b>Empleado:</b> " + nombreApoyo +
+        "<br><b>Servicio de origen:</b> " +
+        servicioOrigenApoyo;
 }
 
 
