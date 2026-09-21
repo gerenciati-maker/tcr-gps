@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Torre de Control</title>
+<title>Lista de Asistencia</title>
 
 <style>
 
@@ -118,7 +118,8 @@ button:hover {
 
 <div class="container">
 
-    <h1>TORRE DE CONTROL</h1>
+    <!-- ENCABEZADO -->
+    <h1 id="tituloServicio">LISTA DE ASISTENCIA</h1>
 
 
     <!-- ESTADO -->
@@ -958,6 +959,16 @@ function identificarServicio(
 
 
     /*
+       ENCABEZADO FUERA DE SERVICIO
+    */
+
+    document.getElementById(
+        "tituloServicio"
+    ).textContent =
+        "FUERA DE SERVICIO";
+
+
+    /*
        Cuando está fuera de un servicio,
        PERSONAL y APOYO no se habilitan.
 
@@ -1005,10 +1016,26 @@ function entrarAlServicio(
     );
 
 
+    /*
+       MOSTRAR SOLAMENTE EL CÓDIGO DEL SERVICIO
+       EN EL ENCABEZADO.
+    */
+
+    document.getElementById(
+        "tituloServicio"
+    ).textContent =
+        servicio.codigo;
+
+
+    /*
+       El texto interno también muestra
+       únicamente el código.
+    */
+
     document.getElementById(
         "servicioIdentificado"
     ).textContent =
-        servicio.servicio;
+        servicio.codigo;
 
 
 
@@ -1052,7 +1079,6 @@ function entrarAlServicio(
 
 
     ocultarTodosLosFormularios();
-
 
 
     mostrarEstado(
@@ -1145,7 +1171,6 @@ function cargarPersonalServicio() {
         'Seleccione una persona' +
 
         '</option>';
-
 
 
     if (
@@ -1249,7 +1274,6 @@ function continuarPersonal() {
         document.getElementById(
             "personalSelect"
         ).value;
-
 
 
     if (!numero) {
@@ -1377,7 +1401,6 @@ function reconocerApoyo() {
         ).value.trim();
 
 
-
     const empleado =
         empleados.find(
 
@@ -1385,7 +1408,6 @@ function reconocerApoyo() {
                 e.numero === numero
 
         );
-
 
 
     if (!empleado) {
@@ -1414,12 +1436,10 @@ function reconocerApoyo() {
         empleado;
 
 
-
     document.getElementById(
         "nombreApoyo"
     ).value =
         empleado.nombre;
-
 
 
     document.getElementById(
@@ -1537,7 +1557,6 @@ function reconocerAdministrativo() {
         ).value.trim();
 
 
-
     const empleado =
         empleados.find(
 
@@ -1547,10 +1566,8 @@ function reconocerAdministrativo() {
         );
 
 
-
     empleadoAdministrativoActual =
         null;
-
 
 
     document.getElementById(
@@ -1561,7 +1578,6 @@ function reconocerAdministrativo() {
     document.getElementById(
         "adminResultado"
     ).innerHTML = "";
-
 
 
     if (!empleado) {
@@ -1601,12 +1617,10 @@ function reconocerAdministrativo() {
         empleado;
 
 
-
     document.getElementById(
         "nombreAdministrativo"
     ).value =
         empleado.nombre;
-
 
 
     document.getElementById(
