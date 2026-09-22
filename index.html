@@ -322,6 +322,33 @@ button:hover {
 
 
 
+    <!-- =========================================
+         TIPO DE REGISTRO
+    ========================================== -->
+
+    <div id="tipoRegistroCard" class="card oculto">
+
+        <div class="info">
+
+            <strong>Tipo de registro</strong>
+
+            <div class="pequeno">
+                Seleccione si corresponde a una entrada o una salida.
+            </div>
+
+        </div>
+
+        <button onclick="enviarRegistro('ENTRADA')">
+            ENTRADA
+        </button>
+
+        <button onclick="enviarRegistro('SALIDA')">
+            SALIDA
+        </button>
+
+    </div>
+
+
     <!-- MENSAJE FINAL -->
 
     <div
@@ -347,6 +374,10 @@ const ID_BASE_QR =
     "1049929211";
 
 
+/*
+   URL DEL WEB APP DE GOOGLE APPS SCRIPT
+*/
+
 const URL_APPS_SCRIPT =
     "https://script.google.com/macros/s/AKfycbwLFAKGBIyPp2g2idSpxG5WEDMfClTV1H0KNTuXb_XqmWqapFYZmcqFTFk9ZjwfB5X0Zg/exec";
 
@@ -360,7 +391,7 @@ const CODIGO_ADMIN =
 
 
 /*
-   Nombre exacto que se mandará al registro
+   Nombre exacto del servicio de Oficinas Centrales
 */
 
 const SERVICIO_CENTRAL =
@@ -384,11 +415,17 @@ let empleadoApoyoActual = null;
 
 let empleadoAdministrativoActual = null;
 
-let gpsActual = {
-    latitud: "",
-    longitud: "",
-    precision: ""
+let ubicacionActual = {
+
+    latitud: null,
+
+    longitud: null,
+
+    precisionGPS: null
+
 };
+
+let registroPendiente = null;
 
 
 
@@ -497,7 +534,8 @@ function cargarBaseQR() {
             ========================================== */
 
             empleados = filas.map(
-                fila => {
+                (fila, indiceFila) => {
+
 
                     const c =
                         fila.c || [];
@@ -816,10 +854,18 @@ function obtenerGPS() {
                 position.coords.longitude;
 
 
-            gpsActual = {
+            const precision =
+                position.coords.accuracy;
+
+
+            ubicacionActual = {
+
                 latitud: lat,
+
                 longitud: lon,
-                precision: position.coords.accuracy
+
+                precisionGPS: precision
+
             };
 
 
@@ -1025,7 +1071,7 @@ function entrarAlServicio(
     document.getElementById(
         "servicioIdentificado"
     ).textContent =
-        servicio.servicio;
+        servicio.codigo;
 
 
 
@@ -1360,6 +1406,15 @@ function seleccionarApoyo() {
     );
 
 
+    const apoyoDuplicado =
+        document.getElementById(
+            "apoyoDuplicadoSelect"
+        );
+
+    if (apoyoDuplicado) {
+        apoyoDuplicado.remove();
+    }
+
     document.getElementById(
         "numeroApoyo"
     ).value = "";
@@ -1519,6 +1574,15 @@ function seleccionarAdministrativo() {
         "oculto"
     );
 
+
+    const adminDuplicado =
+        document.getElementById(
+            "adminDuplicadoSelect"
+        );
+
+    if (adminDuplicado) {
+        adminDuplicado.remove();
+    }
 
     document.getElementById(
         "numeroAdministrativo"
@@ -1685,7 +1749,7 @@ function continuarAdministrativo() {
 
 
 /* =====================================================
-   REGISTRO EN APPS SCRIPT
+   PREPARAR REGISTRO
 ===================================================== */
 
 function abrirFormulario(
@@ -1697,178 +1761,116 @@ function abrirFormulario(
 
 ) {
 
-    mostrarTipoRegistro(
-        nombre,
-        numero,
-        tipo,
-        servicio
-    );
-
-}
-
-
-
-function mostrarTipoRegistro(
-
-    nombre,
-    numero,
-    tipo,
-    servicio
-
-) {
-
-    const mensajeFinal =
-        document.getElementById(
-            "mensajeFinal"
-        );
-
-
-    mensajeFinal.className =
-        "card";
-
-
-    mensajeFinal.innerHTML =
-
-        '<div class="info">' +
-
-        '<strong>Seleccione el tipo de registro</strong>' +
-
-        '</div>' +
-
-        '<button onclick="enviarRegistro(\'ENTRADA\', \'' +
-        escapeHTML(nombre) +
-        '\', \'' +
-        escapeHTML(numero) +
-        '\', \'' +
-        escapeHTML(tipo) +
-        '\', \'' +
-        escapeHTML(servicio) +
-        '\')">' +
-        'ENTRADA' +
-        '</button>' +
-
-        '<button onclick="enviarRegistro(\'SALIDA\', \'' +
-        escapeHTML(nombre) +
-        '\', \'' +
-        escapeHTML(numero) +
-        '\', \'' +
-        escapeHTML(tipo) +
-        '\', \'' +
-        escapeHTML(servicio) +
-        '\')">' +
-        'SALIDA' +
-        '</button>';
-
-
-    mensajeFinal.classList.remove(
-        "oculto"
-    );
-
-}
-
-
-
-function enviarRegistro(
-
-    tipoRegistro,
-    nombre,
-    numero,
-    tipo,
-    servicio
-
-) {
-
-    const mensajeFinal =
-        document.getElementById(
-            "mensajeFinal"
-        );
-
-
-    mensajeFinal.className =
-        "card";
-
-
-    mensajeFinal.innerHTML =
-        '<div class="info">Guardando registro...</div>';
-
-
-    let servicioDetectado = "";
+    let posicion = "";
 
     let servicioOrigen = "";
 
+    let servicioDetectado = "";
 
-    if (tipo === "APOYO") {
+
+
+    if (tipo === "PERSONAL") {
+
+        const empleado = empleados.find(
+
+            e =>
+
+                e.nombre === nombre &&
+
+                e.numero === numero &&
+
+                e.codigoServicio ===
+                (servicioActual
+                    ? servicioActual.codigo
+                    : "")
+
+        );
+
+
+
+        if (empleado) {
+
+            posicion =
+                empleado.posicion;
+
+        }
+
+
 
         servicioDetectado =
             servicioActual
                 ? servicioActual.codigo
                 : "";
+
+    }
+
+
+
+    else if (tipo === "APOYO") {
+
+        posicion =
+            empleadoApoyoActual
+                ? empleadoApoyoActual.posicion
+                : "";
+
+
 
         servicioOrigen =
-            servicio;
+            empleadoApoyoActual
+                ? empleadoApoyoActual.servicio
+                : "";
 
-    }
 
-    else if (tipo === "PERSONAL") {
 
         servicioDetectado =
             servicioActual
                 ? servicioActual.codigo
-                : "";
+                : "FUERA DE SERVICIO";
 
     }
+
+
 
     else if (tipo === "ADMINISTRATIVO") {
 
+        posicion = "ADMINISTRATIVO";
+
+
+
         servicioDetectado =
-            CODIGO_ADMIN;
+            servicioActual
+                ? servicioActual.codigo
+                : "FUERA DE SERVICIO";
 
     }
 
 
-    const ahora =
-        new Date();
 
+    registroPendiente = {
 
-    const datos = {
+        nombre:
+            nombre,
 
-        fecha:
-            ahora.toLocaleDateString(
-                "es-MX"
-            ),
+        numeroEmpleado:
+            numero,
 
-        hora:
-            ahora.toLocaleTimeString(
-                "es-MX"
-            ),
+        servicio:
+            servicio,
 
-        fechaHora:
-            ahora.toLocaleString(
-                "es-MX"
-            ),
-
-        nombre: nombre,
-
-        numeroEmpleado: numero,
-
-        servicio: servicio,
-
-        tipoRegistro: tipoRegistro,
+        tipoRegistro:
+            "",
 
         posicion:
-            obtenerPosicionEmpleado(
-                numero,
-                tipo
-            ),
+            posicion,
 
         latitud:
-            gpsActual.latitud,
+            ubicacionActual.latitud,
 
         longitud:
-            gpsActual.longitud,
+            ubicacionActual.longitud,
 
         precisionGPS:
-            gpsActual.precision,
+            ubicacionActual.precisionGPS,
 
         servicioDetectado:
             servicioDetectado,
@@ -1882,106 +1884,388 @@ function enviarRegistro(
     };
 
 
-    fetch(
-        URL_APPS_SCRIPT,
-        {
-            method: "POST",
-            mode: "no-cors",
-            headers: {
-                "Content-Type":
-                    "text/plain;charset=utf-8"
-            },
-            body: JSON.stringify(datos)
-        }
-    )
 
-    .then(function() {
+    document.getElementById(
+        "tipoRegistroCard"
+    ).classList.remove(
+        "oculto"
+    );
 
-        mensajeFinal.className =
-            "card exito";
 
-        mensajeFinal.innerHTML =
-            '<strong>Registro guardado correctamente.</strong>' +
-            '<div class="pequeno">' +
-            tipoRegistro +
-            '</div>';
 
-    })
+    document.getElementById(
+        "mensajeFinal"
+    ).classList.add(
+        "oculto"
+    );
 
-    .catch(function(error) {
 
-        console.error(error);
 
-        mensajeFinal.className =
-            "card error";
+    window.scrollTo({
 
-        mensajeFinal.innerHTML =
-            '<strong>No fue posible enviar el registro.</strong>' +
-            '<div class="pequeno">Revise la conexión e inténtelo nuevamente.</div>';
+        top: document.body.scrollHeight,
+
+        behavior: "smooth"
 
     });
 
 }
 
 
+/* =====================================================
+   ENVIAR REGISTRO A GOOGLE APPS SCRIPT
+===================================================== */
 
-function obtenerPosicionEmpleado(
-    numero,
-    tipo
+function enviarRegistro(tipoRegistro) {
+
+    if (!registroPendiente) {
+
+        alert(
+            "No existe un registro pendiente."
+        );
+
+        return;
+
+    }
+
+
+
+    registroPendiente.tipoRegistro =
+        tipoRegistro;
+
+
+
+    const ahora =
+        new Date();
+
+
+
+    const fecha =
+        ahora.toLocaleDateString(
+            "es-MX"
+        );
+
+
+
+    const hora =
+        ahora.toLocaleTimeString(
+            "es-MX",
+            {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false
+            }
+        );
+
+
+
+    const fechaHora =
+        ahora.toLocaleString(
+            "es-MX"
+        );
+
+
+
+    const datos = {
+
+        fecha:
+            fecha,
+
+        hora:
+            hora,
+
+        fechaHora:
+            fechaHora,
+
+        nombre:
+            registroPendiente.nombre,
+
+        numeroEmpleado:
+            registroPendiente.numeroEmpleado,
+
+        servicio:
+            registroPendiente.servicio,
+
+        tipoRegistro:
+            registroPendiente.tipoRegistro,
+
+        posicion:
+            registroPendiente.posicion,
+
+        latitud:
+            registroPendiente.latitud,
+
+        longitud:
+            registroPendiente.longitud,
+
+        precisionGPS:
+            registroPendiente.precisionGPS,
+
+        servicioDetectado:
+            registroPendiente.servicioDetectado,
+
+        servicioOrigen:
+            registroPendiente.servicioOrigen,
+
+        resultado:
+            registroPendiente.resultado
+
+    };
+
+
+
+    mostrarEstado(
+        "Guardando registro..."
+    );
+
+
+
+    document.getElementById(
+        "tipoRegistroCard"
+    ).classList.add(
+        "oculto"
+    );
+
+
+
+    fetch(
+
+        URL_APPS_SCRIPT,
+
+        {
+
+            method: "POST",
+
+            mode: "no-cors",
+
+            headers: {
+
+                "Content-Type":
+                    "text/plain;charset=utf-8"
+
+            },
+
+            body:
+                JSON.stringify(datos)
+
+        }
+
+    )
+
+    .then(
+
+        function() {
+
+            mostrarRegistroExitoso(
+                tipoRegistro
+            );
+
+        }
+
+    )
+
+    .catch(
+
+        function(error) {
+
+            console.error(error);
+
+
+
+            mostrarError(
+
+                "No fue posible enviar el registro. " +
+                "Verifique la conexión a internet."
+
+            );
+
+
+
+            document.getElementById(
+                "tipoRegistroCard"
+            ).classList.remove(
+                "oculto"
+            );
+
+        }
+
+    );
+
+}
+
+
+/* =====================================================
+   MOSTRAR REGISTRO EXITOSO
+===================================================== */
+
+function mostrarRegistroExitoso(
+    tipoRegistro
 ) {
 
-    let empleado = null;
+    const mensaje =
+        document.getElementById(
+            "mensajeFinal"
+        );
 
 
-    if (tipo === "PERSONAL") {
 
-        empleado =
-            empleados.find(function(e) {
-                return e.numero === numero &&
-                    e.codigoServicio ===
-                    (servicioActual ? servicioActual.codigo : "") &&
-                    (
-                        e.posicion === "GUARDIA" ||
-                        e.posicion === "MONITORISTA"
-                    );
-            });
-
-    }
-
-    else if (tipo === "APOYO") {
-
-        empleado =
-            empleadoApoyoActual;
-
-    }
-
-    else if (tipo === "ADMINISTRATIVO") {
-
-        empleado =
-            empleadoAdministrativoActual;
-
-    }
+    mensaje.className =
+        "card exito";
 
 
-    return empleado
-        ? empleado.posicion
-        : "";
+
+    mensaje.innerHTML =
+
+        "<strong>Registro realizado correctamente.</strong>" +
+
+        "<div class=\"pequeno\">" +
+
+        "Tipo: " +
+
+        tipoRegistro +
+
+        "<br>" +
+
+        "La información fue enviada a la Torre de Control." +
+
+        "</div>" +
+
+        "<button type=\"button\" onclick=\"nuevoRegistro()\">" +
+
+        "NUEVO REGISTRO" +
+
+        "</button>";
+
+
+
+    mensaje.classList.remove(
+        "oculto"
+    );
+
+
+
+    document.getElementById(
+        "tipoRegistroCard"
+    ).classList.add(
+        "oculto"
+    );
+
+
+
+    ocultarTodosLosFormularios();
+
+
+
+    registroPendiente =
+        null;
+
+
+
+    mostrarEstado(
+        "Registro guardado correctamente. Seleccione NUEVO REGISTRO para continuar."
+    );
+
+
+
+    window.scrollTo({
+
+        top: document.body.scrollHeight,
+
+        behavior: "smooth"
+
+    });
 
 }
 
+/* =====================================================
+   NUEVO REGISTRO
+===================================================== */
 
+function nuevoRegistro() {
 
-function escapeHTML(texto) {
+    document.getElementById(
+        "mensajeFinal"
+    ).classList.add(
+        "oculto"
+    );
 
-    return String(texto || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    document.getElementById(
+        "tipoRegistroCard"
+    ).classList.add(
+        "oculto"
+    );
 
+    ocultarTodosLosFormularios();
+
+    document.getElementById(
+        "personalSelect"
+    ).value = "";
+
+    document.getElementById(
+        "numeroPersonal"
+    ).value = "";
+
+    document.getElementById(
+        "numeroApoyo"
+    ).value = "";
+
+    document.getElementById(
+        "nombreApoyo"
+    ).value = "";
+
+    document.getElementById(
+        "servicioOrigen"
+    ).textContent = "-";
+
+    document.getElementById(
+        "numeroAdministrativo"
+    ).value = "";
+
+    document.getElementById(
+        "nombreAdministrativo"
+    ).value = "";
+
+    document.getElementById(
+        "adminResultado"
+    ).innerHTML = "";
+
+    const apoyoDuplicado =
+        document.getElementById(
+            "apoyoDuplicadoSelect"
+        );
+
+    if (apoyoDuplicado) {
+        apoyoDuplicado.remove();
+    }
+
+    const adminDuplicado =
+        document.getElementById(
+            "adminDuplicadoSelect"
+        );
+
+    if (adminDuplicado) {
+        adminDuplicado.remove();
+    }
+
+    empleadoApoyoActual =
+        null;
+
+    empleadoAdministrativoActual =
+        null;
+
+    registroPendiente =
+        null;
+
+    mostrarEstado(
+        "Ubicación validada correctamente."
+    );
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
 }
-
 
 
 /* =====================================================
