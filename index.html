@@ -7,17 +7,10 @@
 <title>Torre de Control</title>
 
 <style>
-
-:root {
-    --azul-profundo: #001b44;
-    --azul: #063b82;
-    --azul-brillante: #0a4c9c;
-    --blanco: #ffffff;
-    --gris: #667085;
-    --fondo: #eef3f8;
-    --borde: #d8e0ea;
-    --sombra: 0 10px 30px rgba(0, 27, 68, .12);
-}
+/* =====================================================
+   ESTILO AUTORITAS
+   Diseño visual únicamente — la lógica JS permanece intacta
+===================================================== */
 
 * {
     box-sizing: border-box;
@@ -25,75 +18,153 @@
 
 body {
     margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: linear-gradient(145deg, #001b44 0%, #063b82 55%, #0a4c9c 100%);
-    color: #172033;
+    padding: 0;
     min-height: 100vh;
-    background-attachment: fixed;
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: linear-gradient(
+        135deg,
+        #071f3d 0%,
+        #0b315d 50%,
+        #08294d 100%
+    );
+
+    color: #ffffff;
 }
 
 .container {
     width: 100%;
-    max-width: 560px;
-    margin: auto;
-    padding: 18px 16px 32px;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 20px 15px 35px;
 }
 
+/* Encabezado con el logo que ya tenía el archivo */
 .brandHeader {
     text-align: center;
-    color: var(--blanco);
-    padding: 6px 8px 22px;
+    margin-bottom: 20px;
+    color: #ffffff;
 }
 
 .brandLogo {
     display: block;
-    width: min(190px, 58vw);
+    width: min(180px, 58vw);
+    max-height: 95px;
     height: auto;
-    margin: 0 auto 12px;
-    border-radius: 18px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.20);
+    object-fit: contain;
+    margin: 0 auto 14px;
+    border-radius: 14px;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.22);
 }
 
 .brandTitle {
-    margin: 0;
-    font-size: clamp(24px, 7vw, 32px);
-    line-height: 1.1;
-    letter-spacing: .4px;
-    font-weight: 800;
+    color: #ffffff;
+    text-align: center;
+    font-size: 24px;
+    line-height: 1.15;
+    font-weight: bold;
+    margin: 0 0 5px;
 }
 
 .brandSubtitle {
-    margin: 7px 0 0;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    opacity: .92;
+    color: rgba(255,255,255,0.88);
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 20px;
+    letter-spacing: .2px;
 }
 
+/* Tarjetas */
 .card {
-    background: var(--blanco);
-    border: 1px solid rgba(0, 59, 130, .08);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: var(--sombra);
-    margin-bottom: 15px;
+    background: #ffffff;
+    color: #1d1d1d;
+    border-radius: 18px;
+    padding: 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255,255,255,0.15);
 }
 
+/* Títulos dentro de tarjetas */
+h1:not(.brandTitle),
+h2,
+h3 {
+    color: #0b315d;
+    margin-top: 0;
+}
+
+/* Estado sobre el fondo azul */
+#estado {
+    text-align: center;
+    background: rgba(255,255,255,0.12);
+    color: #ffffff;
+    border-radius: 15px;
+    padding: 14px;
+    margin-bottom: 18px;
+    backdrop-filter: blur(8px);
+}
+
+/* Etiquetas */
 label {
     display: block;
-    font-weight: 700;
+    font-weight: bold;
     margin-top: 15px;
-    margin-bottom: 7px;
-    color: #1d2b3d;
+    margin-bottom: 6px;
+    color: #1d1d1d;
 }
 
+/* Información */
+.info {
+    background: #eaf3fb;
+    color: #0b315d;
+    border-left: 5px solid #0b5fa5;
+    padding: 13px;
+    border-radius: 10px;
+    margin-top: 12px;
+}
+
+/* Éxito */
+.exito {
+    background: #e8f7ee;
+    color: #176b3a;
+    border-left: 5px solid #28a745;
+    padding: 14px;
+    border-radius: 10px;
+}
+
+/* Error */
+.error {
+    background: #fdecec;
+    color: #9b1c1c;
+    border-left: 5px solid #d93025;
+    padding: 14px;
+    border-radius: 10px;
+}
+
+/* Origen / ubicación */
+.origen {
+    background: #f3f6f9;
+    color: #334155;
+    padding: 12px;
+    border-radius: 10px;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+/* Texto pequeño */
+.pequeno {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 8px;
+    line-height: 1.45;
+}
+
+/* Inputs */
 input,
 select,
 button {
     width: 100%;
-    min-height: 48px;
-    padding: 12px 14px;
     font-size: 16px;
     border-radius: 10px;
     font-family: inherit;
@@ -101,127 +172,110 @@ button {
 
 input,
 select {
-    border: 1px solid var(--borde);
-    background: #fbfcfe;
-    color: #172033;
-    outline: none;
-    transition: border-color .2s, box-shadow .2s, background .2s;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #1e293b;
+    margin-top: 7px;
 }
 
 input:focus,
 select:focus {
-    border-color: var(--azul-brillante);
-    box-shadow: 0 0 0 3px rgba(10, 76, 156, .12);
-    background: #fff;
+    outline: none;
+    border-color: #0b5fa5;
+    box-shadow: 0 0 0 3px rgba(11,95,165,0.15);
 }
 
+/* Botones */
 button {
+    padding: 13px 16px;
     border: none;
-    background: linear-gradient(135deg, var(--azul-brillante), var(--azul));
-    color: var(--blanco);
-    font-weight: 800;
-    margin-top: 15px;
     cursor: pointer;
-    letter-spacing: .2px;
-    box-shadow: 0 5px 12px rgba(6, 59, 130, .18);
-    transition: transform .12s, box-shadow .12s, opacity .12s;
+    background: #0b5fa5;
+    color: #ffffff;
+    font-weight: bold;
+    margin-top: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+    transition: 0.2s;
 }
 
 button:hover {
-    opacity: .95;
-    box-shadow: 0 7px 16px rgba(6, 59, 130, .24);
+    background: #084b82;
 }
 
 button:active {
-    transform: translateY(1px);
+    transform: scale(0.98);
 }
 
 button:disabled {
     opacity: .6;
     cursor: not-allowed;
-    box-shadow: none;
 }
 
-.oculto {
-    display: none;
-}
-
-.info {
-    background: #edf4fb;
-    border-left: 4px solid var(--azul-brillante);
-    padding: 13px 14px;
-    border-radius: 10px;
-    margin-top: 10px;
-    color: #17385f;
-}
-
-.exito {
-    background: #e8f5e9;
-    padding: 13px 14px;
-    border-radius: 10px;
-    color: #256029;
-    border-left: 4px solid #2e7d32;
-}
-
-.error {
-    background: #fdecea;
-    padding: 13px 14px;
-    border-radius: 10px;
-    color: #a12622;
-    border-left: 4px solid #c62828;
-}
-
-.origen {
-    margin-top: 12px;
-    padding: 12px 14px;
-    background: #f4f7fa;
-    border: 1px solid #e1e7ee;
-    border-radius: 10px;
-}
-
-.pequeno {
-    font-size: 13px;
-    color: var(--gris);
-    margin-top: 8px;
-    line-height: 1.45;
-}
-
+/* Fotografía */
 .fotoRegistro {
-    background: #f7f9fc;
-    border: 1px solid #e1e7ee;
-    padding: 14px;
+    width: 100%;
+    padding: 10px;
+    border: 2px dashed #0b5fa5;
     border-radius: 12px;
+    background: #f4f8fc;
+    color: #334155;
     margin-bottom: 15px;
 }
 
 .fotoPreview {
     display: block;
     width: 100%;
-    max-height: 320px;
+    max-width: 100%;
+    max-height: 300px;
     object-fit: cover;
-    border-radius: 10px;
-    margin-top: 10px;
-    border: 1px solid #d8e0ea;
+    margin: 15px auto 0;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.20);
 }
 
-@media (max-width: 480px) {
-    body {
-        background: linear-gradient(145deg, #001b44 0%, #063b82 55%, #0a4c9c 100%);
-        background-attachment: fixed;
-    }
+/* Ocultar */
+.oculto {
+    display: none !important;
+}
+
+/* Botones de entrada / salida: conservamos la lógica existente */
+button[onclick="enviarRegistro('ENTRADA')"] {
+    background: #198754;
+}
+
+button[onclick="enviarRegistro('ENTRADA')"]:hover {
+    background: #146c43;
+}
+
+button[onclick="enviarRegistro('SALIDA')"] {
+    background: #d9534f;
+}
+
+button[onclick="enviarRegistro('SALIDA')"]:hover {
+    background: #b52b27;
+}
+
+/* Adaptación celular */
+@media (max-width: 600px) {
     .container {
-        padding: 12px 12px 28px;
+        padding: 15px 12px 30px;
     }
+
     .card {
-        padding: 17px;
-        border-radius: 14px;
-    }
-    .brandLogo {
-        width: 165px;
+        padding: 18px;
         border-radius: 16px;
     }
-}
 
+    .brandLogo {
+        width: 165px;
+        max-height: 90px;
+    }
+
+    .brandTitle {
+        font-size: 21px;
+    }
+}
 </style>
 </head>
 
