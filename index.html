@@ -545,28 +545,49 @@ function mostrarEstado(mensaje, tipo = "") {
 
 function cargarBaseQR() {
 
-    mostrarEstado("Cargando base de empleados...");
+    mostrarEstado(
+        "Cargando base de empleados..."
+    );
+
 
     const callbackName =
-        "callbackBaseQR_" + Date.now();
+        "callbackBaseQR_" +
+        Date.now();
+
 
     let terminado = false;
+
 
     const script =
         document.createElement("script");
 
+
     function limpiar() {
 
-        if (script.parentNode) {
-            script.parentNode.removeChild(script);
+        if (
+            script.parentNode
+        ) {
+
+            script.parentNode.removeChild(
+                script
+            );
+
         }
 
+
         try {
+
             delete window[callbackName];
+
         } catch (e) {
-            window[callbackName] = undefined;
+
+            window[callbackName] =
+                undefined;
+
         }
+
     }
+
 
     const temporizador =
         setTimeout(function() {
@@ -577,146 +598,195 @@ function cargarBaseQR() {
 
             limpiar();
 
+
             mostrarEstado(
-                "No fue posible cargar la base de empleados. Verifica que la hoja BASE_QR esté disponible.",
+                "El Apps Script no respondió al cargar BASE_QR.",
                 "error"
             );
+
 
         }, 15000);
 
 
-    window[callbackName] = function(data) {
+    window[callbackName] =
+        function(data) {
 
-        if (terminado) return;
-
-        terminado = true;
-
-        clearTimeout(temporizador);
-
-        try {
-
-            if (
-                !data ||
-                !data.table ||
-                !data.table.rows
-            ) {
-                throw new Error(
-                    "Google Sheets no devolvió información."
-                );
-            }
+            if (terminado) return;
 
 
-            const encabezados =
-                data.table.cols.map(
-                    col => col.label
-                );
+            terminado = true;
+
+            clearTimeout(
+                temporizador
+            );
 
 
-            empleados =
-                data.table.rows
-                .map(row => {
+            try {
 
-                    const objeto = {};
+                if (
+                    !data ||
+                    data.ok !== true
+                ) {
 
-                    encabezados.forEach(
-                        (encabezado, indice) => {
+                    throw new Error(
+                        data &&
+                        data.error
+                            ? data.error
+                            : "No fue posible cargar BASE_QR."
+                    );
 
-                            objeto[encabezado] =
-                                row.c[indice]
-                                    ? row.c[indice].v
-                                    : "";
+                }
+
+
+                if (
+                    !Array.isArray(
+                        data.empleados
+                    )
+                ) {
+
+                    throw new Error(
+                        "BASE_QR no devolvió empleados."
+                    );
+
+                }
+
+
+                empleados =
+                    data.empleados.filter(
+                        function(empleado) {
+
+                            const estatus =
+                                String(
+
+                                    empleado.estatus ||
+                                    empleado.Estatus ||
+                                    empleado.ESTATUS ||
+                                    ""
+
+                                )
+                                .trim()
+                                .toUpperCase();
+
+
+                            return (
+                                estatus ===
+                                "ACTIVO"
+                            );
 
                         }
                     );
 
-                    return objeto;
 
-                })
-                .filter(empleado => {
+                if (
+                    empleados.length === 0
+                ) {
 
-                    const estatus =
-                        String(
-                            empleado.estatus ||
-                            empleado.Estatus ||
-                            empleado.ESTATUS ||
-                            ""
-                        )
-                        .trim()
-                        .toUpperCase();
+                    throw new Error(
+                        "BASE_QR cargó correctamente, pero no encontró empleados ACTIVO."
+                    );
 
-                    return estatus === "ACTIVO";
-
-                });
+                }
 
 
-            if (!empleados.length) {
+                console.log(
+                    "Empleados cargados:",
+                    empleados.length
+                );
 
-                throw new Error(
-                    "La base se cargó, pero no se encontraron empleados activos."
+
+                construirServicios();
+
+
+                if (
+                    !servicios ||
+                    servicios.size === 0
+                ) {
+
+                    throw new Error(
+                        "BASE_QR cargó, pero no se encontraron servicios."
+                    );
+
+                }
+
+
+                limpiar();
+
+
+                mostrarEstado(
+                    "Base cargada. Obteniendo ubicación..."
+                );
+
+
+                iniciarSistema();
+
+
+            } catch (error) {
+
+                console.error(
+                    error
+                );
+
+
+                limpiar();
+
+
+                mostrarEstado(
+                    error.message ||
+                    "Error al procesar BASE_QR.",
+                    "error"
                 );
 
             }
 
-
-            construirServicios();
-
-            limpiar();
-
-            iniciarSistema();
-
-        } catch (error) {
-
-            console.error(error);
-
-            limpiar();
-
-            mostrarEstado(
-                error.message ||
-                "No fue posible procesar la base.",
-                "error"
-            );
-
-        }
-
-    };
+        };
 
 
-    script.src =
-        "https://docs.google.com/spreadsheets/d/" +
-        ID_ARCHIVO +
-        "/gviz/tq" +
-        "?gid=" +
-        ID_BASE_QR +
-        "&tqx=" +
+    const url =
+        URL_APPS_SCRIPT +
+        "?action=base" +
+        "&callback=" +
         encodeURIComponent(
-            "out:json;responseHandler=" +
             callbackName
         );
 
 
-    script.onerror = function() {
-
-        if (terminado) return;
-
-        terminado = true;
-
-        clearTimeout(temporizador);
-
-        limpiar();
-
-        mostrarEstado(
-            "Google Sheets rechazó la conexión con la base BASE_QR.",
-            "error"
-        );
-
-    };
+    script.src =
+        url;
 
 
-    script.async = true;
+    script.async =
+        true;
 
-    document.body.appendChild(script);
+
+    script.onerror =
+        function() {
+
+            if (terminado) return;
+
+
+            terminado = true;
+
+            clearTimeout(
+                temporizador
+            );
+
+
+            limpiar();
+
+
+            mostrarEstado(
+                "No fue posible conectar con Apps Script.",
+                "error"
+            );
+
+        };
+
+
+    document.body.appendChild(
+        script
+    );
+
 }
-
 
 /* =========================================================
    CONSTRUIR SERVICIOS
