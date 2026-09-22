@@ -1,592 +1,563 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>TORRE DE CONTROL - AUTORITAS</title>
+<title>Torre de Control - Registro QR</title>
 
 <style>
-* {
-    box-sizing: border-box;
+*{
+    box-sizing:border-box;
 }
 
-body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #071b33;
-    color: #ffffff;
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#071b33;
+    color:#fff;
+    min-height:100vh;
 }
 
-.container {
-    max-width: 900px;
-    margin: auto;
-    padding: 20px;
+.header{
+    background:#0b2b50;
+    border-bottom:3px solid #d4af37;
+    padding:18px 20px;
+    text-align:center;
 }
 
-.header {
-    background: #0b2b50;
-    border-bottom: 3px solid #d4af37;
-    padding: 18px;
-    text-align: center;
-    border-radius: 0 0 15px 15px;
+.header h1{
+    margin:0;
+    font-size:25px;
+    color:#fff;
 }
 
-.header h1 {
-    margin: 0;
-    font-size: 24px;
-    color: #d4af37;
+.header p{
+    margin:6px 0 0;
+    color:#d4af37;
+    font-size:14px;
+    font-weight:bold;
 }
 
-.header p {
-    margin: 6px 0 0;
-    font-size: 13px;
-    color: #dce6f2;
+.container{
+    width:100%;
+    max-width:850px;
+    margin:auto;
+    padding:18px;
 }
 
-.card {
-    background: #0d3158;
-    margin-top: 18px;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(0,0,0,.25);
+.card{
+    background:#0d3158;
+    border-radius:14px;
+    padding:18px;
+    margin-bottom:16px;
+    box-shadow:0 5px 15px rgba(0,0,0,.25);
 }
 
-.card h2 {
-    margin-top: 0;
-    color: #d4af37;
+.card h2{
+    margin:0 0 14px;
+    font-size:19px;
+    color:#d4af37;
 }
 
-button {
-    width: 100%;
-    border: none;
-    border-radius: 10px;
-    padding: 15px;
-    margin-top: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
+.hidden{
+    display:none!important;
 }
 
-.btn-primary {
-    background: #d4af37;
-    color: #071b33;
+label{
+    display:block;
+    font-size:14px;
+    font-weight:bold;
+    margin-bottom:6px;
 }
 
-.btn-secondary {
-    background: #1d527f;
-    color: white;
+select,
+input{
+    width:100%;
+    padding:13px;
+    border-radius:9px;
+    border:1px solid #53708f;
+    background:#071b33;
+    color:#fff;
+    font-size:15px;
+    outline:none;
 }
 
-.btn-danger {
-    background: #b72c2c;
-    color: white;
+select:focus,
+input:focus{
+    border-color:#d4af37;
 }
 
-.btn-success {
-    background: #238636;
-    color: white;
+button{
+    width:100%;
+    border:0;
+    border-radius:9px;
+    padding:14px;
+    margin-top:9px;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
 }
 
-button:disabled {
-    opacity: .5;
-    cursor: not-allowed;
+button:disabled{
+    opacity:.45;
+    cursor:not-allowed;
 }
 
-input,
-select {
-    width: 100%;
-    padding: 13px;
-    margin-top: 8px;
-    border-radius: 8px;
-    border: 1px solid #496b8c;
-    background: #071b33;
-    color: white;
-    font-size: 16px;
+.btn-primary{
+    background:#d4af37;
+    color:#071b33;
 }
 
-.label {
-    display: block;
-    margin-top: 15px;
-    font-weight: bold;
-    color: #dce6f2;
+.btn-secondary{
+    background:#19558b;
+    color:#fff;
 }
 
-.estado {
-    text-align: center;
-    padding: 12px;
-    margin-top: 15px;
-    border-radius: 10px;
-    background: #102b46;
-    color: #dce6f2;
+.btn-danger{
+    background:#b93636;
+    color:#fff;
 }
 
-.exito {
-    background: #165c32;
-    color: #fff;
+.btn-success{
+    background:#218c57;
+    color:#fff;
 }
 
-.error {
-    background: #702020;
-    color: #fff;
+.btn-dark{
+    background:#071b33;
+    color:#fff;
+    border:1px solid #53708f;
 }
 
-.aviso {
-    background: #735b12;
-    color: #fff;
+.grid2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
 }
 
-.oculto {
-    display: none !important;
+.service-info{
+    background:#071b33;
+    border-radius:10px;
+    padding:14px;
+    line-height:1.6;
 }
 
-.info {
-    background: #092541;
-    border-left: 4px solid #d4af37;
-    padding: 12px;
-    margin-top: 10px;
-    border-radius: 8px;
+.service-title{
+    color:#d4af37;
+    font-weight:bold;
+    font-size:17px;
+    margin-bottom:5px;
 }
 
-.dato {
-    margin: 7px 0;
+.info-row{
+    margin:3px 0;
 }
 
-.dato strong {
-    color: #d4af37;
+.status{
+    border-radius:10px;
+    padding:13px;
+    margin-bottom:15px;
+    font-weight:bold;
+    text-align:center;
+    display:none;
 }
 
-.foto-container {
-    margin-top: 15px;
-    text-align: center;
+.status.info{
+    display:block;
+    background:#12456e;
+    color:#fff;
 }
 
-video,
-canvas,
-#previewFoto {
-    width: 100%;
-    max-width: 500px;
-    border-radius: 10px;
-    margin-top: 10px;
+.status.success{
+    display:block;
+    background:#145d3c;
+    color:#fff;
 }
 
-#previewFoto {
-    display: none;
+.status.error{
+    display:block;
+    background:#722d2d;
+    color:#fff;
 }
 
-.small {
-    font-size: 12px;
-    color: #b9c7d6;
+.status.warning{
+    display:block;
+    background:#765d16;
+    color:#fff;
 }
 
-.grid-botones {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+.person-box{
+    background:#071b33;
+    border:1px solid #315879;
+    border-radius:10px;
+    padding:13px;
+    margin-top:12px;
 }
 
-@media(max-width:600px) {
-    .grid-botones {
-        grid-template-columns: 1fr;
+.person-name{
+    font-size:18px;
+    font-weight:bold;
+    color:#d4af37;
+}
+
+.person-data{
+    font-size:14px;
+    margin-top:5px;
+    line-height:1.5;
+}
+
+.registration-buttons{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.registration-buttons button{
+    margin-top:0;
+    min-height:65px;
+    font-size:17px;
+}
+
+.registration-selected{
+    outline:3px solid #d4af37;
+}
+
+.camera-box{
+    background:#071b33;
+    border-radius:12px;
+    padding:10px;
+    text-align:center;
+}
+
+#video{
+    width:100%;
+    max-height:380px;
+    object-fit:cover;
+    border-radius:10px;
+    background:#000;
+}
+
+#canvas{
+    display:none;
+}
+
+#fotoPreview{
+    width:100%;
+    max-height:380px;
+    object-fit:contain;
+    border-radius:10px;
+    margin-top:10px;
+}
+
+.small{
+    font-size:12px;
+    color:#b9c9d9;
+}
+
+.gps-ok{
+    color:#55d98a;
+    font-weight:bold;
+}
+
+.gps-error{
+    color:#ff7070;
+    font-weight:bold;
+}
+
+.loading{
+    text-align:center;
+    padding:20px;
+    color:#d4af37;
+    font-weight:bold;
+}
+
+@media(max-width:650px){
+    .grid2{
+        grid-template-columns:1fr;
+    }
+
+    .registration-buttons{
+        grid-template-columns:1fr;
+    }
+
+    .container{
+        padding:12px;
+    }
+
+    .header h1{
+        font-size:21px;
     }
 }
 </style>
-
 </head>
 
 <body>
 
+<div class="header">
+    <h1>TORRE DE CONTROL</h1>
+    <p>REGISTRO DE ASISTENCIA QR</p>
+</div>
+
 <div class="container">
 
-```
-<div class="header">
-    <h1>AUTORITAS</h1>
-    <p>TORRE DE CONTROL</p>
-</div>
+    <div id="estado" class="status"></div>
 
-<div id="estadoSistema" class="estado">
-    Iniciando sistema...
-</div>
+    <!-- SERVICIO -->
+    <div id="cardServicio" class="card hidden">
+        <h2>Servicio detectado</h2>
 
+        <div class="service-info">
+            <div class="service-title" id="txtServicio">
+                Buscando servicio...
+            </div>
 
-<!-- =====================================================
-     SERVICIO
-====================================================== -->
+            <div class="info-row">
+                <strong>Inmueble:</strong>
+                <span id="txtInmueble">---</span>
+            </div>
 
-<div id="cardServicio" class="card oculto">
+            <div class="info-row">
+                <strong>Ubicación:</strong>
+                <span id="txtUbicacion">---</span>
+            </div>
 
-    <h2>Servicio</h2>
-
-    <div class="info">
-
-        <div class="dato">
-            <strong>Servicio:</strong>
-            <span id="nombreServicio">-</span>
+            <div class="info-row">
+                <strong>GPS:</strong>
+                <span id="txtGPS">Buscando ubicación...</span>
+            </div>
         </div>
-
-        <div class="dato">
-            <strong>Inmueble:</strong>
-            <span id="inmuebleServicio">-</span>
-        </div>
-
-        <div class="dato">
-            <strong>Ubicación:</strong>
-            <span id="ubicacionServicio">-</span>
-        </div>
-
-        <div class="dato">
-            <strong>GPS:</strong>
-            <span id="gpsServicio">Esperando...</span>
-        </div>
-
-    </div>
-
-    <button
-        class="btn-primary"
-        onclick="seleccionarPersonal()">
-        PERSONAL DEL SERVICIO
-    </button>
-
-    <button
-        class="btn-secondary"
-        onclick="seleccionarApoyo()">
-        APOYO
-    </button>
-
-    <button
-        class="btn-secondary"
-        onclick="seleccionarAdministrativo()">
-        ADMINISTRATIVO
-    </button>
-
-</div>
-
-
-<!-- =====================================================
-     PERSONAL
-====================================================== -->
-
-<div id="cardPersonal" class="card oculto">
-
-    <h2>Personal</h2>
-
-    <label class="label">
-        Puesto
-    </label>
-
-    <select
-        id="puestoPersonal"
-        onchange="cargarPersonalPorPuesto()">
-
-        <option value="">
-            Seleccione puesto
-        </option>
-
-        <option value="GUARDIA">
-            GUARDIA
-        </option>
-
-        <option value="MONITORISTA">
-            MONITORISTA
-        </option>
-
-        <option value="ERI">
-            ERI
-        </option>
-
-    </select>
-
-    <label class="label">
-        Personal
-    </label>
-
-    <select id="empleadoPersonal">
-
-        <option value="">
-            Seleccione personal
-        </option>
-
-    </select>
-
-    <button
-        class="btn-primary"
-        onclick="continuarPersonal()">
-        CONTINUAR
-    </button>
-
-    <button
-        class="btn-danger"
-        onclick="volverServicio()">
-        REGRESAR
-    </button>
-
-</div>
-
-
-<!-- =====================================================
-     APOYO
-====================================================== -->
-
-<div id="cardApoyo" class="card oculto">
-
-    <h2>Registro de apoyo</h2>
-
-    <label class="label">
-        Número de empleado
-    </label>
-
-    <input
-        id="numeroApoyo"
-        type="text"
-        placeholder="Ingrese número de empleado">
-
-    <button
-        class="btn-primary"
-        onclick="buscarApoyo()">
-        BUSCAR
-    </button>
-
-    <div id="resultadoApoyo"></div>
-
-    <button
-        class="btn-danger"
-        onclick="volverServicio()">
-        REGRESAR
-    </button>
-
-</div>
-
-
-<!-- =====================================================
-     ADMINISTRATIVO
-====================================================== -->
-
-<div id="cardAdministrativo" class="card oculto">
-
-    <h2>Registro administrativo</h2>
-
-    <label class="label">
-        Número de empleado
-    </label>
-
-    <input
-        id="numeroAdministrativo"
-        type="text"
-        placeholder="Ingrese número de empleado">
-
-    <button
-        class="btn-primary"
-        onclick="buscarAdministrativo()">
-        BUSCAR
-    </button>
-
-    <div id="resultadoAdministrativo"></div>
-
-    <button
-        class="btn-danger"
-        onclick="volverServicio()">
-        REGRESAR
-    </button>
-
-</div>
-
-
-<!-- =====================================================
-     REGISTRO
-====================================================== -->
-
-<div id="cardRegistro" class="card oculto">
-
-    <h2>Tipo de registro</h2>
-
-    <div id="infoRegistro" class="info"></div>
-
-    <div id="botonesRegistro" class="grid-botones">
 
         <button
-            id="btnEntrada"
-            class="btn-success"
-            onclick="seleccionarTipoRegistro('ENTRADA')">
-            ENTRADA
+            id="btnPersonalServicio"
+            class="btn-primary"
+            onclick="mostrarPersonalServicio()">
+            PERSONAL DEL SERVICIO
         </button>
 
         <button
-            id="btnSalida"
+            id="btnApoyo"
             class="btn-secondary"
-            onclick="seleccionarTipoRegistro('SALIDA')">
-            SALIDA
+            onclick="mostrarApoyo()">
+            APOYO
         </button>
 
+        <button
+            id="btnAdministrativo"
+            class="btn-dark"
+            onclick="mostrarAdministrativo()">
+            ADMINISTRATIVO
+        </button>
     </div>
 
-    <div
-        id="mensajeCandado"
-        class="estado oculto">
+    <!-- PERSONAL DEL SERVICIO -->
+    <div id="cardPersonal" class="card hidden">
+        <h2>Personal del servicio</h2>
+
+        <label for="puestoPersonal">Puesto</label>
+
+        <select id="puestoPersonal" onchange="cargarPersonalPorPuesto()">
+            <option value="">Seleccione puesto</option>
+            <option value="GUARDIA">GUARDIA</option>
+            <option value="MONITORISTA">MONITORISTA</option>
+            <option value="ERI">ERI</option>
+        </select>
+
+        <div id="contenedorPersonal" class="hidden" style="margin-top:12px;">
+            <label for="empleadoPersonal">Empleado</label>
+
+            <select
+                id="empleadoPersonal"
+                onchange="seleccionarPersonal()">
+                <option value="">Seleccione empleado</option>
+            </select>
+        </div>
+
+        <div id="datosPersonal" class="person-box hidden"></div>
     </div>
 
-    <button
-        class="btn-danger"
-        onclick="volverServicio()">
-        REGRESAR
-    </button>
+    <!-- APOYO -->
+    <div id="cardApoyo" class="card hidden">
+        <h2>Registro de apoyo</h2>
 
-</div>
+        <label for="numeroApoyo">Número de empleado</label>
 
+        <input
+            id="numeroApoyo"
+            type="text"
+            inputmode="numeric"
+            placeholder="Ingrese número de empleado">
 
-<!-- =====================================================
-     FOTO
-====================================================== -->
+        <button
+            class="btn-secondary"
+            onclick="buscarApoyo()">
+            BUSCAR APOYO
+        </button>
 
-<div id="cardFoto" class="card oculto">
-
-    <h2>Fotografía</h2>
-
-    <div class="info">
-        Debes tomar una fotografía para completar el registro.
+        <div id="datosApoyo" class="person-box hidden"></div>
     </div>
 
-    <div class="foto-container">
+    <!-- ADMINISTRATIVO -->
+    <div id="cardAdministrativo" class="card hidden">
+        <h2>Registro administrativo</h2>
 
-        <video
-            id="video"
-            autoplay
-            playsinline>
-        </video>
+        <label for="numeroAdministrativo">Número de empleado</label>
 
-        <canvas
-            id="canvas"
-            class="oculto">
-        </canvas>
+        <input
+            id="numeroAdministrativo"
+            type="text"
+            inputmode="numeric"
+            placeholder="Ingrese número de empleado">
 
-        <img
-            id="previewFoto"
-            alt="Vista previa">
+        <button
+            class="btn-secondary"
+            onclick="buscarAdministrativo()">
+            BUSCAR ADMINISTRATIVO
+        </button>
 
+        <div id="datosAdministrativo" class="person-box hidden"></div>
     </div>
 
-    <button
-        class="btn-secondary"
-        onclick="abrirCamara()">
-        ACTIVAR CÁMARA
-    </button>
+    <!-- REGISTRO -->
+    <div id="cardRegistro" class="card hidden">
+        <h2>Tipo de registro</h2>
 
-    <button
-        class="btn-primary"
-        onclick="tomarFotografia()">
-        TOMAR FOTOGRAFÍA
-    </button>
+        <div id="datosRegistro" class="person-box"></div>
 
-    <button
-        id="btnEnviar"
-        class="btn-success"
-        onclick="enviarRegistro()">
-        ENVIAR REGISTRO
-    </button>
+        <div
+            id="mensajeCandado"
+            class="status warning hidden"
+            style="margin-top:12px;">
+        </div>
 
-    <button
-        class="btn-danger"
-        onclick="cancelarFoto()">
-        CANCELAR
-    </button>
+        <div
+            id="botonesRegistro"
+            class="registration-buttons"
+            style="margin-top:14px;">
 
-</div>
-```
+            <button
+                id="btnEntrada"
+                class="btn-success"
+                onclick="seleccionarTipoRegistro('ENTRADA')">
+                ENTRADA
+            </button>
+
+            <button
+                id="btnSalida"
+                class="btn-danger"
+                onclick="seleccionarTipoRegistro('SALIDA')">
+                SALIDA
+            </button>
+        </div>
+    </div>
+
+    <!-- FOTO -->
+    <div id="cardFoto" class="card hidden">
+        <h2>Fotografía del registro</h2>
+
+        <div class="camera-box">
+
+            <video
+                id="video"
+                autoplay
+                playsinline>
+            </video>
+
+            <canvas id="canvas"></canvas>
+
+            <img
+                id="fotoPreview"
+                class="hidden"
+                alt="Vista previa">
+
+            <button
+                id="btnTomarFoto"
+                class="btn-primary"
+                onclick="tomarFotografia()">
+                TOMAR FOTOGRAFÍA
+            </button>
+
+            <button
+                id="btnRepetirFoto"
+                class="btn-secondary hidden"
+                onclick="iniciarCamara()">
+                REPETIR FOTOGRAFÍA
+            </button>
+
+        </div>
+
+        <button
+            id="btnEnviar"
+            class="btn-success"
+            onclick="enviarRegistro()"
+            disabled>
+            ENVIAR REGISTRO
+        </button>
+
+        <button
+            class="btn-danger"
+            onclick="cancelarRegistro()">
+            CANCELAR
+        </button>
+    </div>
 
 </div>
 
 <script>
 
-/* =========================================================
-   CONFIGURACIÓN
-========================================================= */
-
 const ID_ARCHIVO =
     "1zdYovCmbhHOyMVy-huWqzgB6Q5x1XgL8dghe263TTbU";
-
 
 const ID_BASE_QR =
     "1049929211";
 
-
-/*
- * NUEVA URL DEL WEB APP
- */
 const URL_APPS_SCRIPT =
     "https://script.google.com/macros/s/AKfycbwRaqv3bUBUzwJiXfX0yOjQldn51NkNMZiL8OaVw3n4RBCbA0raBqw9heAlbgLLgi3DSQ/exec";
 
-
 const CODIGO_ADMIN =
     "CENTRAL";
-
 
 const SERVICIO_CENTRAL =
     "ID-00167 - OFICINAS CENTRALES";
 
 
-/* =========================================================
-   VARIABLES
-========================================================= */
-
 let empleados = [];
 
-let servicios =
-    new Map();
+let servicios = new Map();
 
 let personalServicio = [];
 
-let empleadoPersonalActual =
-    null;
+let empleadoPersonalActual = null;
 
-let servicioActual =
-    null;
+let servicioActual = null;
 
-let empleadoApoyoActual =
-    null;
+let empleadoApoyoActual = null;
 
-let empleadoAdministrativoActual =
-    null;
+let empleadoAdministrativoActual = null;
 
 let ubicacionActual = {
-
-    latitud: null,
-
-    longitud: null,
-
-    precisionGPS: null
-
+    latitud:null,
+    longitud:null,
+    precisionGPS:null
 };
 
-let registroPendiente =
-    null;
+let registroPendiente = null;
 
-let fotoRegistroBase64 =
-    "";
+let fotoRegistroBase64 = "";
 
-let fotoRegistroNombre =
-    "";
+let fotoRegistroNombre = "";
 
-let enviandoRegistro =
-    false;
+let enviandoRegistro = false;
 
-let consultaCandadoActual =
-    0;
+let consultaCandadoActual = 0;
 
-let streamCamara =
-    null;
+let streamCamara = null;
 
 
 /* =========================================================
    INICIO
 ========================================================= */
 
-window.onload =
-function() {
-
-    mostrarEstado(
-        "Cargando base de empleados..."
-    );
+window.onload = function(){
 
     cargarBaseQR();
 
@@ -594,284 +565,93 @@ function() {
 
 
 /* =========================================================
-   ESTADO
+   ESTADOS
 ========================================================= */
 
-function mostrarEstado(
-    mensaje,
-    tipo = ""
-) {
+function mostrarEstado(mensaje,tipo){
 
     const elemento =
-        document.getElementById(
-            "estadoSistema"
-        );
+        document.getElementById("estado");
 
-    if (!elemento) {
-        return;
-    }
-
-    elemento.textContent =
-        mensaje;
+    elemento.textContent = mensaje;
 
     elemento.className =
-        "estado";
+        "status " + (tipo || "info");
 
-    if (
-        tipo === "error"
-    ) {
+    elemento.style.display = "block";
 
-        elemento.classList.add(
-            "error"
-        );
+}
 
-    }
 
-    if (
-        tipo === "exito"
-    ) {
+function ocultarEstado(){
 
-        elemento.classList.add(
-            "exito"
-        );
+    const elemento =
+        document.getElementById("estado");
 
-    }
-
-    if (
-        tipo === "aviso"
-    ) {
-
-        elemento.classList.add(
-            "aviso"
-        );
-
-    }
+    elemento.style.display = "none";
 
 }
 
 
 /* =========================================================
-   CARGAR BASE QR DESDE APPS SCRIPT
+   CARGAR BASE QR
 ========================================================= */
 
-function cargarBaseQR() {
+function cargarBaseQR(){
 
     mostrarEstado(
-        "Cargando base de empleados..."
+        "Cargando personal y servicios...",
+        "info"
     );
 
-
     const callbackName =
-        "callbackBaseQR_" +
-        Date.now();
+        "callbackBaseQR_" + Date.now();
 
+    window[callbackName] = function(data){
 
-    let terminado =
-        false;
+        try{
 
-
-    const script =
-        document.createElement(
-            "script"
-        );
-
-
-    function limpiar() {
-
-        if (
-            script.parentNode
-        ) {
-
-            script.parentNode.removeChild(
-                script
-            );
-
-        }
-
-        try {
-
-            delete window[
-                callbackName
-            ];
-
-        } catch (e) {
-
-            window[
-                callbackName
-            ] =
-                undefined;
-
-        }
-
-    }
-
-
-    const temporizador =
-        setTimeout(
-            function() {
-
-                if (terminado) {
-                    return;
-                }
-
-                terminado =
-                    true;
-
-                limpiar();
-
-                mostrarEstado(
-                    "El Apps Script no respondió al cargar BASE QR.",
-                    "error"
-                );
-
-            },
-            15000
-        );
-
-
-    window[
-        callbackName
-    ] =
-    function(data) {
-
-        if (terminado) {
-            return;
-        }
-
-
-        terminado =
-            true;
-
-
-        clearTimeout(
-            temporizador
-        );
-
-
-        try {
-
-            if (
-                !data ||
-                data.ok !== true
-            ) {
+            if(!data || data.ok !== true){
 
                 throw new Error(
-                    data &&
-                    data.error
+                    data && data.error
                         ? data.error
-                        : "No fue posible cargar BASE QR."
+                        : "No fue posible cargar la BASE_QR."
                 );
 
             }
-
-
-            if (
-                !Array.isArray(
-                    data.empleados
-                )
-            ) {
-
-                throw new Error(
-                    "BASE QR no devolvió empleados."
-                );
-
-            }
-
 
             empleados =
-                data.empleados.filter(
-                    function(empleado) {
+                Array.isArray(data.empleados)
+                    ? data.empleados
+                    : [];
 
-                        /*
-                         * Si existe estatus,
-                         * tomamos únicamente ACTIVO.
-                         *
-                         * Si no existe la columna,
-                         * no descartamos el empleado.
-                         */
+            empleados =
+                empleados.filter(function(e){
 
-                        const estatus =
-                            String(
+                    const estatus =
+                        String(
+                            e.estatus || ""
+                        ).trim().toUpperCase();
 
-                                empleado.estatus ||
-                                empleado.Estatus ||
-                                empleado.ESTATUS ||
-                                ""
+                    return (
+                        !estatus ||
+                        estatus === "ACTIVO" ||
+                        estatus === "ACTIVA"
+                    );
 
-                            )
-                            .trim()
-                            .toUpperCase();
-
-
-                        if (!estatus) {
-                            return true;
-                        }
-
-
-                        return (
-                            estatus ===
-                            "ACTIVO"
-                        );
-
-                    }
-                );
-
-
-            if (
-                empleados.length === 0
-            ) {
-
-                throw new Error(
-                    "BASE QR cargó correctamente, pero no se encontraron empleados."
-                );
-
-            }
-
-
-            console.log(
-                "Empleados cargados:",
-                empleados.length
-            );
-
+                });
 
             construirServicios();
 
+            ocultarEstado();
 
-            if (
-                servicios.size === 0
-            ) {
+            obtenerUbicacion();
 
-                throw new Error(
-                    "BASE QR cargó, pero no se encontraron servicios."
-                );
-
-            }
-
-
-            limpiar();
-
+        }catch(error){
 
             mostrarEstado(
-                "Base cargada. Obteniendo ubicación..."
-            );
-
-
-            iniciarSistema();
-
-
-        } catch (error) {
-
-            console.error(
-                error
-            );
-
-
-            limpiar();
-
-
-            mostrarEstado(
-                error.message ||
-                "Error al procesar BASE QR.",
+                error.message,
                 "error"
             );
 
@@ -879,42 +659,15 @@ function cargarBaseQR() {
 
     };
 
-
-    const url =
-        URL_APPS_SCRIPT +
-        "?action=base" +
-        "&callback=" +
-        encodeURIComponent(
-            callbackName
-        );
-
+    const script =
+        document.createElement("script");
 
     script.src =
-        url;
+        URL_APPS_SCRIPT +
+        "?action=base&callback=" +
+        encodeURIComponent(callbackName);
 
-    script.async =
-        true;
-
-
-    script.onerror =
-    function() {
-
-        if (terminado) {
-            return;
-        }
-
-
-        terminado =
-            true;
-
-
-        clearTimeout(
-            temporizador
-        );
-
-
-        limpiar();
-
+    script.onerror = function(){
 
         mostrarEstado(
             "No fue posible conectar con Apps Script.",
@@ -923,10 +676,19 @@ function cargarBaseQR() {
 
     };
 
+    document.body.appendChild(script);
 
-    document.body.appendChild(
-        script
-    );
+    setTimeout(function(){
+
+        try{
+            delete window[callbackName];
+        }catch(e){}
+
+        if(script.parentNode){
+            script.parentNode.removeChild(script);
+        }
+
+    },30000);
 
 }
 
@@ -935,115 +697,52 @@ function cargarBaseQR() {
    CONSTRUIR SERVICIOS
 ========================================================= */
 
-function construirServicios() {
+function construirServicios(){
 
     servicios.clear();
 
+    empleados.forEach(function(e){
 
-    empleados.forEach(
-        function(empleado) {
+        const codigo =
+            String(
+                e.codigoServicio || ""
+            ).trim();
 
-            const codigo =
-                String(
+        const nombreServicio =
+            String(
+                e.servicio || ""
+            ).trim();
 
-                    empleado.codigoServicio ||
-                    empleado.codigo ||
-                    empleado.servicioCodigo ||
-                    ""
+        const clave =
+            codigo ||
+            nombreServicio;
 
-                ).trim();
+        if(!clave){
+            return;
+        }
 
+        if(!servicios.has(clave)){
 
-            const nombre =
-                String(
-
-                    empleado.servicio ||
-                    empleado.nombreServicio ||
-                    ""
-
-                ).trim();
-
-
-            if (
-                !codigo &&
-                !nombre
-            ) {
-
-                return;
-
-            }
-
-
-            const clave =
-                codigo ||
-                nombre;
-
-
-            if (
-                !servicios.has(
-                    clave
-                )
-            ) {
-
-                servicios.set(
-                    clave,
-                    {
-
-                        codigoServicio:
-                            codigo,
-
-                        servicio:
-                            nombre ||
-                            codigo,
-
-                        inmueble:
-                            empleado.inmueble ||
-                            "",
-
-                        ubicacion:
-                            empleado.ubicacion ||
-                            "",
-
-                        latitud:
-                            parseFloat(
-                                empleado.latitud
-                            ) ||
-                            null,
-
-                        longitud:
-                            parseFloat(
-                                empleado.longitud
-                            ) ||
-                            null,
-
-                        radio:
-                            parseFloat(
-                                empleado.radio
-                            ) ||
-                            200
-
-                    }
-                );
-
-            }
+            servicios.set(
+                clave,
+                {
+                    codigoServicio:codigo,
+                    servicio:nombreServicio,
+                    inmueble:String(
+                        e.inmueble || ""
+                    ).trim(),
+                    ubicacion:String(
+                        e.ubicacion || ""
+                    ).trim(),
+                    latitud:parseFloat(e.latitud),
+                    longitud:parseFloat(e.longitud),
+                    radio:parseFloat(e.radio) || 200
+                }
+            );
 
         }
-    );
 
-}
-
-
-/* =========================================================
-   INICIAR SISTEMA
-========================================================= */
-
-function iniciarSistema() {
-
-    mostrarEstado(
-        "Base cargada. Obteniendo ubicación..."
-    );
-
-    obtenerGPS();
+    });
 
 }
 
@@ -1052,25 +751,23 @@ function iniciarSistema() {
    GPS
 ========================================================= */
 
-function obtenerGPS() {
+function obtenerUbicacion(){
 
-    if (
-        !navigator.geolocation
-    ) {
+    if(!navigator.geolocation){
 
-        mostrarEstado(
-            "Este dispositivo no permite obtener ubicación.",
-            "error"
-        );
+        document.getElementById("txtGPS").textContent =
+            "GPS no disponible en este dispositivo.";
+
+        document.getElementById("txtGPS").className =
+            "gps-error";
 
         return;
 
     }
 
-
     navigator.geolocation.getCurrentPosition(
 
-        function(position) {
+        function(position){
 
             ubicacionActual.latitud =
                 position.coords.latitude;
@@ -1081,141 +778,57 @@ function obtenerGPS() {
             ubicacionActual.precisionGPS =
                 position.coords.accuracy;
 
+            document.getElementById("txtGPS").textContent =
+                "OK | Precisión: " +
+                Math.round(position.coords.accuracy) +
+                " m";
 
-            document.getElementById(
-                "gpsServicio"
-            ).textContent =
-
-                ubicacionActual.latitud
-                    .toFixed(6) +
-
-                ", " +
-
-                ubicacionActual.longitud
-                    .toFixed(6);
-
+            document.getElementById("txtGPS").className =
+                "gps-ok";
 
             identificarServicio();
 
         },
 
+        function(error){
 
-        function(error) {
+            let mensaje =
+                "No se pudo obtener GPS.";
 
-            console.error(
-                error
-            );
+            if(error.code === 1){
+                mensaje =
+                    "Permiso de ubicación denegado.";
+            }
 
+            if(error.code === 2){
+                mensaje =
+                    "Ubicación no disponible.";
+            }
+
+            if(error.code === 3){
+                mensaje =
+                    "Tiempo agotado al obtener ubicación.";
+            }
+
+            document.getElementById("txtGPS").textContent =
+                mensaje;
+
+            document.getElementById("txtGPS").className =
+                "gps-error";
 
             mostrarEstado(
-                "No fue posible obtener GPS. Activa la ubicación del dispositivo.",
+                mensaje,
                 "error"
             );
 
         },
 
-
         {
-
-            enableHighAccuracy:
-                true,
-
-            timeout:
-                15000,
-
-            maximumAge:
-                0
-
+            enableHighAccuracy:true,
+            timeout:15000,
+            maximumAge:0
         }
 
-    );
-
-}
-
-
-/* =========================================================
-   IDENTIFICAR SERVICIO
-========================================================= */
-
-function identificarServicio() {
-
-    let servicioMasCercano =
-        null;
-
-    let distanciaMenor =
-        Infinity;
-
-
-    servicios.forEach(
-        function(servicio) {
-
-            if (
-                servicio.latitud ===
-                    null ||
-
-                servicio.longitud ===
-                    null
-            ) {
-
-                return;
-
-            }
-
-
-            const distancia =
-                calcularDistancia(
-
-                    ubicacionActual.latitud,
-
-                    ubicacionActual.longitud,
-
-                    servicio.latitud,
-
-                    servicio.longitud
-
-                );
-
-
-            if (
-
-                distancia <
-                (servicio.radio || 200)
-
-                &&
-
-                distancia <
-                distanciaMenor
-
-            ) {
-
-                distanciaMenor =
-                    distancia;
-
-                servicioMasCercano =
-                    servicio;
-
-            }
-
-        }
-    );
-
-
-    if (
-        !servicioMasCercano
-    ) {
-
-        mostrarEstado(
-            "No se identificó un servicio en esta ubicación.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    entrarAlServicio(
-        servicioMasCercano
     );
 
 }
@@ -1225,70 +838,104 @@ function identificarServicio() {
    DISTANCIA GPS
 ========================================================= */
 
-function calcularDistancia(
+function distanciaMetros(
     lat1,
     lon1,
     lat2,
     lon2
-) {
+){
 
-    const R =
-        6371000;
-
+    const R = 6371000;
 
     const rad =
-        Math.PI /
-        180;
-
+        Math.PI / 180;
 
     const dLat =
-        (lat2 - lat1) *
-        rad;
-
+        (lat2-lat1) * rad;
 
     const dLon =
-        (lon2 - lon1) *
-        rad;
-
+        (lon2-lon1) * rad;
 
     const a =
-        Math.sin(
-            dLat / 2
-        ) ** 2
-
-        +
-
-        Math.cos(
-            lat1 * rad
-        )
-
-        *
-
-        Math.cos(
-            lat2 * rad
-        )
-
-        *
-
-        Math.sin(
-            dLon / 2
-        ) ** 2;
-
+        Math.sin(dLat/2) *
+        Math.sin(dLat/2) +
+        Math.cos(lat1*rad) *
+        Math.cos(lat2*rad) *
+        Math.sin(dLon/2) *
+        Math.sin(dLon/2);
 
     const c =
         2 *
         Math.atan2(
-
             Math.sqrt(a),
-
-            Math.sqrt(
-                1 - a
-            )
-
+            Math.sqrt(1-a)
         );
 
+    return R*c;
 
-    return R * c;
+}
+
+
+/* =========================================================
+   IDENTIFICAR SERVICIO
+========================================================= */
+
+function identificarServicio(){
+
+    let servicioEncontrado = null;
+
+    let menorDistancia = Infinity;
+
+    servicios.forEach(function(servicio){
+
+        if(
+            !isFinite(servicio.latitud) ||
+            !isFinite(servicio.longitud)
+        ){
+            return;
+        }
+
+        const distancia =
+            distanciaMetros(
+                ubicacionActual.latitud,
+                ubicacionActual.longitud,
+                servicio.latitud,
+                servicio.longitud
+            );
+
+        const radio =
+            servicio.radio || 200;
+
+        if(
+            distancia <= radio &&
+            distancia < menorDistancia
+        ){
+
+            menorDistancia =
+                distancia;
+
+            servicioEncontrado =
+                servicio;
+
+        }
+
+    });
+
+    if(!servicioEncontrado){
+
+        mostrarEstado(
+            "No se encontró un servicio dentro del radio permitido.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    entrarAlServicio(
+        servicioEncontrado,
+        menorDistancia
+    );
 
 }
 
@@ -1298,86 +945,1552 @@ function calcularDistancia(
 ========================================================= */
 
 function entrarAlServicio(
-    servicio
-) {
+    servicio,
+    distancia
+){
 
     servicioActual =
         servicio;
 
-
-    document.getElementById(
-        "nombreServicio"
-    ).textContent =
-        servicio.servicio ||
-        "-";
-
-
-    document.getElementById(
-        "inmuebleServicio"
-    ).textContent =
-        servicio.inmueble ||
-        "-";
-
-
-    document.getElementById(
-        "ubicacionServicio"
-    ).textContent =
-        servicio.ubicacion ||
-        "-";
-
-
-    document.getElementById(
-        "gpsServicio"
-    ).textContent =
-
-        ubicacionActual.latitud
-            .toFixed(6) +
-
-        ", " +
-
-        ubicacionActual.longitud
-            .toFixed(6);
-
-
-    ocultarTodasLasTarjetas();
-
-
     document.getElementById(
         "cardServicio"
-    ).classList.remove(
-        "oculto"
-    );
+    ).classList.remove("hidden");
 
+    document.getElementById(
+        "txtServicio"
+    ).textContent =
+        servicio.servicio ||
+        servicio.codigoServicio ||
+        "---";
+
+    document.getElementById(
+        "txtInmueble"
+    ).textContent =
+        servicio.inmueble ||
+        "---";
+
+    document.getElementById(
+        "txtUbicacion"
+    ).textContent =
+        servicio.ubicacion ||
+        "---";
 
     mostrarEstado(
-        "Servicio identificado correctamente.",
-        "exito"
+        "Servicio identificado correctamente. Distancia aproximada: " +
+        Math.round(distancia) +
+        " m.",
+        "success"
     );
 
 }
 
 
 /* =========================================================
-   PERSONAL
+   OCULTAR TARJETAS
 ========================================================= */
 
-function seleccionarPersonal() {
-
-    ocultarTodasLasTarjetas();
-
+function ocultarTarjetas(){
 
     document.getElementById(
         "cardPersonal"
-    ).classList.remove(
-        "oculto"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "cardApoyo"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "cardAdministrativo"
+    ).classList.add("hidden");
+
+}
+
+
+/* =========================================================
+   PERSONAL DEL SERVICIO
+========================================================= */
+
+function mostrarPersonalServicio(){
+
+    if(!servicioActual){
+
+        mostrarEstado(
+            "Primero debe identificarse el servicio.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    ocultarTarjetas();
+
+    document.getElementById(
+        "cardPersonal"
+    ).classList.remove("hidden");
+
+    document.getElementById(
+        "puestoPersonal"
+    ).value = "";
+
+    document.getElementById(
+        "contenedorPersonal"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "datosPersonal"
+    ).classList.add("hidden");
+
+    empleadoPersonalActual = null;
+
+}
+
+
+/* =========================================================
+   CARGAR PERSONAL POR PUESTO
+========================================================= */
+
+function cargarPersonalPorPuesto(){
+
+    const puesto =
+        document.getElementById(
+            "puestoPersonal"
+        ).value;
+
+    const select =
+        document.getElementById(
+            "empleadoPersonal"
+        );
+
+    select.innerHTML =
+        '<option value="">Seleccione empleado</option>';
+
+    empleadoPersonalActual = null;
+
+    document.getElementById(
+        "datosPersonal"
+    ).classList.add("hidden");
+
+    if(!puesto){
+
+        document.getElementById(
+            "contenedorPersonal"
+        ).classList.add("hidden");
+
+        return;
+
+    }
+
+    personalServicio =
+        empleados.filter(function(e){
+
+            const puestoEmpleado =
+                String(
+                    e.posicion || ""
+                ).trim().toUpperCase();
+
+            const codigoEmpleado =
+                String(
+                    e.codigoServicio || ""
+                ).trim();
+
+            const servicioEmpleado =
+                String(
+                    e.servicio || ""
+                ).trim();
+
+            const codigoActual =
+                String(
+                    servicioActual.codigoServicio || ""
+                ).trim();
+
+            const nombreActual =
+                String(
+                    servicioActual.servicio || ""
+                ).trim();
+
+            const mismoServicio =
+                (
+                    codigoEmpleado &&
+                    codigoActual &&
+                    codigoEmpleado === codigoActual
+                ) ||
+                (
+                    servicioEmpleado &&
+                    nombreActual &&
+                    servicioEmpleado === nombreActual
+                );
+
+            return (
+                puestoEmpleado ===
+                puesto &&
+                mismoServicio
+            );
+
+        });
+
+    personalServicio.sort(function(a,b){
+
+        return String(a.nombre || "")
+            .localeCompare(
+                String(b.nombre || ""),
+                "es"
+            );
+
+    });
+
+    personalServicio.forEach(function(e){
+
+        const option =
+            document.createElement("option");
+
+        option.value =
+            String(
+                e.numeroEmpleado || ""
+            );
+
+        option.textContent =
+            String(
+                e.nombre || "SIN NOMBRE"
+            ) +
+            " | " +
+            String(
+                e.numeroEmpleado || ""
+            );
+
+        select.appendChild(option);
+
+    });
+
+    document.getElementById(
+        "contenedorPersonal"
+    ).classList.remove("hidden");
+
+    if(personalServicio.length === 0){
+
+        mostrarEstado(
+            "No se encontró personal de este puesto asignado al servicio.",
+            "warning"
+        );
+
+    }else{
+
+        ocultarEstado();
+
+    }
+
+}
+
+
+/* =========================================================
+   SELECCIONAR PERSONAL
+========================================================= */
+
+function seleccionarPersonal(){
+
+    const numero =
+        String(
+            document.getElementById(
+                "empleadoPersonal"
+            ).value
+        ).trim();
+
+    if(!numero){
+
+        empleadoPersonalActual = null;
+
+        document.getElementById(
+            "datosPersonal"
+        ).classList.add("hidden");
+
+        return;
+
+    }
+
+    empleadoPersonalActual =
+        empleados.find(function(e){
+
+            return String(
+                e.numeroEmpleado || ""
+            ).trim() === numero;
+
+        });
+
+    if(!empleadoPersonalActual){
+
+        mostrarEstado(
+            "No se encontró el empleado.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    const caja =
+        document.getElementById(
+            "datosPersonal"
+        );
+
+    caja.innerHTML =
+        "<div class='person-name'>" +
+        escapeHTML(
+            empleadoPersonalActual.nombre || ""
+        ) +
+        "</div>" +
+        "<div class='person-data'>" +
+        "<strong>Número:</strong> " +
+        escapeHTML(
+            empleadoPersonalActual.numeroEmpleado || ""
+        ) +
+        "<br>" +
+        "<strong>Puesto:</strong> " +
+        escapeHTML(
+            empleadoPersonalActual.posicion || ""
+        ) +
+        "</div>";
+
+    caja.classList.remove("hidden");
+
+    prepararRegistro(
+        empleadoPersonalActual,
+        empleadoPersonalActual.posicion || "GUARDIA"
     );
 
 }
 
 
-function cargarPersonalPorPuesto() {
+/* =========================================================
+   APOYO
+========================================================= */
 
-    const puesto =
+function mostrarApoyo(){
+
+    ocultarTarjetas();
+
+    document.getElementById(
+        "cardApoyo"
+    ).classList.remove("hidden");
+
+    document.getElementById(
+        "numeroApoyo"
+    ).value = "";
+
+    document.getElementById(
+        "datosApoyo"
+    ).classList.add("hidden");
+
+    empleadoApoyoActual = null;
+
+}
+
+
+function buscarApoyo(){
+
+    const numero =
+        String(
+            document.getElementById(
+                "numeroApoyo"
+            ).value
+        ).trim();
+
+    if(!numero){
+
+        mostrarEstado(
+            "Ingrese el número de empleado.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    const empleado =
+        empleados.find(function(e){
+
+            return String(
+                e.numeroEmpleado || ""
+            ).trim() === numero;
+
+        });
+
+    if(!empleado){
+
+        mostrarEstado(
+            "No se encontró un empleado con ese número.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    empleadoApoyoActual =
+        empleado;
+
+    const caja =
         document.getElementById(
-            "puestoPersonal"
-        ).val
+            "datosApoyo"
+        );
+
+    caja.innerHTML =
+        "<div class='person-name'>" +
+        escapeHTML(
+            empleado.nombre || ""
+        ) +
+        "</div>" +
+        "<div class='person-data'>" +
+        "<strong>Número:</strong> " +
+        escapeHTML(
+            empleado.numeroEmpleado || ""
+        ) +
+        "<br>" +
+        "<strong>Puesto:</strong> " +
+        escapeHTML(
+            empleado.posicion || ""
+        ) +
+        "</div>";
+
+    caja.classList.remove("hidden");
+
+    prepararRegistro(
+        empleado,
+        empleado.posicion || "GUARDIA"
+    );
+
+}
+
+
+/* =========================================================
+   ADMINISTRATIVO
+========================================================= */
+
+function mostrarAdministrativo(){
+
+    ocultarTarjetas();
+
+    document.getElementById(
+        "cardAdministrativo"
+    ).classList.remove("hidden");
+
+    document.getElementById(
+        "numeroAdministrativo"
+    ).value = "";
+
+    document.getElementById(
+        "datosAdministrativo"
+    ).classList.add("hidden");
+
+    empleadoAdministrativoActual = null;
+
+}
+
+
+function buscarAdministrativo(){
+
+    const numero =
+        String(
+            document.getElementById(
+                "numeroAdministrativo"
+            ).value
+        ).trim();
+
+    if(!numero){
+
+        mostrarEstado(
+            "Ingrese el número de empleado.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    const empleado =
+        empleados.find(function(e){
+
+            return String(
+                e.numeroEmpleado || ""
+            ).trim() === numero;
+
+        });
+
+    if(!empleado){
+
+        mostrarEstado(
+            "No se encontró un empleado con ese número.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    empleadoAdministrativoActual =
+        empleado;
+
+    const caja =
+        document.getElementById(
+            "datosAdministrativo"
+        );
+
+    caja.innerHTML =
+        "<div class='person-name'>" +
+        escapeHTML(
+            empleado.nombre || ""
+        ) +
+        "</div>" +
+        "<div class='person-data'>" +
+        "<strong>Número:</strong> " +
+        escapeHTML(
+            empleado.numeroEmpleado || ""
+        ) +
+        "<br>" +
+        "<strong>Registro:</strong> ADMINISTRATIVO" +
+        "</div>";
+
+    caja.classList.remove("hidden");
+
+    /*
+       Se manda ADMINISTRATIVO para que Apps Script
+       aplique la excepción del candado.
+    */
+
+    prepararRegistro(
+        empleado,
+        "ADMINISTRATIVO"
+    );
+
+}
+
+
+/* =========================================================
+   PREPARAR REGISTRO
+========================================================= */
+
+function prepararRegistro(
+    empleado,
+    posicionForzada
+){
+
+    if(!empleado){
+
+        return;
+
+    }
+
+    if(!servicioActual){
+
+        mostrarEstado(
+            "No hay servicio detectado.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    const posicion =
+        posicionForzada ||
+        empleado.posicion ||
+        "";
+
+    registroPendiente = {
+        nombre:
+            String(
+                empleado.nombre || ""
+            ).trim(),
+
+        numeroEmpleado:
+            String(
+                empleado.numeroEmpleado || ""
+            ).trim(),
+
+        posicion:
+            String(
+                posicion
+            ).trim().toUpperCase(),
+
+        servicio:
+            servicioActual.servicio ||
+            servicioActual.codigoServicio ||
+            "",
+
+        servicioDetectado:
+            servicioActual.codigoServicio ||
+            servicioActual.servicio ||
+            "",
+
+        servicioOrigen:
+            servicioActual.codigoServicio ||
+            servicioActual.servicio ||
+            "",
+
+        inmueble:
+            servicioActual.inmueble || ""
+    };
+
+    document.getElementById(
+        "cardRegistro"
+    ).classList.remove("hidden");
+
+    document.getElementById(
+        "cardFoto"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "btnEntrada"
+    ).disabled = true;
+
+    document.getElementById(
+        "btnSalida"
+    ).disabled = true;
+
+    document.getElementById(
+        "btnEntrada"
+    ).classList.remove(
+        "registration-selected"
+    );
+
+    document.getElementById(
+        "btnSalida"
+    ).classList.remove(
+        "registration-selected"
+    );
+
+    document.getElementById(
+        "mensajeCandado"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "datosRegistro"
+    ).innerHTML =
+        "<div class='person-name'>" +
+        escapeHTML(
+            registroPendiente.nombre
+        ) +
+        "</div>" +
+        "<div class='person-data'>" +
+        "<strong>Número:</strong> " +
+        escapeHTML(
+            registroPendiente.numeroEmpleado
+        ) +
+        "<br>" +
+        "<strong>Puesto:</strong> " +
+        escapeHTML(
+            registroPendiente.posicion
+        ) +
+        "<br>" +
+        "<strong>Servicio:</strong> " +
+        escapeHTML(
+            registroPendiente.servicio
+        ) +
+        "</div>";
+
+    consultarCandadoEmpleado();
+
+}
+
+
+/* =========================================================
+   CONSULTAR CANDADO
+========================================================= */
+
+function consultarCandadoEmpleado(){
+
+    if(!registroPendiente){
+
+        return;
+
+    }
+
+    const numero =
+        registroPendiente.numeroEmpleado;
+
+    const posicion =
+        registroPendiente.posicion;
+
+    const consultaActual =
+        ++consultaCandadoActual;
+
+    mostrarEstado(
+        "Validando ciclo de registro...",
+        "info"
+    );
+
+    const callbackName =
+        "callbackCandado_" +
+        Date.now() +
+        "_" +
+        consultaActual;
+
+    window[callbackName] = function(data){
+
+        try{
+
+            /*
+               Evita que una respuesta vieja de JSONP
+               cambie el estado de una selección nueva.
+            */
+
+            if(
+                consultaActual !==
+                consultaCandadoActual
+            ){
+                return;
+            }
+
+            if(!data || data.ok !== true){
+
+                throw new Error(
+                    data && data.error
+                        ? data.error
+                        : "No fue posible validar el registro."
+                );
+
+            }
+
+            aplicarResultadoCandado(
+                data
+            );
+
+        }catch(error){
+
+            mostrarEstado(
+                error.message,
+                "error"
+            );
+
+            bloquearBotonesRegistro();
+
+        }finally{
+
+            try{
+                delete window[callbackName];
+            }catch(e){}
+
+        }
+
+    };
+
+    const script =
+        document.createElement("script");
+
+    script.src =
+        URL_APPS_SCRIPT +
+        "?action=validar" +
+        "&numero=" +
+        encodeURIComponent(numero) +
+        "&posicion=" +
+        encodeURIComponent(posicion) +
+        "&callback=" +
+        encodeURIComponent(callbackName);
+
+    script.onerror = function(){
+
+        if(
+            consultaActual !==
+            consultaCandadoActual
+        ){
+            return;
+        }
+
+        mostrarEstado(
+            "No fue posible validar el ciclo con Apps Script.",
+            "error"
+        );
+
+        bloquearBotonesRegistro();
+
+    };
+
+    document.body.appendChild(script);
+
+    setTimeout(function(){
+
+        try{
+            delete window[callbackName];
+        }catch(e){}
+
+        if(script.parentNode){
+            script.parentNode.removeChild(script);
+        }
+
+    },20000);
+
+}
+
+
+/* =========================================================
+   APLICAR RESULTADO CANDADO
+========================================================= */
+
+function aplicarResultadoCandado(data){
+
+    const entrada =
+        document.getElementById(
+            "btnEntrada"
+        );
+
+    const salida =
+        document.getElementById(
+            "btnSalida"
+        );
+
+    const mensaje =
+        document.getElementById(
+            "mensajeCandado"
+        );
+
+    entrada.disabled = true;
+    salida.disabled = true;
+
+    entrada.classList.remove(
+        "registration-selected"
+    );
+
+    salida.classList.remove(
+        "registration-selected"
+    );
+
+    mensaje.classList.add(
+        "hidden"
+    );
+
+    /*
+       ADMINISTRATIVO / SUPERVISOR
+       pueden elegir cualquiera.
+    */
+
+    if(data.excepcion === true){
+
+        entrada.disabled = false;
+        salida.disabled = false;
+
+        mostrarEstado(
+            "Registro administrativo habilitado.",
+            "success"
+        );
+
+        return;
+
+    }
+
+    const siguiente =
+        String(
+            data.siguienteRegistro || ""
+        ).toUpperCase();
+
+    if(siguiente === "ENTRADA"){
+
+        entrada.disabled = false;
+
+        mostrarEstado(
+            "Puede realizar ENTRADA.",
+            "success"
+        );
+
+        return;
+
+    }
+
+    if(siguiente === "SALIDA"){
+
+        salida.disabled = false;
+
+        mensaje.textContent =
+            "YA ESTÁ REGISTRADO. Tienes un registro pendiente de SALIDA. Debes cerrar tu registro anterior antes de realizar un nuevo registro.";
+
+        mensaje.classList.remove(
+            "hidden"
+        );
+
+        mostrarEstado(
+            "Tiene una ENTRADA pendiente de SALIDA.",
+            "warning"
+        );
+
+        return;
+
+    }
+
+    bloquearBotonesRegistro();
+
+    mostrarEstado(
+        "No se pudo determinar el siguiente registro.",
+        "error"
+    );
+
+}
+
+
+/* =========================================================
+   BLOQUEAR BOTONES
+========================================================= */
+
+function bloquearBotonesRegistro(){
+
+    document.getElementById(
+        "btnEntrada"
+    ).disabled = true;
+
+    document.getElementById(
+        "btnSalida"
+    ).disabled = true;
+
+}
+
+
+/* =========================================================
+   SELECCIONAR TIPO
+========================================================= */
+
+function seleccionarTipoRegistro(tipo){
+
+    if(!registroPendiente){
+
+        mostrarEstado(
+            "No hay un empleado seleccionado.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    tipo =
+        String(tipo)
+            .trim()
+            .toUpperCase();
+
+    /*
+       Para personal operativo,
+       verificamos nuevamente que el botón
+       corresponda con el ciclo consultado.
+    */
+
+    const esAdministrativo =
+        registroPendiente.posicion ===
+        "ADMINISTRATIVO";
+
+    if(!esAdministrativo){
+
+        if(
+            tipo === "ENTRADA" &&
+            document.getElementById(
+                "btnEntrada"
+            ).disabled
+        ){
+
+            mostrarEstado(
+                "Este empleado no puede realizar ENTRADA en este momento.",
+                "warning"
+            );
+
+            return;
+
+        }
+
+        if(
+            tipo === "SALIDA" &&
+            document.getElementById(
+                "btnSalida"
+            ).disabled
+        ){
+
+            mostrarEstado(
+                "Este empleado no puede realizar SALIDA en este momento.",
+                "warning"
+            );
+
+            return;
+
+        }
+
+    }
+
+    registroPendiente.tipoRegistro =
+        tipo;
+
+    document.getElementById(
+        "btnEntrada"
+    ).classList.toggle(
+        "registration-selected",
+        tipo === "ENTRADA"
+    );
+
+    document.getElementById(
+        "btnSalida"
+    ).classList.toggle(
+        "registration-selected",
+        tipo === "SALIDA"
+    );
+
+    document.getElementById(
+        "cardFoto"
+    ).classList.remove("hidden");
+
+    fotoRegistroBase64 = "";
+
+    fotoRegistroNombre = "";
+
+    document.getElementById(
+        "fotoPreview"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "btnRepetirFoto"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "btnTomarFoto"
+    ).classList.remove("hidden");
+
+    document.getElementById(
+        "btnEnviar"
+    ).disabled = true;
+
+    iniciarCamara();
+
+}
+
+
+/* =========================================================
+   CÁMARA
+========================================================= */
+
+async function iniciarCamara(){
+
+    detenerCamara();
+
+    try{
+
+        streamCamara =
+            await navigator.mediaDevices.getUserMedia({
+                video:{
+                    facingMode:{
+                        ideal:"user"
+                    },
+                    width:{
+                        ideal:1280
+                    },
+                    height:{
+                        ideal:720
+                    }
+                },
+                audio:false
+            });
+
+        const video =
+            document.getElementById(
+                "video"
+            );
+
+        video.srcObject =
+            streamCamara;
+
+        video.classList.remove(
+            "hidden"
+        );
+
+        document.getElementById(
+            "btnTomarFoto"
+        ).classList.remove("hidden");
+
+    }catch(error){
+
+        mostrarEstado(
+            "No fue posible abrir la cámara. Verifica los permisos del navegador.",
+            "error"
+        );
+
+    }
+
+}
+
+
+function detenerCamara(){
+
+    if(streamCamara){
+
+        streamCamara.getTracks().forEach(
+            function(track){
+                track.stop();
+            }
+        );
+
+        streamCamara = null;
+
+    }
+
+}
+
+
+/* =========================================================
+   TOMAR FOTO
+========================================================= */
+
+function tomarFotografia(){
+
+    const video =
+        document.getElementById(
+            "video"
+        );
+
+    const canvas =
+        document.getElementById(
+            "canvas"
+        );
+
+    if(
+        !video.videoWidth ||
+        !video.videoHeight
+    ){
+
+        mostrarEstado(
+            "La cámara todavía no está lista.",
+            "warning"
+        );
+
+        return;
+
+    }
+
+    canvas.width =
+        video.videoWidth;
+
+    canvas.height =
+        video.videoHeight;
+
+    const contexto =
+        canvas.getContext("2d");
+
+    contexto.drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    fotoRegistroBase64 =
+        canvas.toDataURL(
+            "image/jpeg",
+            0.82
+        );
+
+    fotoRegistroNombre =
+        "REGISTRO_" +
+        (
+            registroPendiente
+                ? registroPendiente.numeroEmpleado
+                : "SIN_NUMERO"
+        ) +
+        "_" +
+        Date.now() +
+        ".jpg";
+
+    const preview =
+        document.getElementById(
+            "fotoPreview"
+        );
+
+    preview.src =
+        fotoRegistroBase64;
+
+    preview.classList.remove(
+        "hidden"
+    );
+
+    document.getElementById(
+        "btnTomarFoto"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "btnRepetirFoto"
+    ).classList.remove("hidden");
+
+    document.getElementById(
+        "btnEnviar"
+    ).disabled = false;
+
+    detenerCamara();
+
+    mostrarEstado(
+        "Fotografía tomada correctamente. Puede enviar el registro.",
+        "success"
+    );
+
+}
+
+
+/* =========================================================
+   REPETIR FOTO
+========================================================= */
+
+function repetirFotografia(){
+
+    fotoRegistroBase64 = "";
+
+    document.getElementById(
+        "fotoPreview"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "btnEnviar"
+    ).disabled = true;
+
+    iniciarCamara();
+
+}
+
+
+/* =========================================================
+   ENVIAR REGISTRO
+========================================================= */
+
+async function enviarRegistro(){
+
+    if(enviandoRegistro){
+
+        return;
+
+    }
+
+    if(!registroPendiente){
+
+        mostrarEstado(
+            "No existe un registro pendiente.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    if(
+        !registroPendiente.tipoRegistro
+    ){
+
+        mostrarEstado(
+            "Seleccione ENTRADA o SALIDA.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    if(!fotoRegistroBase64){
+
+        mostrarEstado(
+            "Debe tomar la fotografía antes de enviar.",
+            "warning"
+        );
+
+        return;
+
+    }
+
+    if(
+        ubicacionActual.latitud === null ||
+        ubicacionActual.longitud === null
+    ){
+
+        mostrarEstado(
+            "No se cuenta con ubicación GPS.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    enviandoRegistro = true;
+
+    const botonEnviar =
+        document.getElementById(
+            "btnEnviar"
+        );
+
+    botonEnviar.disabled = true;
+
+    botonEnviar.textContent =
+        "ENVIANDO...";
+
+    const datos = {
+
+        nombre:
+            registroPendiente.nombre,
+
+        numeroEmpleado:
+            registroPendiente.numeroEmpleado,
+
+        servicio:
+            registroPendiente.servicio,
+
+        tipoRegistro:
+            registroPendiente.tipoRegistro,
+
+        posicion:
+            registroPendiente.posicion,
+
+        latitud:
+            ubicacionActual.latitud,
+
+        longitud:
+            ubicacionActual.longitud,
+
+        precisionGPS:
+            ubicacionActual.precisionGPS,
+
+        servicioDetectado:
+            registroPendiente.servicioDetectado,
+
+        servicioOrigen:
+            registroPendiente.servicioOrigen,
+
+        fotoBase64:
+            fotoRegistroBase64,
+
+        fotoNombre:
+            fotoRegistroNombre
+
+    };
+
+    try{
+
+        /*
+           Apps Script recibe este JSON mediante
+           e.postData.contents.
+        */
+
+        await fetch(
+            URL_APPS_SCRIPT,
+            {
+                method:"POST",
+                mode:"no-cors",
+                headers:{
+                    "Content-Type":
+                        "text/plain;charset=utf-8"
+                },
+                body:
+                    JSON.stringify(datos)
+            }
+        );
+
+        mostrarEstado(
+            "REGISTRO ENVIADO CORRECTAMENTE.",
+            "success"
+        );
+
+        detenerCamara();
+
+        setTimeout(
+            function(){
+                reiniciarRegistro();
+            },
+            1800
+        );
+
+    }catch(error){
+
+        mostrarEstado(
+            "No fue posible enviar el registro: " +
+            error.message,
+            "error"
+        );
+
+        botonEnviar.disabled = false;
+
+        botonEnviar.textContent =
+            "ENVIAR REGISTRO";
+
+        enviandoRegistro = false;
+
+    }
+
+}
+
+
+/* =========================================================
+   CANCELAR REGISTRO
+========================================================= */
+
+function cancelarRegistro(){
+
+    detenerCamara();
+
+    registroPendiente = null;
+
+    fotoRegistroBase64 = "";
+
+    fotoRegistroNombre = "";
+
+    enviandoRegistro = false;
+
+    document.getElementById(
+        "cardRegistro"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "cardFoto"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "datosPersonal"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "datosApoyo"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "datosAdministrativo"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "empleadoPersonal"
+    ).value = "";
+
+    document.getElementById(
+        "numeroApoyo"
+    ).value = "";
+
+    document.getElementById(
+        "numeroAdministrativo"
+    ).value = "";
+
+    mostrarEstado(
+        "Registro cancelado.",
+        "info"
+    );
+
+}
+
+
+/* =========================================================
+   REINICIAR DESPUÉS DE REGISTRAR
+========================================================= */
+
+function reiniciarRegistro(){
+
+    detenerCamara();
+
+    registroPendiente = null;
+
+    fotoRegistroBase64 = "";
+
+    fotoRegistroNombre = "";
+
+    enviandoRegistro = false;
+
+    document.getElementById(
+        "cardRegistro"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "cardFoto"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "datosPersonal"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "datosApoyo"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "datosAdministrativo"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "btnEnviar"
+    ).disabled = true;
+
+    document.getElementById(
+        "btnEnviar"
+    ).textContent =
+        "ENVIAR REGISTRO";
+
+    document.getElementById(
+        "fotoPreview"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "btnRepetirFoto"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "btnTomarFoto"
+    ).classList.remove("hidden");
+
+    document.getElementById(
+        "empleadoPersonal"
+    ).value = "";
+
+    document.getElementById(
+        "numeroApoyo"
+    ).value = "";
+
+    document.getElementById(
+        "numeroAdministrativo"
+    ).value = "";
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(valor){
+
+    return String(valor || "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================================================
+   BOTÓN REPETIR FOTO
+========================================================= */
+
+document.addEventListener(
+    "click",
+    function(event){
+
+        if(
+            event.target &&
+            event.target.id ===
+            "btnRepetirFoto"
+        ){
+
+            repetirFotografia();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   EVITAR SALIR CON CÁMARA ABIERTA
+========================================================= */
+
+window.addEventListener(
+    "beforeunload",
+    function(){
+        detenerCamara();
+    }
+);
+
+</script>
+
+</body>
+</html>
