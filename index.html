@@ -201,9 +201,6 @@ button:hover {
         >
 
 
-        <button onclick="continuarPersonal()">
-            CONTINUAR
-        </button>
 
     </div>
 
@@ -255,9 +252,6 @@ button:hover {
         </div>
 
 
-        <button onclick="continuarApoyo()">
-            CONTINUAR
-        </button>
 
     </div>
 
@@ -314,9 +308,6 @@ button:hover {
         <div id="adminResultado"></div>
 
 
-        <button onclick="continuarAdministrativo()">
-            CONTINUAR
-        </button>
 
     </div>
 
@@ -1310,6 +1301,15 @@ function actualizarNumeroPersonal() {
             ? empleadoPersonalActual.numero
             : "";
 
+    if (empleadoPersonalActual) {
+        abrirFormulario(
+            empleadoPersonalActual.nombre,
+            empleadoPersonalActual.numero,
+            "PERSONAL",
+            empleadoPersonalActual.servicio
+        );
+    }
+
 }
 
 
@@ -1426,6 +1426,12 @@ function reconocerApoyo() {
         empleadoApoyoActual = coincidencias[0];
         document.getElementById("nombreApoyo").value = coincidencias[0].nombre;
         resultado.textContent = coincidencias[0].servicio;
+        abrirFormulario(
+            coincidencias[0].nombre,
+            coincidencias[0].numero,
+            "APOYO",
+            servicioActual ? servicioActual.codigo : "FUERA DE SERVICIO"
+        );
         return;
     }
 
@@ -1604,6 +1610,12 @@ function reconocerAdministrativo() {
         empleadoAdministrativoActual = coincidencias[0];
         document.getElementById("nombreAdministrativo").value = coincidencias[0].nombre;
         resultado.innerHTML = '<div class="exito">Empleado administrativo validado. Registro: CENTRAL.</div>';
+        abrirFormulario(
+            coincidencias[0].nombre,
+            coincidencias[0].numero,
+            "ADMINISTRATIVO",
+            SERVICIO_CENTRAL
+        );
         return;
     }
 
