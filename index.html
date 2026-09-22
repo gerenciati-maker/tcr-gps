@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -192,255 +193,306 @@ canvas,
     }
 }
 </style>
+
 </head>
 
 <body>
 
 <div class="container">
 
-    <div class="header">
-        <h1>AUTORITAS</h1>
-        <p>TORRE DE CONTROL</p>
-    </div>
+```
+<div class="header">
+    <h1>AUTORITAS</h1>
+    <p>TORRE DE CONTROL</p>
+</div>
 
-    <div id="estadoSistema" class="estado">
-        Iniciando sistema...
-    </div>
+<div id="estadoSistema" class="estado">
+    Iniciando sistema...
+</div>
 
-    <!-- SERVICIO -->
-    <div id="cardServicio" class="card oculto">
 
-        <h2>Servicio</h2>
+<!-- =====================================================
+     SERVICIO
+====================================================== -->
 
-        <div class="info">
-            <div class="dato">
-                <strong>Servicio:</strong>
-                <span id="nombreServicio">-</span>
-            </div>
+<div id="cardServicio" class="card oculto">
 
-            <div class="dato">
-                <strong>Inmueble:</strong>
-                <span id="inmuebleServicio">-</span>
-            </div>
+    <h2>Servicio</h2>
 
-            <div class="dato">
-                <strong>Ubicación:</strong>
-                <span id="ubicacionServicio">-</span>
-            </div>
+    <div class="info">
 
-            <div class="dato">
-                <strong>GPS:</strong>
-                <span id="gpsServicio">Esperando...</span>
-            </div>
+        <div class="dato">
+            <strong>Servicio:</strong>
+            <span id="nombreServicio">-</span>
         </div>
 
-        <button
-            class="btn-primary"
-            onclick="seleccionarPersonal()">
-            PERSONAL DEL SERVICIO
-        </button>
-
-        <button
-            class="btn-secondary"
-            onclick="seleccionarApoyo()">
-            APOYO
-        </button>
-
-        <button
-            class="btn-secondary"
-            onclick="seleccionarAdministrativo()">
-            ADMINISTRATIVO
-        </button>
-
-    </div>
-
-    <!-- PERSONAL -->
-    <div id="cardPersonal" class="card oculto">
-
-        <h2>Personal</h2>
-
-        <label class="label">
-            Puesto
-        </label>
-
-        <select id="puestoPersonal" onchange="cargarPersonalPorPuesto()">
-            <option value="">Seleccione puesto</option>
-            <option value="GUARDIA">GUARDIA</option>
-            <option value="MONITORISTA">MONITORISTA</option>
-            <option value="ERI">ERI</option>
-        </select>
-
-        <label class="label">
-            Personal
-        </label>
-
-        <select id="empleadoPersonal">
-            <option value="">Seleccione personal</option>
-        </select>
-
-        <button
-            class="btn-primary"
-            onclick="continuarPersonal()">
-            CONTINUAR
-        </button>
-
-        <button
-            class="btn-danger"
-            onclick="volverServicio()">
-            REGRESAR
-        </button>
-
-    </div>
-
-    <!-- APOYO -->
-    <div id="cardApoyo" class="card oculto">
-
-        <h2>Registro de apoyo</h2>
-
-        <label class="label">
-            Número de empleado
-        </label>
-
-        <input
-            id="numeroApoyo"
-            type="text"
-            placeholder="Ingrese número de empleado">
-
-        <button
-            class="btn-primary"
-            onclick="buscarApoyo()">
-            BUSCAR
-        </button>
-
-        <div id="resultadoApoyo"></div>
-
-        <button
-            class="btn-danger"
-            onclick="volverServicio()">
-            REGRESAR
-        </button>
-
-    </div>
-
-    <!-- ADMINISTRATIVO -->
-    <div id="cardAdministrativo" class="card oculto">
-
-        <h2>Registro administrativo</h2>
-
-        <label class="label">
-            Número de empleado
-        </label>
-
-        <input
-            id="numeroAdministrativo"
-            type="text"
-            placeholder="Ingrese número de empleado">
-
-        <button
-            class="btn-primary"
-            onclick="buscarAdministrativo()">
-            BUSCAR
-        </button>
-
-        <div id="resultadoAdministrativo"></div>
-
-        <button
-            class="btn-danger"
-            onclick="volverServicio()">
-            REGRESAR
-        </button>
-
-    </div>
-
-    <!-- REGISTRO -->
-    <div id="cardRegistro" class="card oculto">
-
-        <h2>Tipo de registro</h2>
-
-        <div id="infoRegistro" class="info"></div>
-
-        <div id="botonesRegistro" class="grid-botones">
-
-            <button
-                id="btnEntrada"
-                class="btn-success"
-                onclick="seleccionarTipoRegistro('ENTRADA')">
-                ENTRADA
-            </button>
-
-            <button
-                id="btnSalida"
-                class="btn-secondary"
-                onclick="seleccionarTipoRegistro('SALIDA')">
-                SALIDA
-            </button>
-
+        <div class="dato">
+            <strong>Inmueble:</strong>
+            <span id="inmuebleServicio">-</span>
         </div>
 
-        <div id="mensajeCandado" class="estado oculto"></div>
+        <div class="dato">
+            <strong>Ubicación:</strong>
+            <span id="ubicacionServicio">-</span>
+        </div>
 
-        <button
-            class="btn-danger"
-            onclick="volverServicio()">
-            REGRESAR
-        </button>
+        <div class="dato">
+            <strong>GPS:</strong>
+            <span id="gpsServicio">Esperando...</span>
+        </div>
 
     </div>
 
-    <!-- FOTO -->
-    <div id="cardFoto" class="card oculto">
+    <button
+        class="btn-primary"
+        onclick="seleccionarPersonal()">
+        PERSONAL DEL SERVICIO
+    </button>
 
-        <h2>Fotografía</h2>
+    <button
+        class="btn-secondary"
+        onclick="seleccionarApoyo()">
+        APOYO
+    </button>
 
-        <div class="info">
-            Debes tomar una fotografía para completar el registro.
-        </div>
+    <button
+        class="btn-secondary"
+        onclick="seleccionarAdministrativo()">
+        ADMINISTRATIVO
+    </button>
 
-        <div class="foto-container">
+</div>
 
-            <video
-                id="video"
-                autoplay
-                playsinline>
-            </video>
 
-            <canvas
-                id="canvas"
-                class="oculto">
-            </canvas>
+<!-- =====================================================
+     PERSONAL
+====================================================== -->
 
-            <img
-                id="previewFoto"
-                alt="Vista previa">
+<div id="cardPersonal" class="card oculto">
 
-        </div>
+    <h2>Personal</h2>
+
+    <label class="label">
+        Puesto
+    </label>
+
+    <select
+        id="puestoPersonal"
+        onchange="cargarPersonalPorPuesto()">
+
+        <option value="">
+            Seleccione puesto
+        </option>
+
+        <option value="GUARDIA">
+            GUARDIA
+        </option>
+
+        <option value="MONITORISTA">
+            MONITORISTA
+        </option>
+
+        <option value="ERI">
+            ERI
+        </option>
+
+    </select>
+
+    <label class="label">
+        Personal
+    </label>
+
+    <select id="empleadoPersonal">
+
+        <option value="">
+            Seleccione personal
+        </option>
+
+    </select>
+
+    <button
+        class="btn-primary"
+        onclick="continuarPersonal()">
+        CONTINUAR
+    </button>
+
+    <button
+        class="btn-danger"
+        onclick="volverServicio()">
+        REGRESAR
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     APOYO
+====================================================== -->
+
+<div id="cardApoyo" class="card oculto">
+
+    <h2>Registro de apoyo</h2>
+
+    <label class="label">
+        Número de empleado
+    </label>
+
+    <input
+        id="numeroApoyo"
+        type="text"
+        placeholder="Ingrese número de empleado">
+
+    <button
+        class="btn-primary"
+        onclick="buscarApoyo()">
+        BUSCAR
+    </button>
+
+    <div id="resultadoApoyo"></div>
+
+    <button
+        class="btn-danger"
+        onclick="volverServicio()">
+        REGRESAR
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     ADMINISTRATIVO
+====================================================== -->
+
+<div id="cardAdministrativo" class="card oculto">
+
+    <h2>Registro administrativo</h2>
+
+    <label class="label">
+        Número de empleado
+    </label>
+
+    <input
+        id="numeroAdministrativo"
+        type="text"
+        placeholder="Ingrese número de empleado">
+
+    <button
+        class="btn-primary"
+        onclick="buscarAdministrativo()">
+        BUSCAR
+    </button>
+
+    <div id="resultadoAdministrativo"></div>
+
+    <button
+        class="btn-danger"
+        onclick="volverServicio()">
+        REGRESAR
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     REGISTRO
+====================================================== -->
+
+<div id="cardRegistro" class="card oculto">
+
+    <h2>Tipo de registro</h2>
+
+    <div id="infoRegistro" class="info"></div>
+
+    <div id="botonesRegistro" class="grid-botones">
 
         <button
-            class="btn-secondary"
-            onclick="abrirCamara()">
-            ACTIVAR CÁMARA
-        </button>
-
-        <button
-            class="btn-primary"
-            onclick="tomarFotografia()">
-            TOMAR FOTOGRAFÍA
-        </button>
-
-        <button
-            id="btnEnviar"
+            id="btnEntrada"
             class="btn-success"
-            onclick="enviarRegistro()">
-            ENVIAR REGISTRO
+            onclick="seleccionarTipoRegistro('ENTRADA')">
+            ENTRADA
         </button>
 
         <button
-            class="btn-danger"
-            onclick="cancelarFoto()">
-            CANCELAR
+            id="btnSalida"
+            class="btn-secondary"
+            onclick="seleccionarTipoRegistro('SALIDA')">
+            SALIDA
         </button>
 
     </div>
+
+    <div
+        id="mensajeCandado"
+        class="estado oculto">
+    </div>
+
+    <button
+        class="btn-danger"
+        onclick="volverServicio()">
+        REGRESAR
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     FOTO
+====================================================== -->
+
+<div id="cardFoto" class="card oculto">
+
+    <h2>Fotografía</h2>
+
+    <div class="info">
+        Debes tomar una fotografía para completar el registro.
+    </div>
+
+    <div class="foto-container">
+
+        <video
+            id="video"
+            autoplay
+            playsinline>
+        </video>
+
+        <canvas
+            id="canvas"
+            class="oculto">
+        </canvas>
+
+        <img
+            id="previewFoto"
+            alt="Vista previa">
+
+    </div>
+
+    <button
+        class="btn-secondary"
+        onclick="abrirCamara()">
+        ACTIVAR CÁMARA
+    </button>
+
+    <button
+        class="btn-primary"
+        onclick="tomarFotografia()">
+        TOMAR FOTOGRAFÍA
+    </button>
+
+    <button
+        id="btnEnviar"
+        class="btn-success"
+        onclick="enviarRegistro()">
+        ENVIAR REGISTRO
+    </button>
+
+    <button
+        class="btn-danger"
+        onclick="cancelarFoto()">
+        CANCELAR
+    </button>
+
+</div>
+```
 
 </div>
 
@@ -453,13 +505,21 @@ canvas,
 const ID_ARCHIVO =
     "1zdYovCmbhHOyMVy-huWqzgB6Q5x1XgL8dghe263TTbU";
 
+
 const ID_BASE_QR =
     "1049929211";
 
+
+/*
+ * NUEVA URL DEL WEB APP
+ */
 const URL_APPS_SCRIPT =
     "https://script.google.com/macros/s/AKfycbwRaqv3bUBUzwJiXfX0yOjQldn51NkNMZiL8OaVw3n4RBCbA0raBqw9heAlbgLLgi3DSQ/exec";
 
-const CODIGO_ADMIN = "CENTRAL";
+
+const CODIGO_ADMIN =
+    "CENTRAL";
+
 
 const SERVICIO_CENTRAL =
     "ID-00167 - OFICINAS CENTRALES";
@@ -470,40 +530,63 @@ const SERVICIO_CENTRAL =
 ========================================================= */
 
 let empleados = [];
-let servicios = new Map();
+
+let servicios =
+    new Map();
+
 let personalServicio = [];
 
-let empleadoPersonalActual = null;
-let servicioActual = null;
+let empleadoPersonalActual =
+    null;
 
-let empleadoApoyoActual = null;
-let empleadoAdministrativoActual = null;
+let servicioActual =
+    null;
+
+let empleadoApoyoActual =
+    null;
+
+let empleadoAdministrativoActual =
+    null;
 
 let ubicacionActual = {
+
     latitud: null,
+
     longitud: null,
+
     precisionGPS: null
+
 };
 
-let registroPendiente = null;
+let registroPendiente =
+    null;
 
-let fotoRegistroBase64 = "";
-let fotoRegistroNombre = "";
+let fotoRegistroBase64 =
+    "";
 
-let enviandoRegistro = false;
+let fotoRegistroNombre =
+    "";
 
-let consultaCandadoActual = 0;
+let enviandoRegistro =
+    false;
 
-let streamCamara = null;
+let consultaCandadoActual =
+    0;
+
+let streamCamara =
+    null;
 
 
 /* =========================================================
    INICIO
 ========================================================= */
 
-window.onload = function() {
+window.onload =
+function() {
 
-    mostrarEstado("Cargando base de empleados...");
+    mostrarEstado(
+        "Cargando base de empleados..."
+    );
 
     cargarBaseQR();
 
@@ -514,33 +597,61 @@ window.onload = function() {
    ESTADO
 ========================================================= */
 
-function mostrarEstado(mensaje, tipo = "") {
+function mostrarEstado(
+    mensaje,
+    tipo = ""
+) {
 
     const elemento =
-        document.getElementById("estadoSistema");
+        document.getElementById(
+            "estadoSistema"
+        );
 
-    if (!elemento) return;
-
-    elemento.textContent = mensaje;
-
-    elemento.className = "estado";
-
-    if (tipo === "error") {
-        elemento.classList.add("error");
+    if (!elemento) {
+        return;
     }
 
-    if (tipo === "exito") {
-        elemento.classList.add("exito");
+    elemento.textContent =
+        mensaje;
+
+    elemento.className =
+        "estado";
+
+    if (
+        tipo === "error"
+    ) {
+
+        elemento.classList.add(
+            "error"
+        );
+
     }
 
-    if (tipo === "aviso") {
-        elemento.classList.add("aviso");
+    if (
+        tipo === "exito"
+    ) {
+
+        elemento.classList.add(
+            "exito"
+        );
+
     }
+
+    if (
+        tipo === "aviso"
+    ) {
+
+        elemento.classList.add(
+            "aviso"
+        );
+
+    }
+
 }
 
 
 /* =========================================================
-   CARGAR BASE QR
+   CARGAR BASE QR DESDE APPS SCRIPT
 ========================================================= */
 
 function cargarBaseQR() {
@@ -555,11 +666,14 @@ function cargarBaseQR() {
         Date.now();
 
 
-    let terminado = false;
+    let terminado =
+        false;
 
 
     const script =
-        document.createElement("script");
+        document.createElement(
+            "script"
+        );
 
 
     function limpiar() {
@@ -574,14 +688,17 @@ function cargarBaseQR() {
 
         }
 
-
         try {
 
-            delete window[callbackName];
+            delete window[
+                callbackName
+            ];
 
         } catch (e) {
 
-            window[callbackName] =
+            window[
+                callbackName
+            ] =
                 undefined;
 
         }
@@ -590,155 +707,177 @@ function cargarBaseQR() {
 
 
     const temporizador =
-        setTimeout(function() {
+        setTimeout(
+            function() {
 
-            if (terminado) return;
+                if (terminado) {
+                    return;
+                }
 
-            terminado = true;
+                terminado =
+                    true;
+
+                limpiar();
+
+                mostrarEstado(
+                    "El Apps Script no respondió al cargar BASE QR.",
+                    "error"
+                );
+
+            },
+            15000
+        );
+
+
+    window[
+        callbackName
+    ] =
+    function(data) {
+
+        if (terminado) {
+            return;
+        }
+
+
+        terminado =
+            true;
+
+
+        clearTimeout(
+            temporizador
+        );
+
+
+        try {
+
+            if (
+                !data ||
+                data.ok !== true
+            ) {
+
+                throw new Error(
+                    data &&
+                    data.error
+                        ? data.error
+                        : "No fue posible cargar BASE QR."
+                );
+
+            }
+
+
+            if (
+                !Array.isArray(
+                    data.empleados
+                )
+            ) {
+
+                throw new Error(
+                    "BASE QR no devolvió empleados."
+                );
+
+            }
+
+
+            empleados =
+                data.empleados.filter(
+                    function(empleado) {
+
+                        /*
+                         * Si existe estatus,
+                         * tomamos únicamente ACTIVO.
+                         *
+                         * Si no existe la columna,
+                         * no descartamos el empleado.
+                         */
+
+                        const estatus =
+                            String(
+
+                                empleado.estatus ||
+                                empleado.Estatus ||
+                                empleado.ESTATUS ||
+                                ""
+
+                            )
+                            .trim()
+                            .toUpperCase();
+
+
+                        if (!estatus) {
+                            return true;
+                        }
+
+
+                        return (
+                            estatus ===
+                            "ACTIVO"
+                        );
+
+                    }
+                );
+
+
+            if (
+                empleados.length === 0
+            ) {
+
+                throw new Error(
+                    "BASE QR cargó correctamente, pero no se encontraron empleados."
+                );
+
+            }
+
+
+            console.log(
+                "Empleados cargados:",
+                empleados.length
+            );
+
+
+            construirServicios();
+
+
+            if (
+                servicios.size === 0
+            ) {
+
+                throw new Error(
+                    "BASE QR cargó, pero no se encontraron servicios."
+                );
+
+            }
+
 
             limpiar();
 
 
             mostrarEstado(
-                "El Apps Script no respondió al cargar BASE_QR.",
+                "Base cargada. Obteniendo ubicación..."
+            );
+
+
+            iniciarSistema();
+
+
+        } catch (error) {
+
+            console.error(
+                error
+            );
+
+
+            limpiar();
+
+
+            mostrarEstado(
+                error.message ||
+                "Error al procesar BASE QR.",
                 "error"
             );
 
+        }
 
-        }, 15000);
-
-
-    window[callbackName] =
-        function(data) {
-
-            if (terminado) return;
-
-
-            terminado = true;
-
-            clearTimeout(
-                temporizador
-            );
-
-
-            try {
-
-                if (
-                    !data ||
-                    data.ok !== true
-                ) {
-
-                    throw new Error(
-                        data &&
-                        data.error
-                            ? data.error
-                            : "No fue posible cargar BASE_QR."
-                    );
-
-                }
-
-
-                if (
-                    !Array.isArray(
-                        data.empleados
-                    )
-                ) {
-
-                    throw new Error(
-                        "BASE_QR no devolvió empleados."
-                    );
-
-                }
-
-
-                empleados =
-                    data.empleados.filter(
-                        function(empleado) {
-
-                            const estatus =
-                                String(
-
-                                    empleado.estatus ||
-                                    empleado.Estatus ||
-                                    empleado.ESTATUS ||
-                                    ""
-
-                                )
-                                .trim()
-                                .toUpperCase();
-
-
-                            return (
-                                estatus ===
-                                "ACTIVO"
-                            );
-
-                        }
-                    );
-
-
-                if (
-                    empleados.length === 0
-                ) {
-
-                    throw new Error(
-                        "BASE_QR cargó correctamente, pero no encontró empleados ACTIVO."
-                    );
-
-                }
-
-
-                console.log(
-                    "Empleados cargados:",
-                    empleados.length
-                );
-
-
-                construirServicios();
-
-
-                if (
-                    !servicios ||
-                    servicios.size === 0
-                ) {
-
-                    throw new Error(
-                        "BASE_QR cargó, pero no se encontraron servicios."
-                    );
-
-                }
-
-
-                limpiar();
-
-
-                mostrarEstado(
-                    "Base cargada. Obteniendo ubicación..."
-                );
-
-
-                iniciarSistema();
-
-
-            } catch (error) {
-
-                console.error(
-                    error
-                );
-
-
-                limpiar();
-
-
-                mostrarEstado(
-                    error.message ||
-                    "Error al procesar BASE_QR.",
-                    "error"
-                );
-
-            }
-
-        };
+    };
 
 
     const url =
@@ -753,33 +892,36 @@ function cargarBaseQR() {
     script.src =
         url;
 
-
     script.async =
         true;
 
 
     script.onerror =
-        function() {
+    function() {
 
-            if (terminado) return;
-
-
-            terminado = true;
-
-            clearTimeout(
-                temporizador
-            );
+        if (terminado) {
+            return;
+        }
 
 
-            limpiar();
+        terminado =
+            true;
 
 
-            mostrarEstado(
-                "No fue posible conectar con Apps Script.",
-                "error"
-            );
+        clearTimeout(
+            temporizador
+        );
 
-        };
+
+        limpiar();
+
+
+        mostrarEstado(
+            "No fue posible conectar con Apps Script.",
+            "error"
+        );
+
+    };
 
 
     document.body.appendChild(
@@ -787,6 +929,7 @@ function cargarBaseQR() {
     );
 
 }
+
 
 /* =========================================================
    CONSTRUIR SERVICIOS
@@ -796,56 +939,96 @@ function construirServicios() {
 
     servicios.clear();
 
-    empleados.forEach(empleado => {
 
-        const codigo =
-            String(
-                empleado.codigoServicio ||
-                empleado.codigo ||
-                empleado.servicioCodigo ||
-                ""
-            ).trim();
+    empleados.forEach(
+        function(empleado) {
 
-        const nombre =
-            String(
-                empleado.servicio ||
-                empleado.nombreServicio ||
-                ""
-            ).trim();
+            const codigo =
+                String(
 
-        if (!codigo && !nombre) return;
+                    empleado.codigoServicio ||
+                    empleado.codigo ||
+                    empleado.servicioCodigo ||
+                    ""
 
-        const clave = codigo || nombre;
+                ).trim();
 
-        if (!servicios.has(clave)) {
 
-            servicios.set(clave, {
+            const nombre =
+                String(
 
-                codigoServicio: codigo,
+                    empleado.servicio ||
+                    empleado.nombreServicio ||
+                    ""
 
-                servicio:
-                    nombre || codigo,
+                ).trim();
 
-                inmueble:
-                    empleado.inmueble || "",
 
-                ubicacion:
-                    empleado.ubicacion || "",
+            if (
+                !codigo &&
+                !nombre
+            ) {
 
-                latitud:
-                    parseFloat(empleado.latitud) || null,
+                return;
 
-                longitud:
-                    parseFloat(empleado.longitud) || null,
+            }
 
-                radio:
-                    parseFloat(empleado.radio) || 200
 
-            });
+            const clave =
+                codigo ||
+                nombre;
+
+
+            if (
+                !servicios.has(
+                    clave
+                )
+            ) {
+
+                servicios.set(
+                    clave,
+                    {
+
+                        codigoServicio:
+                            codigo,
+
+                        servicio:
+                            nombre ||
+                            codigo,
+
+                        inmueble:
+                            empleado.inmueble ||
+                            "",
+
+                        ubicacion:
+                            empleado.ubicacion ||
+                            "",
+
+                        latitud:
+                            parseFloat(
+                                empleado.latitud
+                            ) ||
+                            null,
+
+                        longitud:
+                            parseFloat(
+                                empleado.longitud
+                            ) ||
+                            null,
+
+                        radio:
+                            parseFloat(
+                                empleado.radio
+                            ) ||
+                            200
+
+                    }
+                );
+
+            }
 
         }
-
-    });
+    );
 
 }
 
@@ -871,7 +1054,9 @@ function iniciarSistema() {
 
 function obtenerGPS() {
 
-    if (!navigator.geolocation) {
+    if (
+        !navigator.geolocation
+    ) {
 
         mostrarEstado(
             "Este dispositivo no permite obtener ubicación.",
@@ -900,18 +1085,27 @@ function obtenerGPS() {
             document.getElementById(
                 "gpsServicio"
             ).textContent =
-                ubicacionActual.latitud.toFixed(6) +
+
+                ubicacionActual.latitud
+                    .toFixed(6) +
+
                 ", " +
-                ubicacionActual.longitud.toFixed(6);
+
+                ubicacionActual.longitud
+                    .toFixed(6);
 
 
             identificarServicio();
 
         },
 
+
         function(error) {
 
-            console.error(error);
+            console.error(
+                error
+            );
+
 
             mostrarEstado(
                 "No fue posible obtener GPS. Activa la ubicación del dispositivo.",
@@ -920,10 +1114,18 @@ function obtenerGPS() {
 
         },
 
+
         {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 0
+
+            enableHighAccuracy:
+                true,
+
+            timeout:
+                15000,
+
+            maximumAge:
+                0
+
         }
 
     );
@@ -937,50 +1139,70 @@ function obtenerGPS() {
 
 function identificarServicio() {
 
-    let servicioMasCercano = null;
-    let distanciaMenor = Infinity;
+    let servicioMasCercano =
+        null;
+
+    let distanciaMenor =
+        Infinity;
 
 
-    servicios.forEach(servicio => {
+    servicios.forEach(
+        function(servicio) {
 
-        if (
-            servicio.latitud === null ||
-            servicio.longitud === null
-        ) {
-            return;
+            if (
+                servicio.latitud ===
+                    null ||
+
+                servicio.longitud ===
+                    null
+            ) {
+
+                return;
+
+            }
+
+
+            const distancia =
+                calcularDistancia(
+
+                    ubicacionActual.latitud,
+
+                    ubicacionActual.longitud,
+
+                    servicio.latitud,
+
+                    servicio.longitud
+
+                );
+
+
+            if (
+
+                distancia <
+                (servicio.radio || 200)
+
+                &&
+
+                distancia <
+                distanciaMenor
+
+            ) {
+
+                distanciaMenor =
+                    distancia;
+
+                servicioMasCercano =
+                    servicio;
+
+            }
+
         }
+    );
 
 
-        const distancia =
-            calcularDistancia(
-
-                ubicacionActual.latitud,
-                ubicacionActual.longitud,
-
-                servicio.latitud,
-                servicio.longitud
-
-            );
-
-
-        if (
-            distancia <
-            (servicio.radio || 200) &&
-            distancia <
-            distanciaMenor
-        ) {
-
-            distanciaMenor = distancia;
-
-            servicioMasCercano =
-                servicio;
-
-        }
-
-    });
-
-
-    if (!servicioMasCercano) {
+    if (
+        !servicioMasCercano
+    ) {
 
         mostrarEstado(
             "No se identificó un servicio en esta ubicación.",
@@ -992,7 +1214,9 @@ function identificarServicio() {
     }
 
 
-    entrarAlServicio(servicioMasCercano);
+    entrarAlServicio(
+        servicioMasCercano
+    );
 
 }
 
@@ -1008,29 +1232,61 @@ function calcularDistancia(
     lon2
 ) {
 
-    const R = 6371000;
+    const R =
+        6371000;
+
 
     const rad =
-        Math.PI / 180;
+        Math.PI /
+        180;
+
 
     const dLat =
-        (lat2 - lat1) * rad;
+        (lat2 - lat1) *
+        rad;
+
 
     const dLon =
-        (lon2 - lon1) * rad;
+        (lon2 - lon1) *
+        rad;
+
 
     const a =
-        Math.sin(dLat / 2) ** 2 +
-        Math.cos(lat1 * rad) *
-        Math.cos(lat2 * rad) *
-        Math.sin(dLon / 2) ** 2;
+        Math.sin(
+            dLat / 2
+        ) ** 2
+
+        +
+
+        Math.cos(
+            lat1 * rad
+        )
+
+        *
+
+        Math.cos(
+            lat2 * rad
+        )
+
+        *
+
+        Math.sin(
+            dLon / 2
+        ) ** 2;
+
 
     const c =
         2 *
         Math.atan2(
+
             Math.sqrt(a),
-            Math.sqrt(1 - a)
+
+            Math.sqrt(
+                1 - a
+            )
+
         );
+
 
     return R * c;
 
@@ -1041,7 +1297,9 @@ function calcularDistancia(
    ENTRAR AL SERVICIO
 ========================================================= */
 
-function entrarAlServicio(servicio) {
+function entrarAlServicio(
+    servicio
+) {
 
     servicioActual =
         servicio;
@@ -1050,34 +1308,45 @@ function entrarAlServicio(servicio) {
     document.getElementById(
         "nombreServicio"
     ).textContent =
-        servicio.servicio || "-";
+        servicio.servicio ||
+        "-";
 
 
     document.getElementById(
         "inmuebleServicio"
     ).textContent =
-        servicio.inmueble || "-";
+        servicio.inmueble ||
+        "-";
 
 
     document.getElementById(
         "ubicacionServicio"
     ).textContent =
-        servicio.ubicacion || "-";
+        servicio.ubicacion ||
+        "-";
 
 
     document.getElementById(
         "gpsServicio"
     ).textContent =
-        ubicacionActual.latitud.toFixed(6) +
+
+        ubicacionActual.latitud
+            .toFixed(6) +
+
         ", " +
-        ubicacionActual.longitud.toFixed(6);
+
+        ubicacionActual.longitud
+            .toFixed(6);
 
 
     ocultarTodasLasTarjetas();
 
+
     document.getElementById(
         "cardServicio"
-    ).classList.remove("oculto");
+    ).classList.remove(
+        "oculto"
+    );
 
 
     mostrarEstado(
@@ -1096,9 +1365,12 @@ function seleccionarPersonal() {
 
     ocultarTodasLasTarjetas();
 
+
     document.getElementById(
         "cardPersonal"
-    ).classList.remove("oculto");
+    ).classList.remove(
+        "oculto"
+    );
 
 }
 
@@ -1108,1382 +1380,4 @@ function cargarPersonalPorPuesto() {
     const puesto =
         document.getElementById(
             "puestoPersonal"
-        ).value
-        .trim()
-        .toUpperCase();
-
-
-    const select =
-        document.getElementById(
-            "empleadoPersonal"
-        );
-
-
-    select.innerHTML =
-        '<option value="">Seleccione personal</option>';
-
-
-    if (!puesto || !servicioActual) {
-        return;
-    }
-
-
-    personalServicio =
-        empleados.filter(empleado => {
-
-            const puestoEmpleado =
-                String(
-                    empleado.posicion ||
-                    empleado.puesto ||
-                    ""
-                )
-                .trim()
-                .toUpperCase();
-
-
-            const servicioEmpleado =
-                String(
-                    empleado.codigoServicio ||
-                    empleado.servicioCodigo ||
-                    ""
-                ).trim();
-
-
-            const servicioActualCodigo =
-                String(
-                    servicioActual.codigoServicio ||
-                    ""
-                ).trim();
-
-
-            return (
-                puestoEmpleado === puesto &&
-                servicioEmpleado === servicioActualCodigo
-            );
-
-        });
-
-
-    personalServicio.forEach(empleado => {
-
-        const option =
-            document.createElement("option");
-
-        option.value =
-            empleado.numeroEmpleado ||
-            empleado.numero ||
-            empleado["numero de empleado"] ||
-            "";
-
-        option.textContent =
-            empleado.nombre ||
-            empleado.nombreCompleto ||
-            "SIN NOMBRE";
-
-
-        select.appendChild(option);
-
-    });
-
-}
-
-
-function continuarPersonal() {
-
-    const numero =
-        document.getElementById(
-            "empleadoPersonal"
-        ).value;
-
-
-    if (!numero) {
-
-        alert(
-            "Selecciona un empleado."
-        );
-
-        return;
-
-    }
-
-
-    empleadoPersonalActual =
-        empleados.find(empleado => {
-
-            const numeroEmpleado =
-                String(
-                    empleado.numeroEmpleado ||
-                    empleado.numero ||
-                    empleado["numero de empleado"] ||
-                    ""
-                ).trim();
-
-            return numeroEmpleado ===
-                String(numero).trim();
-
-        });
-
-
-    if (!empleadoPersonalActual) {
-
-        alert(
-            "No se encontró el empleado."
-        );
-
-        return;
-
-    }
-
-
-    abrirFormulario(
-        empleadoPersonalActual
-    );
-
-}
-
-
-/* =========================================================
-   APOYO
-========================================================= */
-
-function seleccionarApoyo() {
-
-    ocultarTodasLasTarjetas();
-
-    document.getElementById(
-        "cardApoyo"
-    ).classList.remove("oculto");
-
-}
-
-
-function buscarApoyo() {
-
-    const numero =
-        document.getElementById(
-            "numeroApoyo"
-        ).value
-        .trim();
-
-
-    if (!numero) {
-
-        alert(
-            "Ingresa el número de empleado."
-        );
-
-        return;
-
-    }
-
-
-    const resultados =
-        empleados.filter(empleado => {
-
-            const numeroEmpleado =
-                String(
-                    empleado.numeroEmpleado ||
-                    empleado.numero ||
-                    empleado["numero de empleado"] ||
-                    ""
-                ).trim();
-
-            return numeroEmpleado === numero;
-
-        });
-
-
-    const contenedor =
-        document.getElementById(
-            "resultadoApoyo"
-        );
-
-
-    if (!resultados.length) {
-
-        contenedor.innerHTML =
-            '<div class="estado error">Empleado no encontrado.</div>';
-
-        return;
-
-    }
-
-
-    if (resultados.length === 1) {
-
-        empleadoApoyoActual =
-            resultados[0];
-
-        contenedor.innerHTML =
-            '<div class="info">' +
-            '<strong>' +
-            (resultados[0].nombre ||
-            resultados[0].nombreCompleto ||
-            "") +
-            '</strong><br>' +
-            'Número: ' +
-            numero +
-            '</div>' +
-
-            '<button class="btn-primary" onclick="continuarApoyo()">' +
-            'CONTINUAR' +
-            '</button>';
-
-        return;
-
-    }
-
-
-    let html =
-        '<label class="label">Seleccione empleado</label>' +
-        '<select id="selectApoyo">';
-
-    resultados.forEach((empleado, indice) => {
-
-        html +=
-            '<option value="' +
-            indice +
-            '">' +
-            (
-                empleado.nombre ||
-                empleado.nombreCompleto ||
-                "SIN NOMBRE"
-            ) +
-            '</option>';
-
-    });
-
-    html +=
-        '</select>' +
-
-        '<button class="btn-primary" onclick="seleccionarApoyoDuplicado()">' +
-        'CONTINUAR' +
-        '</button>';
-
-    contenedor.innerHTML =
-        html;
-
-
-    window.resultadosApoyo =
-        resultados;
-
-}
-
-
-function seleccionarApoyoDuplicado() {
-
-    const indice =
-        document.getElementById(
-            "selectApoyo"
-        ).value;
-
-
-    empleadoApoyoActual =
-        window.resultadosApoyo[indice];
-
-
-    continuarApoyo();
-
-}
-
-
-function continuarApoyo() {
-
-    if (!empleadoApoyoActual) {
-
-        alert(
-            "Selecciona un empleado."
-        );
-
-        return;
-
-    }
-
-
-    abrirFormulario(
-        empleadoApoyoActual,
-        "APOYO"
-    );
-
-}
-
-
-/* =========================================================
-   ADMINISTRATIVO
-========================================================= */
-
-function seleccionarAdministrativo() {
-
-    ocultarTodasLasTarjetas();
-
-    document.getElementById(
-        "cardAdministrativo"
-    ).classList.remove("oculto");
-
-}
-
-
-function buscarAdministrativo() {
-
-    const numero =
-        document.getElementById(
-            "numeroAdministrativo"
-        ).value
-        .trim();
-
-
-    if (!numero) {
-
-        alert(
-            "Ingresa el número de empleado."
-        );
-
-        return;
-
-    }
-
-
-    const empleado =
-        empleados.find(persona => {
-
-            const numeroEmpleado =
-                String(
-                    persona.numeroEmpleado ||
-                    persona.numero ||
-                    persona["numero de empleado"] ||
-                    ""
-                ).trim();
-
-            const puesto =
-                String(
-                    persona.posicion ||
-                    persona.puesto ||
-                    ""
-                )
-                .trim()
-                .toUpperCase();
-
-
-            return (
-                numeroEmpleado === numero &&
-                puesto === "ADMINISTRATIVO"
-            );
-
-        });
-
-
-    const contenedor =
-        document.getElementById(
-            "resultadoAdministrativo"
-        );
-
-
-    if (!empleado) {
-
-        contenedor.innerHTML =
-            '<div class="estado error">' +
-            'No se encontró un empleado administrativo con ese número.' +
-            '</div>';
-
-        return;
-
-    }
-
-
-    empleadoAdministrativoActual =
-        empleado;
-
-
-    contenedor.innerHTML =
-        '<div class="info">' +
-
-        '<strong>' +
-        (
-            empleado.nombre ||
-            empleado.nombreCompleto ||
-            ""
-        ) +
-        '</strong><br>' +
-
-        'Número: ' +
-        numero +
-
-        '</div>' +
-
-        '<button class="btn-primary" onclick="continuarAdministrativo()">' +
-        'CONTINUAR' +
-        '</button>';
-
-}
-
-
-function continuarAdministrativo() {
-
-    if (!empleadoAdministrativoActual) {
-
-        alert(
-            "Selecciona un empleado."
-        );
-
-        return;
-
-    }
-
-
-    abrirFormulario(
-        empleadoAdministrativoActual,
-        "ADMINISTRATIVO"
-    );
-
-}
-
-
-/* =========================================================
-   ABRIR FORMULARIO
-========================================================= */
-
-function abrirFormulario(
-    empleado,
-    tipoPersonal = "PERSONAL"
-) {
-
-    if (!empleado) {
-
-        alert(
-            "No se encontró información del empleado."
-        );
-
-        return;
-
-    }
-
-
-    const nombre =
-        empleado.nombre ||
-        empleado.nombreCompleto ||
-        "";
-
-
-    const numero =
-        String(
-            empleado.numeroEmpleado ||
-            empleado.numero ||
-            empleado["numero de empleado"] ||
-            ""
-        ).trim();
-
-
-    const posicion =
-        String(
-            empleado.posicion ||
-            empleado.puesto ||
-            tipoPersonal
-        ).trim();
-
-
-    let servicioRegistro =
-        servicioActual
-            ? servicioActual.servicio
-            : "";
-
-
-    if (
-        tipoPersonal === "ADMINISTRATIVO"
-    ) {
-
-        servicioRegistro =
-            SERVICIO_CENTRAL;
-
-    }
-
-
-    registroPendiente = {
-
-        nombre: nombre,
-
-        numeroEmpleado: numero,
-
-        servicio: servicioRegistro,
-
-        posicion: posicion,
-
-        tipoPersonal: tipoPersonal,
-
-        latitud:
-            ubicacionActual.latitud,
-
-        longitud:
-            ubicacionActual.longitud,
-
-        precisionGPS:
-            ubicacionActual.precisionGPS,
-
-        servicioDetectado:
-            servicioActual
-                ? servicioActual.servicio
-                : "",
-
-        servicioOrigen:
-            servicioActual
-                ? servicioActual.codigoServicio
-                : ""
-
-    };
-
-
-    fotoRegistroBase64 = "";
-    fotoRegistroNombre = "";
-
-
-    prepararConsultaCandado();
-
-
-    ocultarTodasLasTarjetas();
-
-    document.getElementById(
-        "cardRegistro"
-    ).classList.remove("oculto");
-
-
-    document.getElementById(
-        "infoRegistro"
-    ).innerHTML =
-
-        "<div class='dato'><strong>Nombre:</strong> " +
-        nombre +
-        "</div>" +
-
-        "<div class='dato'><strong>Empleado:</strong> " +
-        numero +
-        "</div>" +
-
-        "<div class='dato'><strong>Puesto:</strong> " +
-        posicion +
-        "</div>" +
-
-        "<div class='dato'><strong>Servicio:</strong> " +
-        servicioRegistro +
-        "</div>";
-
-
-    consultarCandadoEmpleado(
-        numero,
-        posicion,
-        function(resultado, numeroConsulta) {
-
-            if (
-                numeroConsulta !==
-                consultaCandadoActual
-            ) {
-                return;
-            }
-
-            procesarResultadoCandado(
-                resultado
-            );
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   CANDADO
-========================================================= */
-
-function prepararConsultaCandado() {
-
-    consultaCandadoActual++;
-
-    document.getElementById(
-        "btnEntrada"
-    ).disabled = true;
-
-    document.getElementById(
-        "btnSalida"
-    ).disabled = true;
-
-
-    const mensaje =
-        document.getElementById(
-            "mensajeCandado"
-        );
-
-    mensaje.className =
-        "estado aviso";
-
-    mensaje.textContent =
-        "Consultando último registro...";
-
-    mensaje.classList.remove(
-        "oculto"
-    );
-
-}
-
-
-function consultarCandadoEmpleado(
-    numero,
-    puesto,
-    callback
-) {
-
-    const callbackName =
-        "callbackCandado_" +
-        Date.now() +
-        "_" +
-        Math.floor(
-            Math.random() * 10000
-        );
-
-
-    let terminado = false;
-
-
-    window[callbackName] =
-        function(resultado) {
-
-            if (terminado) return;
-
-            terminado = true;
-
-            limpiar();
-
-            callback(
-                resultado,
-                consultaCandadoActual
-            );
-
-        };
-
-
-    const script =
-        document.createElement("script");
-
-
-    function limpiar() {
-
-        if (script.parentNode) {
-            script.parentNode.removeChild(script);
-        }
-
-        try {
-            delete window[callbackName];
-        } catch (e) {
-            window[callbackName] = undefined;
-        }
-
-    }
-
-
-    const timeout =
-        setTimeout(function() {
-
-            if (terminado) return;
-
-            terminado = true;
-
-            limpiar();
-
-
-            callback(
-                {
-                    ok: false,
-                    error:
-                        "No fue posible consultar el candado."
-                },
-                consultaCandadoActual
-            );
-
-
-        }, 10000);
-
-
-    const url =
-        URL_APPS_SCRIPT +
-        "?action=validar" +
-        "&numero=" +
-        encodeURIComponent(numero) +
-        "&posicion=" +
-        encodeURIComponent(puesto) +
-        "&callback=" +
-        encodeURIComponent(callbackName);
-
-
-    script.src = url;
-
-    script.async = true;
-
-
-    document.body.appendChild(
-        script
-    );
-
-
-    const originalCallback =
-        window[callbackName];
-
-
-    window[callbackName] =
-        function(resultado) {
-
-            clearTimeout(timeout);
-
-            if (terminado) return;
-
-            terminado = true;
-
-            limpiar();
-
-            originalCallback(
-                resultado
-            );
-
-        };
-
-}
-
-
-function procesarResultadoCandado(
-    resultado
-) {
-
-    const mensaje =
-        document.getElementById(
-            "mensajeCandado"
-        );
-
-
-    if (
-        !resultado ||
-        resultado.ok !== true
-    ) {
-
-        document.getElementById(
-            "btnEntrada"
-        ).disabled = false;
-
-        document.getElementById(
-            "btnSalida"
-        ).disabled = false;
-
-
-        mensaje.className =
-            "estado error";
-
-        mensaje.textContent =
-            "No fue posible validar el último registro. Intenta nuevamente.";
-
-        return;
-
-    }
-
-
-    const siguiente =
-        String(
-            resultado.siguienteRegistro ||
-            ""
-        )
-        .trim()
-        .toUpperCase();
-
-
-    if (siguiente === "ENTRADA") {
-
-        document.getElementById(
-            "btnEntrada"
-        ).disabled = false;
-
-        document.getElementById(
-            "btnSalida"
-        ).disabled = true;
-
-
-        mensaje.className =
-            "estado aviso";
-
-        mensaje.textContent =
-            "Puedes realizar ENTRADA.";
-
-        return;
-
-    }
-
-
-    if (siguiente === "SALIDA") {
-
-        document.getElementById(
-            "btnEntrada"
-        ).disabled = true;
-
-        document.getElementById(
-            "btnSalida"
-        ).disabled = false;
-
-
-        mensaje.className =
-            "estado aviso";
-
-        mensaje.textContent =
-            "Tienes una ENTRADA pendiente. Debes realizar SALIDA.";
-
-        return;
-
-    }
-
-
-    if (siguiente === "CUALQUIERA") {
-
-        document.getElementById(
-            "btnEntrada"
-        ).disabled = false;
-
-        document.getElementById(
-            "btnSalida"
-        ).disabled = false;
-
-
-        mensaje.className =
-            "estado aviso";
-
-        mensaje.textContent =
-            "Personal con excepción de candado.";
-
-        return;
-
-    }
-
-
-    document.getElementById(
-        "btnEntrada"
-    ).disabled = false;
-
-    document.getElementById(
-        "btnSalida"
-    ).disabled = false;
-
-}
-
-
-/* =========================================================
-   TIPO DE REGISTRO
-========================================================= */
-
-function seleccionarTipoRegistro(
-    tipo
-) {
-
-    if (!registroPendiente) {
-
-        alert(
-            "No existe un registro pendiente."
-        );
-
-        return;
-
-    }
-
-
-    registroPendiente.tipoRegistro =
-        tipo;
-
-
-    ocultarTodasLasTarjetas();
-
-
-    document.getElementById(
-        "cardFoto"
-    ).classList.remove(
-        "oculto"
-    );
-
-
-    abrirCamara();
-
-}
-
-
-/* =========================================================
-   CÁMARA
-========================================================= */
-
-async function abrirCamara() {
-
-    try {
-
-        if (streamCamara) {
-
-            streamCamara
-                .getTracks()
-                .forEach(track =>
-                    track.stop()
-                );
-
-        }
-
-
-        streamCamara =
-            await navigator.mediaDevices
-                .getUserMedia({
-
-                    video: {
-                        facingMode: "user"
-                    },
-
-                    audio: false
-
-                });
-
-
-        const video =
-            document.getElementById(
-                "video"
-            );
-
-
-        video.srcObject =
-            streamCamara;
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(
-            "No fue posible activar la cámara."
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   TOMAR FOTO
-========================================================= */
-
-function tomarFotografia() {
-
-    const video =
-        document.getElementById(
-            "video"
-        );
-
-    const canvas =
-        document.getElementById(
-            "canvas"
-        );
-
-    if (
-        !video.videoWidth ||
-        !video.videoHeight
-    ) {
-
-        alert(
-            "Activa la cámara antes de tomar la fotografía."
-        );
-
-        return;
-
-    }
-
-
-    let ancho =
-        video.videoWidth;
-
-    let alto =
-        video.videoHeight;
-
-
-    const maximo =
-        1200;
-
-
-    if (ancho > maximo) {
-
-        alto =
-            alto *
-            maximo /
-            ancho;
-
-        ancho =
-            maximo;
-
-    }
-
-
-    canvas.width =
-        ancho;
-
-    canvas.height =
-        alto;
-
-
-    const contexto =
-        canvas.getContext("2d");
-
-
-    contexto.drawImage(
-        video,
-        0,
-        0,
-        ancho,
-        alto
-    );
-
-
-    fotoRegistroBase64 =
-        canvas.toDataURL(
-            "image/jpeg",
-            0.72
-        );
-
-
-    fotoRegistroNombre =
-        "foto_" +
-        Date.now() +
-        ".jpg";
-
-
-    const preview =
-        document.getElementById(
-            "previewFoto"
-        );
-
-
-    preview.src =
-        fotoRegistroBase64;
-
-    preview.style.display =
-        "block";
-
-
-    if (streamCamara) {
-
-        streamCamara
-            .getTracks()
-            .forEach(track =>
-                track.stop()
-            );
-
-    }
-
-}
-
-
-/* =========================================================
-   ENVIAR REGISTRO
-========================================================= */
-
-async function enviarRegistro() {
-
-    if (enviandoRegistro) {
-        return;
-    }
-
-
-    if (!registroPendiente) {
-
-        alert(
-            "No existe información para registrar."
-        );
-
-        return;
-
-    }
-
-
-    if (!fotoRegistroBase64) {
-
-        alert(
-            "Debes tomar una fotografía."
-        );
-
-        return;
-
-    }
-
-
-    enviandoRegistro = true;
-
-
-    const boton =
-        document.getElementById(
-            "btnEnviar"
-        );
-
-
-    boton.disabled = true;
-
-    boton.textContent =
-        "ENVIANDO...";
-
-
-    const datos = {
-
-        fecha:
-            new Date().toLocaleDateString(
-                "es-MX"
-            ),
-
-        hora:
-            new Date().toLocaleTimeString(
-                "es-MX"
-            ),
-
-        fechaHora:
-            new Date().toISOString(),
-
-        nombre:
-            registroPendiente.nombre,
-
-        numeroEmpleado:
-            registroPendiente.numeroEmpleado,
-
-        servicio:
-            registroPendiente.servicio,
-
-        tipoRegistro:
-            registroPendiente.tipoRegistro,
-
-        posicion:
-            registroPendiente.posicion,
-
-        latitud:
-            registroPendiente.latitud,
-
-        longitud:
-            registroPendiente.longitud,
-
-        precisionGPS:
-            registroPendiente.precisionGPS,
-
-        servicioDetectado:
-            registroPendiente.servicioDetectado,
-
-        servicioOrigen:
-            registroPendiente.servicioOrigen,
-
-        resultado:
-            "REGISTRO OK",
-
-        fotoBase64:
-            fotoRegistroBase64,
-
-        fotoNombre:
-            fotoRegistroNombre
-
-    };
-
-
-    try {
-
-        await fetch(
-            URL_APPS_SCRIPT,
-            {
-
-                method: "POST",
-
-                mode: "no-cors",
-
-                headers: {
-                    "Content-Type":
-                        "text/plain;charset=utf-8"
-                },
-
-                body:
-                    JSON.stringify(datos)
-
-            }
-        );
-
-
-        mostrarRegistroExitoso();
-
-
-    } catch (error) {
-
-        console.error(error);
-
-
-        enviandoRegistro =
-            false;
-
-        boton.disabled =
-            false;
-
-        boton.textContent =
-            "ENVIAR REGISTRO";
-
-
-        alert(
-            "No fue posible enviar el registro."
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   REGISTRO EXITOSO
-========================================================= */
-
-function mostrarRegistroExitoso() {
-
-    if (streamCamara) {
-
-        streamCamara
-            .getTracks()
-            .forEach(track =>
-                track.stop()
-            );
-
-    }
-
-
-    ocultarTodasLasTarjetas();
-
-
-    mostrarEstado(
-        "REGISTRO ENVIADO CORRECTAMENTE.",
-        "exito"
-    );
-
-
-    const card =
-        document.getElementById(
-            "cardServicio"
-        );
-
-    card.classList.remove(
-        "oculto"
-    );
-
-
-    enviandoRegistro =
-        false;
-
-
-    registroPendiente =
-        null;
-
-
-    fotoRegistroBase64 =
-        "";
-
-    fotoRegistroNombre =
-        "";
-
-
-    document.getElementById(
-        "previewFoto"
-    ).style.display =
-        "none";
-
-
-    document.getElementById(
-        "btnEnviar"
-    ).disabled =
-        false;
-
-
-    document.getElementById(
-        "btnEnviar"
-    ).textContent =
-        "ENVIAR REGISTRO";
-
-}
-
-
-/* =========================================================
-   REGRESAR
-========================================================= */
-
-function volverServicio() {
-
-    consultaCandadoActual++;
-
-    ocultarTodasLasTarjetas();
-
-    document.getElementById(
-        "cardServicio"
-    ).classList.remove(
-        "oculto"
-    );
-
-}
-
-
-/* =========================================================
-   OCULTAR TARJETAS
-========================================================= */
-
-function ocultarTodasLasTarjetas() {
-
-    const tarjetas = [
-
-        "cardServicio",
-        "cardPersonal",
-        "cardApoyo",
-        "cardAdministrativo",
-        "cardRegistro",
-        "cardFoto"
-
-    ];
-
-
-    tarjetas.forEach(id => {
-
-        const elemento =
-            document.getElementById(id);
-
-        if (elemento) {
-
-            elemento.classList.add(
-                "oculto"
-            );
-
-        }
-
-    });
-
-}
-
-
-/* =========================================================
-   CANCELAR FOTO
-========================================================= */
-
-function cancelarFoto() {
-
-    if (streamCamara) {
-
-        streamCamara
-            .getTracks()
-            .forEach(track =>
-                track.stop()
-            );
-
-    }
-
-
-    registroPendiente =
-        null;
-
-    fotoRegistroBase64 =
-        "";
-
-    fotoRegistroNombre =
-        "";
-
-
-    volverServicio();
-
-}
-
-</script>
-
-</body>
-</html>
+        ).val
