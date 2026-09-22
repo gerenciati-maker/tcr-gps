@@ -1125,9 +1125,15 @@ let fotoRegistroNombre = "";
 
 let enviandoRegistro = false;
 
-let registrosExistentes = [];
 
-let registrosCargados = false;
+/*
+ * Control de consultas del candado.
+ *
+ * Sirve para evitar que una respuesta vieja
+ * sobrescriba una consulta nueva.
+ */
+
+let consultaCandadoActual = 0;
 
 
 /* =====================================================
@@ -1137,8 +1143,6 @@ let registrosCargados = false;
 window.onload = function() {
 
     cargarBaseQR();
-
-    cargarRegistrosExistentes();
 
 };
 
@@ -1408,7 +1412,7 @@ function cargarBaseQR() {
 
         ID_BASE_QR +
 
-        "&tqx=out:json;responseHandler:" +
+        "&tqx=out:json;responseHandler=" +
 
         callbackName;
 
@@ -2811,7 +2815,44 @@ function abrirFormulario(
     );
 
 
-    actualizarBotonesCiclo();
+    /*
+     * Primero bloqueamos los botones.
+     * Después consultamos Apps Script.
+     */
+
+    prepararConsultaCandado();
+
+
+    consultarCandadoEmpleado(
+
+        registroPendiente.numeroEmpleado,
+
+        registroPendiente.posicion,
+
+        function(resultado, numeroConsulta) {
+
+            /*
+             * Si ya hubo una consulta posterior,
+             * ignoramos esta respuesta.
+             */
+
+            if (
+                numeroConsulta !==
+                consultaCandadoActual
+            ) {
+
+                return;
+
+            }
+
+
+            procesarResultadoCandado(
+                resultado
+            );
+
+        }
+
+    );
 
 
     window.scrollTo({
@@ -2828,168 +2869,239 @@ function abrirFormulario(
 
 
 /* =====================================================
-   CARGAR REGISTROS EXISTENTES
+   PREPARAR CONSULTA DEL CANDADO
 ===================================================== */
 
-function cargarRegistrosExistentes() {
+function prepararConsultaCandado() {
+
+    const entrada =
+        document.getElementById(
+            "btnEntrada"
+        );
+
+
+    const salida =
+        document.getElementById(
+            "btnSalida"
+        );
+
+
+    const aviso =
+        document.getElementById(
+            "cicloAviso"
+        );
+
+
+    entrada.classList.remove(
+        "oculto"
+    );
+
+
+    salida.classList.remove(
+        "oculto"
+    );
+
+
+    entrada.disabled =
+        true;
+
+
+    salida.disabled =
+        true;
+
+
+    aviso.innerHTML =
+
+        "<strong>VERIFICANDO REGISTRO...</strong>" +
+
+        "Consultando el último registro del empleado.";
+
+
+    aviso.classList.remove(
+        "oculto"
+    );
+
+}
+
+
+/* =====================================================
+   CONSULTAR CANDADO EN APPS SCRIPT
+===================================================== */
+
+function consultarCandadoEmpleado(
+
+    numeroEmpleado,
+
+    posicion,
+
+    callback
+
+) {
+
+    const numero =
+        String(
+            numeroEmpleado || ""
+        ).trim();
+
+
+    const puesto =
+        String(
+            posicion || ""
+        ).trim();
+
+
+    if (!numero) {
+
+        callback({
+
+            ok:
+                false,
+
+            error:
+                "No se recibió número de empleado."
+
+        });
+
+        return;
+
+    }
+
+
+    /*
+     * Número único para esta consulta.
+     */
+
+    const numeroConsulta =
+        ++consultaCandadoActual;
+
 
     const callbackName =
-        "callbackRegistros_" +
-        Date.now();
+
+        "candado_" +
+
+        Date.now() +
+
+        "_" +
+
+        Math.floor(
+            Math.random() * 100000
+        );
+
+
+    let script = null;
+
+
+    let terminado =
+        false;
+
+
+    function finalizar(respuesta) {
+
+        if (terminado) {
+
+            return;
+
+        }
+
+
+        terminado =
+            true;
+
+
+        try {
+
+            callback(
+                respuesta,
+                numeroConsulta
+            );
+
+        }
+
+        catch(error) {
+
+            console.error(
+                error
+            );
+
+        }
+
+
+        delete window[
+            callbackName
+        ];
+
+
+        if (
+            script &&
+            script.parentNode
+        ) {
+
+            script.parentNode.removeChild(
+                script
+            );
+
+        }
+
+    }
 
 
     window[callbackName] =
-        function(data) {
+        function(respuesta) {
 
-            try {
-
-                const rows =
-                    data.table.rows || [];
-
-
-                registrosExistentes =
-                    rows.map(
-
-                        (row, indice) => {
-
-                            const c =
-                                row.c || [];
-
-
-                            return {
-
-                                indice:
-                                    indice,
-
-                                fecha:
-
-                                    c[0] &&
-                                    c[0].v != null
-
-                                    ?
-
-                                    String(
-                                        c[0].v
-                                    )
-
-                                    :
-
-                                    "",
-
-
-                                hora:
-
-                                    c[1] &&
-                                    c[1].v != null
-
-                                    ?
-
-                                    String(
-                                        c[1].v
-                                    )
-
-                                    :
-
-                                    "",
-
-
-                                nombre:
-
-                                    c[3] &&
-                                    c[3].v != null
-
-                                    ?
-
-                                    String(
-                                        c[3].v
-                                    ).trim()
-                                    .toUpperCase()
-
-                                    :
-
-                                    "",
-
-
-                                numeroEmpleado:
-
-                                    c[4] &&
-                                    c[4].v != null
-
-                                    ?
-
-                                    String(
-                                        c[4].v
-                                    ).trim()
-
-                                    :
-
-                                    "",
-
-
-                                tipoRegistro:
-
-                                    c[6] &&
-                                    c[6].v != null
-
-                                    ?
-
-                                    String(
-                                        c[6].v
-                                    ).trim()
-                                    .toUpperCase()
-
-                                    :
-
-                                    ""
-
-                            };
-
-                        }
-
-                    );
-
-
-                registrosCargados =
-                    true;
-
-            }
-
-            catch (e) {
-
-                console.error(e);
-
-                registrosCargados =
-                    false;
-
-            }
+            finalizar(
+                respuesta
+            );
 
         };
 
 
-    const script =
+    const url =
+
+        URL_APPS_SCRIPT +
+
+        "?action=validar" +
+
+        "&numero=" +
+
+        encodeURIComponent(
+            numero
+        ) +
+
+        "&posicion=" +
+
+        encodeURIComponent(
+            puesto
+        ) +
+
+        "&callback=" +
+
+        encodeURIComponent(
+            callbackName
+        );
+
+
+    script =
         document.createElement(
             "script"
         );
 
 
     script.src =
-
-        "https://docs.google.com/spreadsheets/d/" +
-
-        ID_ARCHIVO +
-
-        "/gviz/tq?sheet=REGISTROS" +
-
-        "&tqx=out:json;responseHandler=" +
-
-        callbackName;
+        url;
 
 
     script.onerror =
         function() {
 
-            registrosCargados =
-                false;
+            finalizar({
+
+                ok:
+                    false,
+
+                error:
+                    "No fue posible consultar el candado en Apps Script."
+
+            });
 
         };
 
@@ -3002,309 +3114,12 @@ function cargarRegistrosExistentes() {
 
 
 /* =====================================================
-   FECHA NORMALIZADA
+   PROCESAR RESULTADO DEL CANDADO
 ===================================================== */
 
-function fechaRegistroNormalizada(
-    valor
+function procesarResultadoCandado(
+    resultado
 ) {
-
-    const texto =
-        String(
-            valor || ""
-        ).trim();
-
-
-    const match =
-        texto.match(
-            /Date\((\d+),(\d+),(\d+)/
-        );
-
-
-    if (match) {
-
-        return (
-
-            match[1] +
-
-            "-" +
-
-            String(
-                Number(match[2]) + 1
-            ).padStart(2, "0") +
-
-            "-" +
-
-            String(
-                Number(match[3])
-            ).padStart(2, "0")
-
-        );
-
-    }
-
-
-    const partes =
-        texto.split("/");
-
-
-    if (
-        partes.length === 3
-    ) {
-
-        if (
-            partes[0].length === 4
-        ) {
-
-            return texto;
-
-        }
-
-
-        return (
-
-            partes[2] +
-
-            "-" +
-
-            partes[1].padStart(2, "0") +
-
-            "-" +
-
-            partes[0].padStart(2, "0")
-
-        );
-
-    }
-
-
-    return texto.slice(
-        0,
-        10
-    );
-
-}
-
-
-/* =====================================================
-   FECHA/HORA DEL REGISTRO
-===================================================== */
-
-function obtenerTimestampRegistro(
-    registro
-) {
-
-    const fecha =
-        fechaRegistroNormalizada(
-            registro.fecha
-        );
-
-
-    const hora =
-        String(
-            registro.hora ||
-            "00:00:00"
-        ).trim();
-
-
-    const m =
-        fecha.match(
-            /^(\d{4})-(\d{2})-(\d{2})$/
-        );
-
-
-    if (!m) {
-
-        return 0;
-
-    }
-
-
-    const hm =
-        hora.match(
-            /(\d{1,2}):(\d{2})(?::(\d{2}))?/
-        );
-
-
-    if (!hm) {
-
-        return new Date(
-
-            Number(m[1]),
-
-            Number(m[2]) - 1,
-
-            Number(m[3])
-
-        ).getTime();
-
-    }
-
-
-    return new Date(
-
-        Number(m[1]),
-
-        Number(m[2]) - 1,
-
-        Number(m[3]),
-
-        Number(hm[1]),
-
-        Number(hm[2]),
-
-        Number(hm[3] || 0)
-
-    ).getTime();
-
-}
-
-
-/* =====================================================
-   ÚLTIMO REGISTRO DEL EMPLEADO
-===================================================== */
-
-function obtenerUltimoRegistro(
-    numeroEmpleado
-) {
-
-    const numero =
-        String(
-            numeroEmpleado || ""
-        ).trim();
-
-
-    const registros =
-        registrosExistentes.filter(
-
-            registro =>
-
-                String(
-                    registro.numeroEmpleado ||
-                    ""
-                ).trim() === numero
-
-        );
-
-
-    if (
-        !registros.length
-    ) {
-
-        return null;
-
-    }
-
-
-    registros.sort(
-
-        (a, b) => {
-
-            const ta =
-                obtenerTimestampRegistro(a);
-
-            const tb =
-                obtenerTimestampRegistro(b);
-
-
-            if (
-                ta !== tb
-            ) {
-
-                return ta - tb;
-
-            }
-
-
-            return (
-
-                (a.indice || 0) -
-
-                (b.indice || 0)
-
-            );
-
-        }
-
-    );
-
-
-    return registros[
-        registros.length - 1
-    ];
-
-}
-
-
-/* =====================================================
-   EXCEPCIONES DEL CANDADO
-===================================================== */
-
-function esExcepcionCandado(
-    posicion
-) {
-
-    const p =
-        String(
-            posicion || ""
-        )
-        .trim()
-        .toUpperCase();
-
-
-    return (
-
-        p === "ADMINISTRATIVO" ||
-
-        p === "ADMIN" ||
-
-        p.includes("SUPERVIS")
-
-    );
-
-}
-
-
-/* =====================================================
-   SABER SI TIENE ENTRADA ABIERTA
-===================================================== */
-
-function tieneRegistroAbierto(
-    numeroEmpleado
-) {
-
-    const ultimo =
-        obtenerUltimoRegistro(
-            numeroEmpleado
-        );
-
-
-    if (!ultimo) {
-
-        return false;
-
-    }
-
-
-    return (
-
-        String(
-            ultimo.tipoRegistro || ""
-        )
-        .trim()
-        .toUpperCase() ===
-        "ENTRADA"
-
-    );
-
-}
-
-
-/* =====================================================
-   ACTUALIZAR BOTONES DEL CICLO
-===================================================== */
-
-function actualizarBotonesCiclo() {
 
     const entrada =
         document.getElementById(
@@ -3325,19 +3140,47 @@ function actualizarBotonesCiclo() {
 
 
     if (
-        !registroPendiente
+        !resultado ||
+        resultado.ok !== true
     ) {
+
+        entrada.disabled =
+            true;
+
+
+        salida.disabled =
+            true;
+
+
+        aviso.innerHTML =
+
+            "<strong>NO FUE POSIBLE VERIFICAR</strong>" +
+
+            "No se puede continuar hasta validar el registro del empleado.";
+
+
+        aviso.classList.remove(
+            "oculto"
+        );
+
+
+        console.error(
+            resultado
+        );
+
 
         return;
 
     }
 
 
-    /* -----------------------------------------------
-       ADMINISTRATIVOS Y SUPERVISORES
-    ------------------------------------------------ */
+    /*
+     * ADMINISTRATIVO / SUPERVISOR
+     */
 
     if (
+
+        registroPendiente &&
 
         esExcepcionCandado(
             registroPendiente.posicion
@@ -3349,28 +3192,40 @@ function actualizarBotonesCiclo() {
             "oculto"
         );
 
+
         salida.classList.remove(
             "oculto"
         );
 
+
+        entrada.disabled =
+            false;
+
+
+        salida.disabled =
+            false;
+
+
         aviso.classList.add(
             "oculto"
         );
+
 
         return;
 
     }
 
 
-    /* -----------------------------------------------
-       SI TIENE ENTRADA ABIERTA
-    ------------------------------------------------ */
+    /*
+     * ÚLTIMO REGISTRO = ENTRADA
+     *
+     * Solo puede hacer SALIDA.
+     */
 
     if (
 
-        tieneRegistroAbierto(
-            registroPendiente.numeroEmpleado
-        )
+        resultado.siguienteRegistro ===
+        "SALIDA"
 
     ) {
 
@@ -3382,6 +3237,14 @@ function actualizarBotonesCiclo() {
         salida.classList.remove(
             "oculto"
         );
+
+
+        entrada.disabled =
+            true;
+
+
+        salida.disabled =
+            false;
 
 
         aviso.innerHTML =
@@ -3403,21 +3266,68 @@ function actualizarBotonesCiclo() {
     }
 
 
-    /* -----------------------------------------------
-       NO TIENE ENTRADA ABIERTA
-    ------------------------------------------------ */
+    /*
+     * ÚLTIMO REGISTRO = SALIDA
+     * O no existe registro.
+     *
+     * Puede hacer ENTRADA.
+     */
 
-    entrada.classList.remove(
-        "oculto"
-    );
+    if (
+
+        resultado.siguienteRegistro ===
+        "ENTRADA"
+
+    ) {
+
+        entrada.classList.remove(
+            "oculto"
+        );
 
 
-    salida.classList.add(
-        "oculto"
-    );
+        salida.classList.add(
+            "oculto"
+        );
 
 
-    aviso.classList.add(
+        entrada.disabled =
+            false;
+
+
+        salida.disabled =
+            true;
+
+
+        aviso.classList.add(
+            "oculto"
+        );
+
+
+        return;
+
+    }
+
+
+    /*
+     * Resultado inesperado.
+     */
+
+    entrada.disabled =
+        true;
+
+
+    salida.disabled =
+        true;
+
+
+    aviso.innerHTML =
+
+        "<strong>NO SE PUDO DETERMINAR EL CICLO</strong>" +
+
+        "No se puede realizar el registro.";
+
+
+    aviso.classList.remove(
         "oculto"
     );
 
@@ -3694,99 +3604,51 @@ function enviarRegistro(
     }
 
 
-    if (
-        !registrosCargados
-    ) {
+    /*
+     * Verificación adicional del lado del cliente.
+     *
+     * El candado definitivo también está en Apps Script.
+     */
 
-        alert(
-
-            "ESPERE UN MOMENTO. SE ESTÁN VERIFICANDO LOS REGISTROS."
-
+    const entrada =
+        document.getElementById(
+            "btnEntrada"
         );
 
 
-        cargarRegistrosExistentes();
+    const salida =
+        document.getElementById(
+            "btnSalida"
+        );
+
+
+    /*
+     * Si el botón está deshabilitado,
+     * no permitimos el envío.
+     */
+
+    if (
+
+        tipoRegistro === "ENTRADA" &&
+
+        entrada.disabled
+
+    ) {
 
         return;
 
     }
 
 
-    /* =================================================
-       CANDADO DE SEGURIDAD
-    ================================================= */
-
     if (
 
-        !esExcepcionCandado(
-            registroPendiente.posicion
-        )
+        tipoRegistro === "SALIDA" &&
+
+        salida.disabled
 
     ) {
 
-
-        const abierto =
-            tieneRegistroAbierto(
-                registroPendiente.numeroEmpleado
-            );
-
-
-        /* ---------------------------------------------
-           ENTRADA CON REGISTRO ABIERTO
-        ---------------------------------------------- */
-
-        if (
-
-            tipoRegistro ===
-            "ENTRADA" &&
-
-            abierto
-
-        ) {
-
-            alert(
-
-                "YA ESTÁ REGISTRADO.\n\n" +
-
-                "Tienes un registro pendiente de SALIDA. " +
-
-                "Debes cerrar tu registro anterior antes de realizar un nuevo registro."
-
-            );
-
-
-            actualizarBotonesCiclo();
-
-            return;
-
-        }
-
-
-        /* ---------------------------------------------
-           SALIDA SIN ENTRADA
-        ---------------------------------------------- */
-
-        if (
-
-            tipoRegistro ===
-            "SALIDA" &&
-
-            !abierto
-
-        ) {
-
-            alert(
-
-                "NO EXISTE UNA ENTRADA PENDIENTE DE SALIDA PARA ESTE EMPLEADO."
-
-            );
-
-
-            actualizarBotonesCiclo();
-
-            return;
-
-        }
+        return;
 
     }
 
@@ -3957,44 +3819,6 @@ function enviarRegistro(
 
         function() {
 
-
-            /* -----------------------------------------
-               ACTUALIZAR HISTORIAL LOCAL
-            ------------------------------------------ */
-
-            registrosExistentes.push({
-
-                fecha:
-                    fecha,
-
-                hora:
-                    hora,
-
-                indice:
-                    registrosExistentes.length,
-
-                nombre:
-
-                    String(
-                        registroPendiente.nombre ||
-                        ""
-                    )
-                    .trim()
-                    .toUpperCase(),
-
-                numeroEmpleado:
-
-                    String(
-                        registroPendiente.numeroEmpleado
-                    )
-                    .trim(),
-
-                tipoRegistro:
-                    tipoRegistro
-
-            });
-
-
             enviandoRegistro =
                 false;
 
@@ -4015,38 +3839,25 @@ function enviarRegistro(
                 false;
 
 
+            console.error(
+                error
+            );
+
+
             document
                 .querySelectorAll(
                     "#tipoRegistroCard button"
                 )
                 .forEach(
 
-                    (btn, i) => {
+                    btn => {
 
                         btn.disabled =
                             false;
 
-
-                        btn.textContent =
-
-                            i === 0
-
-                            ?
-
-                            "ENTRADA"
-
-                            :
-
-                            "SALIDA";
-
                     }
 
                 );
-
-
-            console.error(
-                error
-            );
 
 
             mostrarError(
@@ -4065,7 +3876,42 @@ function enviarRegistro(
             );
 
 
-            actualizarBotonesCiclo();
+            /*
+             * Volvemos a consultar el estado
+             * real del empleado.
+             */
+
+            if (
+                registroPendiente
+            ) {
+
+                prepararConsultaCandado();
+
+
+                consultarCandadoEmpleado(
+
+                    registroPendiente.numeroEmpleado,
+
+                    registroPendiente.posicion,
+
+                    function(resultado, numeroConsulta) {
+
+                        if (
+                            numeroConsulta ===
+                            consultaCandadoActual
+                        ) {
+
+                            procesarResultadoCandado(
+                                resultado
+                            );
+
+                        }
+
+                    }
+
+                );
+
+            }
 
         }
 
