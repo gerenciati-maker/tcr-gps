@@ -111,6 +111,22 @@ button:hover {
     margin-top: 8px;
 }
 
+.fotoRegistro {
+    background: #f7f7f7;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.fotoPreview {
+    display: block;
+    width: 100%;
+    max-height: 320px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
 </style>
 </head>
 
@@ -201,6 +217,9 @@ button:hover {
         >
 
 
+        <button onclick="continuarPersonal()">
+            CONTINUAR
+        </button>
 
     </div>
 
@@ -252,6 +271,9 @@ button:hover {
         </div>
 
 
+        <button onclick="continuarApoyo()">
+            CONTINUAR
+        </button>
 
     </div>
 
@@ -308,6 +330,9 @@ button:hover {
         <div id="adminResultado"></div>
 
 
+        <button onclick="continuarAdministrativo()">
+            CONTINUAR
+        </button>
 
     </div>
 
@@ -318,6 +343,20 @@ button:hover {
     ========================================== -->
 
     <div id="tipoRegistroCard" class="card oculto">
+
+        <div class="fotoRegistro">
+            <strong>Fotografía del guardia</strong>
+            <div class="pequeno">La fotografía es obligatoria para poder registrar la entrada o salida.</div>
+            <input
+                type="file"
+                id="fotoRegistro"
+                accept="image/*"
+                capture="environment"
+                onchange="procesarFotografia(event)"
+            >
+            <div id="fotoEstado" class="pequeno">No se ha seleccionado fotografía.</div>
+            <img id="fotoVistaPrevia" class="oculto fotoPreview" alt="Vista previa de la fotografía">
+        </div>
 
         <div class="info">
 
@@ -370,7 +409,7 @@ const ID_BASE_QR =
 */
 
 const URL_APPS_SCRIPT =
-    "https://script.google.com/macros/s/AKfycbwLFAKGBIyPp2g2idSpxG5WEDMfClTV1H0KNTuXb_XqmWqapFYZmcqFTFk9ZjwfB5X0Zg/exec";
+    "https://script.google.com/macros/s/AKfycbwRaqv3bUBUzwJiXfX0yOjQldn51NkNMZiL8OaVw3n4RBCbA0raBqw9heAlbgLLgi3DSQ/exec";
 
 
 /*
@@ -419,6 +458,8 @@ let ubicacionActual = {
 };
 
 let registroPendiente = null;
+let fotoRegistroBase64 = "";
+let fotoRegistroNombre = "";
 let enviandoRegistro = false;
 let registrosExistentes = [];
 let registrosCargados = false;
@@ -1301,15 +1342,6 @@ function actualizarNumeroPersonal() {
             ? empleadoPersonalActual.numero
             : "";
 
-    if (empleadoPersonalActual) {
-        abrirFormulario(
-            empleadoPersonalActual.nombre,
-            empleadoPersonalActual.numero,
-            "PERSONAL",
-            empleadoPersonalActual.servicio
-        );
-    }
-
 }
 
 
@@ -1426,12 +1458,6 @@ function reconocerApoyo() {
         empleadoApoyoActual = coincidencias[0];
         document.getElementById("nombreApoyo").value = coincidencias[0].nombre;
         resultado.textContent = coincidencias[0].servicio;
-        abrirFormulario(
-            coincidencias[0].nombre,
-            coincidencias[0].numero,
-            "APOYO",
-            servicioActual ? servicioActual.codigo : "FUERA DE SERVICIO"
-        );
         return;
     }
 
@@ -1610,12 +1636,6 @@ function reconocerAdministrativo() {
         empleadoAdministrativoActual = coincidencias[0];
         document.getElementById("nombreAdministrativo").value = coincidencias[0].nombre;
         resultado.innerHTML = '<div class="exito">Empleado administrativo validado. Registro: CENTRAL.</div>';
-        abrirFormulario(
-            coincidencias[0].nombre,
-            coincidencias[0].numero,
-            "ADMINISTRATIVO",
-            SERVICIO_CENTRAL
-        );
         return;
     }
 
@@ -1901,6 +1921,79 @@ function registroYaExiste(nombre, numeroEmpleado, tipoRegistro) {
 }
 
 /* =====================================================
+   FOTOGRAFÍA DEL REGISTRO
+===================================================== */
+
+function procesarFotografia(event) {
+
+    const archivo = event.target.files && event.target.files[0];
+
+    fotoRegistroBase64 = "";
+    fotoRegistroNombre = "";
+
+    const estado = document.getElementById("fotoEstado");
+    const vista = document.getElementById("fotoVistaPrevia");
+
+    if (!archivo) {
+        estado.textContent = "No se ha seleccionado fotografía.";
+        vista.classList.add("oculto");
+        return;
+    }
+
+    if (!archivo.type.startsWith("image/")) {
+        alert("Seleccione una fotografía válida.");
+        event.target.value = "";
+        return;
+    }
+
+    const lector = new FileReader();
+
+    lector.onload = function(e) {
+        const imagen = new Image();
+
+        imagen.onload = function() {
+            const maximo = 1200;
+            let ancho = imagen.width;
+            let alto = imagen.height;
+
+            if (ancho > maximo || alto > maximo) {
+                const factor = Math.min(maximo / ancho, maximo / alto);
+                ancho = Math.round(ancho * factor);
+                alto = Math.round(alto * factor);
+            }
+
+            const canvas = document.createElement("canvas");
+            canvas.width = ancho;
+            canvas.height = alto;
+
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(imagen, 0, 0, ancho, alto);
+
+            fotoRegistroBase64 = canvas.toDataURL("image/jpeg", 0.72);
+            fotoRegistroNombre = archivo.name || "foto_registro.jpg";
+
+            vista.src = fotoRegistroBase64;
+            vista.classList.remove("oculto");
+            estado.textContent = "Fotografía lista para registrar.";
+        };
+
+        imagen.src = e.target.result;
+    };
+
+    lector.readAsDataURL(archivo);
+}
+
+
+function validarFotografia() {
+    if (!fotoRegistroBase64) {
+        alert("DEBE TOMAR O SELECCIONAR UNA FOTOGRAFÍA ANTES DE REGISTRAR.");
+        return false;
+    }
+    return true;
+}
+
+
+/* =====================================================
    ENVIAR REGISTRO A GOOGLE APPS SCRIPT
 ===================================================== */
 
@@ -1919,6 +2012,10 @@ function enviarRegistro(tipoRegistro) {
     }
 
 
+
+    if (!validarFotografia()) {
+        return;
+    }
 
     if (!registrosCargados) {
         alert("ESPERE UN MOMENTO. SE ESTÁN VERIFICANDO LOS REGISTROS.");
@@ -2017,7 +2114,13 @@ function enviarRegistro(tipoRegistro) {
             registroPendiente.servicioOrigen,
 
         resultado:
-            registroPendiente.resultado
+            registroPendiente.resultado,
+
+        fotoBase64:
+            fotoRegistroBase64,
+
+        fotoNombre:
+            fotoRegistroNombre
 
     };
 
@@ -2180,6 +2283,16 @@ function mostrarRegistroExitoso(
     registroPendiente =
         null;
 
+    fotoRegistroBase64 = "";
+    fotoRegistroNombre = "";
+
+    const fotoInput = document.getElementById("fotoRegistro");
+    if (fotoInput) fotoInput.value = "";
+    const fotoVista = document.getElementById("fotoVistaPrevia");
+    if (fotoVista) { fotoVista.src = ""; fotoVista.classList.add("oculto"); }
+    const fotoEstado = document.getElementById("fotoEstado");
+    if (fotoEstado) fotoEstado.textContent = "No se ha seleccionado fotografía.";
+
 
 
     mostrarEstado(
@@ -2278,6 +2391,15 @@ function nuevoRegistro() {
 
     registroPendiente =
         null;
+
+    fotoRegistroBase64 = "";
+    fotoRegistroNombre = "";
+    const fotoInput = document.getElementById("fotoRegistro");
+    if (fotoInput) fotoInput.value = "";
+    const fotoVista = document.getElementById("fotoVistaPrevia");
+    if (fotoVista) { fotoVista.src = ""; fotoVista.classList.add("oculto"); }
+    const fotoEstado = document.getElementById("fotoEstado");
+    if (fotoEstado) fotoEstado.textContent = "No se ha seleccionado fotografía.";
 
     mostrarEstado(
         "Ubicación validada correctamente."
