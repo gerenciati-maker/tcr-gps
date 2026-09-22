@@ -426,6 +426,9 @@ let ubicacionActual = {
 };
 
 let registroPendiente = null;
+let enviandoRegistro = false;
+let registrosExistentes = [];
+let registrosCargados = false;
 
 
 
@@ -436,6 +439,7 @@ let registroPendiente = null;
 window.onload = function() {
 
     cargarBaseQR();
+    cargarRegistrosExistentes();
 
 };
 
@@ -1443,64 +1447,61 @@ function seleccionarApoyo() {
 
 function reconocerApoyo() {
 
-    const numero =
-        document.getElementById(
-            "numeroApoyo"
-        ).value.trim();
+    const numero = document.getElementById("numeroApoyo").value.trim();
+    const coincidencias = empleados.filter(e => e.numero === numero);
+    const resultado = document.getElementById("servicioOrigen");
+    const anterior = document.getElementById("apoyoDuplicadoSelect");
+    if (anterior) anterior.remove();
 
+    empleadoApoyoActual = null;
+    document.getElementById("nombreApoyo").value = "";
+    resultado.textContent = "-";
 
+    if (!numero || coincidencias.length === 0) return;
 
-    const empleado =
-        empleados.find(
-
-            e =>
-                e.numero === numero
-
-        );
-
-
-
-    if (!empleado) {
-
-        document.getElementById(
-            "nombreApoyo"
-        ).value = "";
-
-
-        document.getElementById(
-            "servicioOrigen"
-        ).textContent = "-";
-
-
-        empleadoApoyoActual =
-            null;
-
-
+    if (coincidencias.length === 1) {
+        empleadoApoyoActual = coincidencias[0];
+        document.getElementById("nombreApoyo").value = coincidencias[0].nombre;
+        resultado.textContent = coincidencias[0].servicio;
         return;
-
     }
 
-
-
-    empleadoApoyoActual =
-        empleado;
-
-
-
-    document.getElementById(
-        "nombreApoyo"
-    ).value =
-        empleado.nombre;
-
-
-
-    document.getElementById(
-        "servicioOrigen"
-    ).textContent =
-        empleado.servicio;
-
+    mostrarSelectorDuplicados("apoyoCard", "apoyoDuplicadoSelect", coincidencias, function(empleado) {
+        empleadoApoyoActual = empleado;
+        document.getElementById("nombreApoyo").value = empleado.nombre;
+        resultado.textContent = empleado.servicio;
+    });
 }
 
+function mostrarSelectorDuplicados(contenedorId, selectId, coincidencias, alSeleccionar) {
+    const contenedor = document.getElementById(contenedorId);
+    const div = document.createElement("div");
+    div.id = selectId;
+    div.className = "error";
+    div.style.marginTop = "12px";
+    div.innerHTML = "<strong>NÚMERO DE EMPLEADO DUPLICADO</strong><div class=\"pequeno\">Seleccione el nombre correcto:</div>";
+
+    const select = document.createElement("select");
+    select.style.marginTop = "8px";
+    const base = document.createElement("option");
+    base.value = "";
+    base.textContent = "Seleccione un nombre";
+    select.appendChild(base);
+
+    coincidencias.forEach((empleado, indice) => {
+        const option = document.createElement("option");
+        option.value = String(indice);
+        option.textContent = empleado.nombre;
+        select.appendChild(option);
+    });
+
+    select.onchange = function() {
+        if (this.value === "") return;
+        alSeleccionar(coincidencias[Number(this.value)]);
+    };
+    div.appendChild(select);
+    contenedor.appendChild(div);
+}
 
 
 /* =====================================================
@@ -1540,7 +1541,7 @@ function continuarApoyo() {
 
         "APOYO",
 
-        empleadoApoyoActual.servicio
+        servicioActual ? servicioActual.codigo : "FUERA DE SERVICIO"
 
     );
 
@@ -1612,96 +1613,37 @@ function seleccionarAdministrativo() {
 
 function reconocerAdministrativo() {
 
-    const numero =
-        document.getElementById(
-            "numeroAdministrativo"
-        ).value.trim();
+    const numero = document.getElementById("numeroAdministrativo").value.trim();
+    const coincidencias = empleados.filter(e => e.numero === numero && e.posicion === "ADMINISTRATIVO");
+    const resultado = document.getElementById("adminResultado");
+    const anterior = document.getElementById("adminDuplicadoSelect");
+    if (anterior) anterior.remove();
 
+    empleadoAdministrativoActual = null;
+    document.getElementById("nombreAdministrativo").value = "";
+    resultado.innerHTML = "";
 
-
-    const empleado =
-        empleados.find(
-
-            e =>
-                e.numero === numero
-
-        );
-
-
-
-    empleadoAdministrativoActual =
-        null;
-
-
-
-    document.getElementById(
-        "nombreAdministrativo"
-    ).value = "";
-
-
-    document.getElementById(
-        "adminResultado"
-    ).innerHTML = "";
-
-
-
-    if (!empleado) {
-
+    if (!numero || coincidencias.length === 0) {
+        if (numero) {
+            const existeNoAdmin = empleados.some(e => e.numero === numero);
+            if (existeNoAdmin) resultado.innerHTML = '<div class="error">Este empleado no está registrado como ADMINISTRATIVO.</div>';
+        }
         return;
-
     }
 
-
-
-    /*
-       VALIDACIÓN DE POSICIÓN
-    */
-
-    if (
-        empleado.posicion !==
-        "ADMINISTRATIVO"
-    ) {
-
-        document.getElementById(
-            "adminResultado"
-        ).innerHTML =
-
-            '<div class="error">' +
-
-            'Este empleado no está registrado como ADMINISTRATIVO.' +
-
-            '</div>';
-
+    if (coincidencias.length === 1) {
+        empleadoAdministrativoActual = coincidencias[0];
+        document.getElementById("nombreAdministrativo").value = coincidencias[0].nombre;
+        resultado.innerHTML = '<div class="exito">Empleado administrativo validado. Registro: CENTRAL.</div>';
         return;
-
     }
 
-
-
-    empleadoAdministrativoActual =
-        empleado;
-
-
-
-    document.getElementById(
-        "nombreAdministrativo"
-    ).value =
-        empleado.nombre;
-
-
-
-    document.getElementById(
-        "adminResultado"
-    ).innerHTML =
-
-        '<div class="exito">' +
-
-        'Empleado administrativo validado. Registro: CENTRAL.' +
-
-        '</div>';
-
+    mostrarSelectorDuplicados("administrativoCard", "adminDuplicadoSelect", coincidencias, function(empleado) {
+        empleadoAdministrativoActual = empleado;
+        document.getElementById("nombreAdministrativo").value = empleado.nombre;
+        resultado.innerHTML = '<div class="exito">Empleado administrativo validado. Registro: CENTRAL.</div>';
+    });
 }
-
 
 
 /* =====================================================
@@ -1913,10 +1855,63 @@ function abrirFormulario(
 
 
 /* =====================================================
+   VALIDACIÓN DE REGISTROS EXISTENTES
+===================================================== */
+
+function cargarRegistrosExistentes() {
+    const callbackName = "callbackRegistros_" + Date.now();
+    window[callbackName] = function(data) {
+        try {
+            const rows = data.table.rows || [];
+            registrosExistentes = rows.map(row => {
+                const c = row.c || [];
+                return {
+                    fecha: c[0] && c[0].v != null ? String(c[0].v) : "",
+                    numeroEmpleado: c[4] && c[4].v != null ? String(c[4].v).trim() : "",
+                    tipoRegistro: c[6] && c[6].v != null ? String(c[6].v).trim().toUpperCase() : ""
+                };
+            });
+            registrosCargados = true;
+        } catch (e) {
+            registrosCargados = false;
+        }
+    };
+    const script = document.createElement("script");
+    script.src = "https://docs.google.com/spreadsheets/d/" + ID_ARCHIVO + "/gviz/tq?sheet=REGISTROS&tqx=out:json;responseHandler:" + callbackName;
+    script.onerror = function() { registrosCargados = false; };
+    document.body.appendChild(script);
+}
+
+function fechaRegistroNormalizada(valor) {
+    const texto = String(valor || "").trim();
+    const match = texto.match(/Date\((\d+),(\d+),(\d+)/);
+    if (match) return match[1] + "-" + String(Number(match[2]) + 1).padStart(2, "0") + "-" + String(Number(match[3])).padStart(2, "0");
+    const partes = texto.split("/");
+    if (partes.length === 3) {
+        if (partes[0].length === 4) return texto;
+        return partes[2] + "-" + partes[1].padStart(2, "0") + "-" + partes[0].padStart(2, "0");
+    }
+    return texto.slice(0,10);
+}
+
+function hoyNormalizado() {
+    const d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+
+function registroYaExiste(numeroEmpleado, tipoRegistro) {
+    const numero = String(numeroEmpleado).trim();
+    const tipo = String(tipoRegistro).trim().toUpperCase();
+    return registrosExistentes.some(r => String(r.numeroEmpleado).trim() === numero && fechaRegistroNormalizada(r.fecha) === hoyNormalizado() && r.tipoRegistro === tipo);
+}
+
+/* =====================================================
    ENVIAR REGISTRO A GOOGLE APPS SCRIPT
 ===================================================== */
 
 function enviarRegistro(tipoRegistro) {
+
+    if (enviandoRegistro) return;
 
     if (!registroPendiente) {
 
@@ -1929,6 +1924,24 @@ function enviarRegistro(tipoRegistro) {
     }
 
 
+
+    if (!registrosCargados) {
+        alert("ESPERE UN MOMENTO. SE ESTÁN VERIFICANDO LOS REGISTROS.");
+        cargarRegistrosExistentes();
+        return;
+    }
+
+    if (registroYaExiste(registroPendiente.numeroEmpleado, tipoRegistro)) {
+        alert(tipoRegistro === "ENTRADA"
+            ? "YA ESTÁ REGISTRADA LA ENTRADA PARA ESTE EMPLEADO EL DÍA DE HOY."
+            : "YA ESTÁ REGISTRADA LA SALIDA PARA ESTE EMPLEADO EL DÍA DE HOY.");
+        return;
+    }
+
+    enviandoRegistro = true;
+
+    const botones = document.querySelectorAll("#tipoRegistroCard button");
+    botones.forEach(btn => { btn.disabled = true; btn.textContent = "GUARDANDO..."; });
 
     registroPendiente.tipoRegistro =
         tipoRegistro;
@@ -2057,6 +2070,14 @@ function enviarRegistro(tipoRegistro) {
 
         function() {
 
+            registrosExistentes.push({
+                fecha: fecha,
+                numeroEmpleado: String(registroPendiente.numeroEmpleado).trim(),
+                tipoRegistro: tipoRegistro
+            });
+            enviandoRegistro = false;
+
+
             mostrarRegistroExitoso(
                 tipoRegistro
             );
@@ -2068,6 +2089,9 @@ function enviarRegistro(tipoRegistro) {
     .catch(
 
         function(error) {
+            enviandoRegistro = false;
+            document.querySelectorAll("#tipoRegistroCard button").forEach((btn,i)=>{ btn.disabled=false; btn.textContent=i===0?"ENTRADA":"SALIDA"; });
+
 
             console.error(error);
 
