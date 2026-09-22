@@ -409,6 +409,8 @@ let servicios = new Map();
 
 let personalServicio = [];
 
+let empleadoPersonalActual = null;
+
 let servicioActual = null;
 
 let empleadoApoyoActual = null;
@@ -1258,7 +1260,7 @@ function cargarPersonalServicio() {
 
 
     personalServicio.forEach(
-        empleado => {
+        (empleado, indice) => {
 
             const option =
                 document.createElement(
@@ -1267,7 +1269,7 @@ function cargarPersonalServicio() {
 
 
             option.value =
-                empleado.numero;
+                String(indice);
 
 
             option.textContent =
@@ -1291,19 +1293,24 @@ function cargarPersonalServicio() {
 
 function actualizarNumeroPersonal() {
 
-    const numero =
+    const indice =
         document.getElementById(
             "personalSelect"
         ).value;
 
+    empleadoPersonalActual =
+        indice !== "" && personalServicio[Number(indice)]
+            ? personalServicio[Number(indice)]
+            : null;
 
     document.getElementById(
         "numeroPersonal"
     ).value =
-        numero;
+        empleadoPersonalActual
+            ? empleadoPersonalActual.numero
+            : "";
 
 }
-
 
 
 /* =====================================================
@@ -1312,14 +1319,9 @@ function actualizarNumeroPersonal() {
 
 function continuarPersonal() {
 
-    const numero =
-        document.getElementById(
-            "personalSelect"
-        ).value;
+    const empleado = empleadoPersonalActual;
 
-
-
-    if (!numero) {
+    if (!empleado) {
 
         alert(
             "Seleccione una persona."
@@ -1328,44 +1330,6 @@ function continuarPersonal() {
         return;
 
     }
-
-
-
-    const empleado =
-        empleados.find(
-
-            e =>
-
-                e.numero === numero &&
-
-                e.codigoServicio ===
-                servicioActual.codigo &&
-
-                (
-                    e.posicion ===
-                    "GUARDIA"
-
-                    ||
-
-                    e.posicion ===
-                    "MONITORISTA"
-                )
-
-        );
-
-
-
-    if (!empleado) {
-
-        alert(
-            "No se encontró el empleado en el servicio identificado."
-        );
-
-        return;
-
-    }
-
-
 
     abrirFormulario(
 
@@ -1380,7 +1344,6 @@ function continuarPersonal() {
     );
 
 }
-
 
 
 /* =====================================================
@@ -1470,6 +1433,12 @@ function reconocerApoyo() {
         empleadoApoyoActual = empleado;
         document.getElementById("nombreApoyo").value = empleado.nombre;
         resultado.textContent = empleado.servicio;
+        abrirFormulario(
+            empleado.nombre,
+            empleado.numero,
+            "APOYO",
+            servicioActual ? servicioActual.codigo : "FUERA DE SERVICIO"
+        );
     });
 }
 
@@ -1642,6 +1611,12 @@ function reconocerAdministrativo() {
         empleadoAdministrativoActual = empleado;
         document.getElementById("nombreAdministrativo").value = empleado.nombre;
         resultado.innerHTML = '<div class="exito">Empleado administrativo validado. Registro: CENTRAL.</div>';
+        abrirFormulario(
+            empleado.nombre,
+            empleado.numero,
+            "ADMINISTRATIVO",
+            SERVICIO_CENTRAL
+        );
     });
 }
 
@@ -1867,6 +1842,7 @@ function cargarRegistrosExistentes() {
                 const c = row.c || [];
                 return {
                     fecha: c[0] && c[0].v != null ? String(c[0].v) : "",
+                    nombre: c[3] && c[3].v != null ? String(c[3].v).trim().toUpperCase() : "",
                     numeroEmpleado: c[4] && c[4].v != null ? String(c[4].v).trim() : "",
                     tipoRegistro: c[6] && c[6].v != null ? String(c[6].v).trim().toUpperCase() : ""
                 };
@@ -1899,10 +1875,17 @@ function hoyNormalizado() {
     return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
 }
 
-function registroYaExiste(numeroEmpleado, tipoRegistro) {
+function registroYaExiste(nombre, numeroEmpleado, tipoRegistro) {
     const numero = String(numeroEmpleado).trim();
+    const nombreNormalizado = String(nombre || "").trim().toUpperCase();
     const tipo = String(tipoRegistro).trim().toUpperCase();
-    return registrosExistentes.some(r => String(r.numeroEmpleado).trim() === numero && fechaRegistroNormalizada(r.fecha) === hoyNormalizado() && r.tipoRegistro === tipo);
+
+    return registrosExistentes.some(r =>
+        String(r.numeroEmpleado).trim() === numero &&
+        String(r.nombre || "").trim().toUpperCase() === nombreNormalizado &&
+        fechaRegistroNormalizada(r.fecha) === hoyNormalizado() &&
+        r.tipoRegistro === tipo
+    );
 }
 
 /* =====================================================
@@ -1931,7 +1914,7 @@ function enviarRegistro(tipoRegistro) {
         return;
     }
 
-    if (registroYaExiste(registroPendiente.numeroEmpleado, tipoRegistro)) {
+    if (registroYaExiste(registroPendiente.nombre, registroPendiente.numeroEmpleado, tipoRegistro)) {
         alert(tipoRegistro === "ENTRADA"
             ? "YA ESTÁ REGISTRADA LA ENTRADA PARA ESTE EMPLEADO EL DÍA DE HOY."
             : "YA ESTÁ REGISTRADA LA SALIDA PARA ESTE EMPLEADO EL DÍA DE HOY.");
@@ -2072,6 +2055,7 @@ function enviarRegistro(tipoRegistro) {
 
             registrosExistentes.push({
                 fecha: fecha,
+                nombre: String(registroPendiente.nombre || "").trim().toUpperCase(),
                 numeroEmpleado: String(registroPendiente.numeroEmpleado).trim(),
                 tipoRegistro: tipoRegistro
             });
@@ -2225,6 +2209,8 @@ function nuevoRegistro() {
     document.getElementById(
         "personalSelect"
     ).value = "";
+
+    empleadoPersonalActual = null;
 
     document.getElementById(
         "numeroPersonal"
