@@ -2681,28 +2681,37 @@ function validarCicloAntesDeConfirmar(tipoRegistro) {
     validandoCiclo = true;
     mostrarEstado("Verificando el ciclo de asistencia...");
 
-    const numero = encodeURIComponent(
-        registroPendiente.numeroEmpleado || ""
-    );
-
-    const posicion = encodeURIComponent(
-        registroPendiente.posicion || ""
-    );
-
+    const numero = encodeURIComponent(registroPendiente.numeroEmpleado || "");
+    const posicion = encodeURIComponent(registroPendiente.posicion || "");
     const servicio = encodeURIComponent(
         registroPendiente.servicio ||
         registroPendiente.servicioDetectado ||
         ""
     );
 
-    const callback = "validarCicloCallback_" + Date.now();
+    const token = "ciclo_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+    let iframe = null;
+    let terminado = false;
 
-    window[callback] = function(respuesta) {
+    function limpiar() {
+        if (terminado) return;
+        terminado = true;
+        validandoCiclo = false;
+        window.removeEventListener("message", recibirRespuestaCiclo);
+        if (iframe && iframe.parentNode) {
+            iframe.parentNode.removeChild(iframe);
+        }
+    }
+
+    function procesarRespuesta(respuesta) {
+        if (terminado) return;
 
         try {
-
             if (!respuesta || respuesta.ok !== true) {
-                mostrarBloqueoCiclo(respuesta);
+                mostrarBloqueoCiclo(respuesta || {
+                    ok: false,
+                    error: "No fue posible validar el ciclo de asistencia."
+                });
                 return;
             }
 
@@ -2715,7 +2724,6 @@ function validarCicloAntesDeConfirmar(tipoRegistro) {
             ).toUpperCase();
 
             if (requerido && requerido !== "CUALQUIERA" && requerido !== solicitado) {
-
                 mostrarBloqueoCiclo({
                     ok: false,
                     codigo: requerido === "SALIDA"
@@ -2733,54 +2741,58 @@ function validarCicloAntesDeConfirmar(tipoRegistro) {
             mostrarConfirmacionRegistro(tipoRegistro);
 
         } finally {
-
-            validandoCiclo = false;
-            mostrarEstado("Ciclo verificado. Revise los datos antes de registrar.");
-            try {
-                delete window[callback];
-            } catch (e) {}
+            limpiar();
+            if (respuesta && respuesta.ok === true) {
+                mostrarEstado("Ciclo verificado. Revise los datos antes de registrar.");
+            }
         }
-    };
+    }
 
-    const script = document.createElement("script");
+    function recibirRespuestaCiclo(evento) {
+        const datos = evento && evento.data;
+        if (!datos || datos.tipo !== "VALIDACION_CICLO_ASISTENCIA") return;
+        if (datos.token !== token) return;
 
-    script.src =
+        procesarRespuesta(datos.respuesta);
+    }
+
+    window.addEventListener("message", recibirRespuestaCiclo);
+
+    iframe = document.createElement("iframe");
+    iframe.title = "Validación de ciclo";
+    iframe.setAttribute("aria-hidden", "true");
+    iframe.style.position = "fixed";
+    iframe.style.width = "1px";
+    iframe.style.height = "1px";
+    iframe.style.border = "0";
+    iframe.style.opacity = "0";
+    iframe.style.pointerEvents = "none";
+
+    iframe.src =
         URL_APPS_SCRIPT +
-        "?action=validar" +
+        "?action=validarMovil" +
         "&numero=" + numero +
         "&posicion=" + posicion +
         "&servicio=" + servicio +
-        "&callback=" + callback +
+        "&token=" + encodeURIComponent(token) +
         "&_=" + Date.now();
 
-    script.onerror = function() {
-
-        validandoCiclo = false;
-
-        try {
-            delete window[callback];
-        } catch (e) {}
-
+    iframe.onerror = function() {
+        if (terminado) return;
+        limpiar();
         mostrarError(
             "No fue posible verificar el ciclo de asistencia. Revise su conexión e inténtelo nuevamente."
         );
     };
 
-    document.body.appendChild(script);
+    document.body.appendChild(iframe);
 
     setTimeout(function() {
-        if (window[callback]) {
-            validandoCiclo = false;
-            try {
-                delete window[callback];
-            } catch (e) {}
-            if (script.parentNode) {
-                script.parentNode.removeChild(script);
-            }
-            mostrarError(
-                "El servidor no respondió a tiempo. No se envió ningún registro."
-            );
-        }
+        if (terminado) return;
+        limpiar();
+        mostrarError(
+            "El servidor no respondió a tiempo. No se envió ningún registro."
+        );
     }, 15000);
 }
 
