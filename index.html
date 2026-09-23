@@ -2376,26 +2376,22 @@ function abrirFormulario(
     };
 
 
-    document.getElementById(
-        "personalCard"
-    ).classList.add(
-        "oculto"
-    );
-
-
-    document.getElementById(
-        "apoyoCard"
-    ).classList.add(
-        "oculto"
-    );
-
-
-    document.getElementById(
-        "administrativoCard"
-    ).classList.add(
-        "oculto"
-    );
-
+    /* Mantener visible en pantalla la tarjeta donde se seleccionó
+       el trabajador, para que el usuario pueda comprobar el nombre
+       y número antes de tomar la foto y registrar. */
+    if (tipo === "PERSONAL") {
+        document.getElementById("personalCard").classList.remove("oculto");
+        document.getElementById("apoyoCard").classList.add("oculto");
+        document.getElementById("administrativoCard").classList.add("oculto");
+    } else if (tipo === "APOYO") {
+        document.getElementById("personalCard").classList.add("oculto");
+        document.getElementById("apoyoCard").classList.remove("oculto");
+        document.getElementById("administrativoCard").classList.add("oculto");
+    } else {
+        document.getElementById("personalCard").classList.add("oculto");
+        document.getElementById("apoyoCard").classList.add("oculto");
+        document.getElementById("administrativoCard").classList.remove("oculto");
+    }
 
     document.getElementById(
         "tipoRegistroCard"
@@ -2732,7 +2728,9 @@ function mostrarConfirmacionRegistro(tipoRegistro) {
 
     mensaje.classList.remove("oculto");
 
-    /* Ocultamos los botones ENTRADA/SALIDA para evitar dobles clics. */
+    /* Ocultamos únicamente la tarjeta de captura (foto y ENTRADA/SALIDA).
+       La tarjeta del trabajador seleccionado permanece visible arriba para
+       que el usuario pueda seguir comprobando a quién está registrando. */
     document.getElementById("tipoRegistroCard").classList.add("oculto");
 
     mensaje.scrollIntoView({
