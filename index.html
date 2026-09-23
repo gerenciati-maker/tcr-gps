@@ -276,6 +276,25 @@ button[onclick="enviarRegistro('SALIDA')"]:hover {
         font-size: 21px;
     }
 }
+
+.resumenRegistro {
+    background: rgba(255,255,255,0.75);
+    border-radius: 12px;
+    padding: 14px;
+    margin: 14px 0;
+    color: #176b3a;
+    line-height: 1.7;
+}
+
+.resumenRegistro div {
+    border-bottom: 1px solid rgba(23,107,58,0.12);
+    padding: 2px 0;
+}
+
+.resumenRegistro div:last-child {
+    border-bottom: none;
+}
+
 </style>
 </head>
 
@@ -2909,38 +2928,62 @@ function mostrarRegistroExitoso(
             "mensajeFinal"
         );
 
+    // Conservamos los datos antes de limpiar el registro pendiente.
+    const nombre =
+        registroPendiente?.nombre || "-";
+
+    const numeroEmpleado =
+        registroPendiente?.numeroEmpleado || "-";
+
+    const servicio =
+        registroPendiente?.servicio ||
+        registroPendiente?.servicioDetectado ||
+        "-";
+
+    const posicion =
+        registroPendiente?.posicion || "-";
+
+    const fecha =
+        new Date().toLocaleDateString("es-MX");
+
+    const hora =
+        new Date().toLocaleTimeString("es-MX", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false
+        });
 
     mensaje.className =
         "card exito";
 
-
     mensaje.innerHTML =
 
-        "<strong>Registro realizado correctamente.</strong>" +
+        "<strong style=\"font-size:18px;\">Registro realizado correctamente.</strong>" +
 
-        "<div class=\"pequeno\">" +
+        "<div class=\"resumenRegistro\">" +
 
-        "Tipo: " +
-
-        tipoRegistro +
-
-        "<br>" +
-
-        "La información fue enviada a la Torre de Control." +
+        "<div><strong>Nombre:</strong> " + nombre + "</div>" +
+        "<div><strong>Número de empleado:</strong> " + numeroEmpleado + "</div>" +
+        "<div><strong>Servicio:</strong> " + servicio + "</div>" +
+        "<div><strong>Puesto:</strong> " + posicion + "</div>" +
+        "<div><strong>Registro:</strong> " + tipoRegistro + "</div>" +
+        "<div><strong>Fecha:</strong> " + fecha + "</div>" +
+        "<div><strong>Hora:</strong> " + hora + "</div>" +
 
         "</div>" +
 
+        "<div class=\"pequeno\">" +
+        "La información fue enviada correctamente." +
+        "</div>" +
+
         "<button type=\"button\" onclick=\"nuevoRegistro()\">" +
-
         "NUEVO REGISTRO" +
-
         "</button>";
-
 
     mensaje.classList.remove(
         "oculto"
     );
-
 
     document.getElementById(
         "tipoRegistroCard"
@@ -2948,38 +2991,26 @@ function mostrarRegistroExitoso(
         "oculto"
     );
 
-
     ocultarTodosLosFormularios();
-
 
     registroPendiente =
         null;
 
-
     fotoRegistroBase64 =
         "";
-
 
     fotoRegistroNombre =
         "";
 
-
     limpiarFotografia();
-
 
     mostrarEstado(
         "Registro guardado correctamente. Seleccione NUEVO REGISTRO para continuar."
     );
 
-
     window.scrollTo({
-
-        top:
-            document.body.scrollHeight,
-
-        behavior:
-            "smooth"
-
+        top: document.body.scrollHeight,
+        behavior: "smooth"
     });
 
 }
