@@ -674,6 +674,8 @@ let fotoRegistroNombre = "";
 
 let enviandoRegistro = false;
 
+let validandoCiclo = false;
+
 
 
 /* =====================================================
@@ -2648,7 +2650,7 @@ function enviarRegistro(
     tipoRegistro
 ) {
 
-    if (enviandoRegistro) {
+    if (enviandoRegistro || validandoCiclo) {
         return;
     }
 
@@ -2661,14 +2663,180 @@ function enviarRegistro(
         return;
     }
 
-    /*
-       IMPORTANTE:
-       Aquí NO se envía todavía el registro.
-       Primero mostramos al usuario los datos que va a enviar
-       para que pueda detectar un nombre/empleado/servicio incorrecto.
-    */
-    mostrarConfirmacionRegistro(tipoRegistro);
+    validarCicloAntesDeConfirmar(tipoRegistro);
 
+}
+
+
+/* =====================================================
+   VALIDACIÓN DE CICLO EN APPS SCRIPT
+===================================================== */
+
+function validarCicloAntesDeConfirmar(tipoRegistro) {
+
+    if (!registroPendiente) {
+        return;
+    }
+
+    validandoCiclo = true;
+    mostrarEstado("Verificando el ciclo de asistencia...");
+
+    const numero = encodeURIComponent(
+        registroPendiente.numeroEmpleado || ""
+    );
+
+    const posicion = encodeURIComponent(
+        registroPendiente.posicion || ""
+    );
+
+    const servicio = encodeURIComponent(
+        registroPendiente.servicio ||
+        registroPendiente.servicioDetectado ||
+        ""
+    );
+
+    const callback = "validarCicloCallback_" + Date.now();
+
+    window[callback] = function(respuesta) {
+
+        try {
+
+            if (!respuesta || respuesta.ok !== true) {
+                mostrarBloqueoCiclo(respuesta);
+                return;
+            }
+
+            const requerido = String(
+                respuesta.siguienteRegistro || ""
+            ).toUpperCase();
+
+            const solicitado = String(
+                tipoRegistro || ""
+            ).toUpperCase();
+
+            if (requerido && requerido !== "CUALQUIERA" && requerido !== solicitado) {
+
+                mostrarBloqueoCiclo({
+                    ok: false,
+                    codigo: requerido === "SALIDA"
+                        ? "SALIDA_PENDIENTE"
+                        : "ENTRADA_PENDIENTE",
+                    error: requerido === "SALIDA"
+                        ? "TIENES UNA ENTRADA PENDIENTE. DEBES REGISTRAR SALIDA ANTES DE UNA NUEVA ENTRADA."
+                        : "EL SIGUIENTE REGISTRO DEBE SER ENTRADA.",
+                    siguienteRegistro: requerido,
+                    servicioPendiente: respuesta.servicioPendiente || ""
+                });
+                return;
+            }
+
+            mostrarConfirmacionRegistro(tipoRegistro);
+
+        } finally {
+
+            validandoCiclo = false;
+            mostrarEstado("Ciclo verificado. Revise los datos antes de registrar.");
+            try {
+                delete window[callback];
+            } catch (e) {}
+        }
+    };
+
+    const script = document.createElement("script");
+
+    script.src =
+        URL_APPS_SCRIPT +
+        "?action=validar" +
+        "&numero=" + numero +
+        "&posicion=" + posicion +
+        "&servicio=" + servicio +
+        "&callback=" + callback +
+        "&_=" + Date.now();
+
+    script.onerror = function() {
+
+        validandoCiclo = false;
+
+        try {
+            delete window[callback];
+        } catch (e) {}
+
+        mostrarError(
+            "No fue posible verificar el ciclo de asistencia. Revise su conexión e inténtelo nuevamente."
+        );
+    };
+
+    document.body.appendChild(script);
+
+    setTimeout(function() {
+        if (window[callback]) {
+            validandoCiclo = false;
+            try {
+                delete window[callback];
+            } catch (e) {}
+            if (script.parentNode) {
+                script.parentNode.removeChild(script);
+            }
+            mostrarError(
+                "El servidor no respondió a tiempo. No se envió ningún registro."
+            );
+        }
+    }, 15000);
+}
+
+
+function mostrarBloqueoCiclo(respuesta) {
+
+    const mensaje = document.getElementById("mensajeFinal");
+
+    const texto =
+        respuesta && respuesta.error
+            ? respuesta.error
+            : "No se puede realizar este registro porque el ciclo de asistencia no corresponde.";
+
+    const servicioPendiente =
+        respuesta && respuesta.servicioPendiente
+            ? "<div class=\"pequeno\" style=\"margin-top:8px;\"><strong>Servicio pendiente:</strong> " + escaparHTML(respuesta.servicioPendiente) + "</div>"
+            : "";
+
+    if (mensaje) {
+        mensaje.className = "card";
+        mensaje.innerHTML =
+            '<div class="error" style="margin-top:0;">' +
+                '<strong style="font-size:18px;">REGISTRO NO PERMITIDO</strong>' +
+                '<div style="margin-top:8px;">' + escaparHTML(texto) + '</div>' +
+                servicioPendiente +
+            '</div>' +
+            '<button type="button" onclick="cerrarBloqueoCiclo()">CORREGIR REGISTRO</button>';
+        mensaje.classList.remove("oculto");
+        mensaje.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    const tipoCard = document.getElementById("tipoRegistroCard");
+    if (tipoCard) {
+        tipoCard.classList.remove("oculto");
+    }
+
+}
+
+
+function cerrarBloqueoCiclo() {
+
+    const mensaje = document.getElementById("mensajeFinal");
+
+    if (mensaje) {
+        mensaje.classList.add("oculto");
+        mensaje.innerHTML = "";
+    }
+
+    const tipoCard = document.getElementById("tipoRegistroCard");
+    if (tipoCard) {
+        tipoCard.classList.remove("oculto");
+    }
+
+    mostrarEstado(
+        "Corrija el tipo de registro o cierre primero el ciclo pendiente."
+    );
 }
 
 
@@ -2783,7 +2951,7 @@ function cancelarConfirmacionRegistro() {
 
 function confirmarYEnviarRegistro(tipoRegistro) {
 
-    if (enviandoRegistro) {
+    if (enviandoRegistro || validandoCiclo) {
         return;
     }
 
