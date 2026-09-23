@@ -3023,11 +3023,39 @@ function mostrarRegistroExitoso(
 
 function nuevoRegistro() {
 
-    document.getElementById(
-        "mensajeFinal"
-    ).classList.add(
-        "oculto"
-    );
+    /* Reiniciar la pantalla SIN volver a pedir GPS ni escanear el QR.
+       El servicioActual y los datos cargados de la base se conservan. */
+
+    const mensajeFinal =
+        document.getElementById("mensajeFinal");
+
+    if (mensajeFinal) {
+        mensajeFinal.classList.add("oculto");
+    }
+
+    const servicioCard =
+        document.getElementById("servicioCard");
+
+    const tipoRegistro =
+        document.getElementById("tipoRegistro");
+
+    /* Volver a mostrar el servicio que ya fue identificado. */
+    if (servicioCard) {
+        servicioCard.classList.remove("oculto");
+    }
+
+    /* Restaurar los botones de selección sin volver a identificar GPS. */
+    if (tipoRegistro) {
+        if (servicioActual) {
+            tipoRegistro.innerHTML =
+                '<button onclick="seleccionarPersonal()">PERSONAL DEL SERVICIO</button>' +
+                '<button onclick="seleccionarApoyo()">APOYO</button>' +
+                '<button onclick="seleccionarAdministrativo()">ADMINISTRATIVO</button>';
+        } else {
+            tipoRegistro.innerHTML =
+                '<button onclick="seleccionarAdministrativo()">ADMINISTRATIVO</button>';
+        }
+    }
 
 
     document.getElementById(
@@ -3134,7 +3162,9 @@ function nuevoRegistro() {
 
 
     mostrarEstado(
-        "Ubicación validada correctamente."
+        servicioActual
+            ? "Servicio listo. Seleccione el tipo de registro."
+            : "Seleccione el tipo de registro."
     );
 
 
