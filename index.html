@@ -2652,369 +2652,292 @@ function enviarRegistro(
     tipoRegistro
 ) {
 
-    if (
-        enviandoRegistro
-    ) {
-
+    if (enviandoRegistro) {
         return;
-
     }
 
-
-    if (
-        !registroPendiente
-    ) {
-
-        alert(
-            "No existe un registro pendiente."
-        );
-
+    if (!registroPendiente) {
+        alert("No existe un registro pendiente.");
         return;
-
     }
 
-
-    if (
-        !validarFotografia()
-    ) {
-
+    if (!validarFotografia()) {
         return;
-
     }
 
+    /*
+       IMPORTANTE:
+       Aquí NO se envía todavía el registro.
+       Primero mostramos al usuario los datos que va a enviar
+       para que pueda detectar un nombre/empleado/servicio incorrecto.
+    */
+    mostrarConfirmacionRegistro(tipoRegistro);
 
-    enviandoRegistro =
-        true;
-
-
-    const botones =
-        document.querySelectorAll(
-            "#tipoRegistroCard button"
-        );
-
-
-    botones.forEach(
-        btn => {
-
-            btn.disabled =
-                true;
-
-            btn.textContent =
-                "GUARDANDO...";
-
-        }
-    );
+}
 
 
-    registroPendiente.tipoRegistro =
-        tipoRegistro;
+/* =====================================================
+   CONFIRMACIÓN ANTES DE ENVIAR
+===================================================== */
+
+function mostrarConfirmacionRegistro(tipoRegistro) {
+
+    const mensaje =
+        document.getElementById("mensajeFinal");
+
+    if (!mensaje || !registroPendiente) {
+        return;
+    }
+
+    const nombre =
+        registroPendiente.nombre || "-";
+
+    const numeroEmpleado =
+        registroPendiente.numeroEmpleado || "-";
+
+    const servicio =
+        registroPendiente.servicio ||
+        registroPendiente.servicioDetectado ||
+        "-";
+
+    const posicion =
+        registroPendiente.posicion || "-";
+
+    const tipo =
+        tipoRegistro || "-";
+
+    mensaje.className = "card";
+
+    mensaje.innerHTML =
+        '<div class="info" style="margin-top:0;">' +
+            '<strong style="font-size:18px;">VERIFIQUE LOS DATOS ANTES DE REGISTRAR</strong>' +
+            '<div class="pequeno" style="margin-top:6px;">Revise que el nombre y los datos correspondan al guardia correcto. El registro todavía NO ha sido enviado.</div>' +
+        '</div>' +
+
+        '<div class="resumenRegistro" style="margin-top:14px;">' +
+            '<div><strong>Nombre:</strong> ' + escaparHTML(nombre) + '</div>' +
+            '<div><strong>Número de empleado:</strong> ' + escaparHTML(numeroEmpleado) + '</div>' +
+            '<div><strong>Servicio:</strong> ' + escaparHTML(servicio) + '</div>' +
+            '<div><strong>Puesto:</strong> ' + escaparHTML(posicion) + '</div>' +
+            '<div><strong>Registro:</strong> ' + escaparHTML(tipo) + '</div>' +
+        '</div>' +
+
+        '<button type="button" onclick="confirmarYEnviarRegistro(\'' + tipo + '\')">' +
+            'CONFIRMAR Y ENVIAR' +
+        '</button>' +
+
+        '<button type="button" onclick="cancelarConfirmacionRegistro()" style="background:#64748b; margin-top:8px;">' +
+            'CANCELAR Y CORREGIR' +
+        '</button>';
+
+    mensaje.classList.remove("oculto");
+
+    /* Ocultamos los botones ENTRADA/SALIDA para evitar dobles clics. */
+    document.getElementById("tipoRegistroCard").classList.add("oculto");
+
+    mensaje.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
 
 
-    const ahora =
-        new Date();
+function escaparHTML(valor) {
+
+    return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
 
 
-    const fecha =
-        ahora.toLocaleDateString(
-            "es-MX"
-        );
+function cancelarConfirmacionRegistro() {
 
+    if (enviandoRegistro) {
+        return;
+    }
 
-    const hora =
-        ahora.toLocaleTimeString(
+    const mensaje =
+        document.getElementById("mensajeFinal");
 
-            "es-MX",
-
-            {
-
-                hour:
-                    "2-digit",
-
-                minute:
-                    "2-digit",
-
-                second:
-                    "2-digit",
-
-                hour12:
-                    false
-
-            }
-
-        );
-
-
-    const fechaHora =
-        ahora.toLocaleString(
-            "es-MX"
-        );
-
-
-    const datos = {
-
-        fecha:
-            fecha,
-
-        hora:
-            hora,
-
-        fechaHora:
-            fechaHora,
-
-        nombre:
-            registroPendiente.nombre,
-
-        numeroEmpleado:
-            registroPendiente.numeroEmpleado,
-
-        servicio:
-            registroPendiente.servicio,
-
-        tipoRegistro:
-            registroPendiente.tipoRegistro,
-
-        posicion:
-            registroPendiente.posicion,
-
-        latitud:
-            registroPendiente.latitud,
-
-        longitud:
-            registroPendiente.longitud,
-
-        precisionGPS:
-            registroPendiente.precisionGPS,
-
-        servicioDetectado:
-            registroPendiente.servicioDetectado,
-
-        servicioOrigen:
-            registroPendiente.servicioOrigen,
-
-        resultado:
-            registroPendiente.resultado,
-
-        fotoBase64:
-            fotoRegistroBase64,
-
-        fotoNombre:
-            fotoRegistroNombre
-
-    };
-
-
-    mostrarEstado(
-        "Guardando registro..."
-    );
-
+    if (mensaje) {
+        mensaje.classList.add("oculto");
+        mensaje.innerHTML = "";
+    }
 
     document.getElementById(
         "tipoRegistroCard"
-    ).classList.add(
-        "oculto"
-    );
+    ).classList.remove("oculto");
 
-
-    fetch(
-
-        URL_APPS_SCRIPT,
-
-        {
-
-            method:
-                "POST",
-
-            mode:
-                "no-cors",
-
-            headers: {
-
-                "Content-Type":
-                    "text/plain;charset=utf-8"
-
-            },
-
-            body:
-                JSON.stringify(
-                    datos
-                )
-
-        }
-
-    )
-
-    .then(
-
-        function() {
-
-            enviandoRegistro =
-                false;
-
-
-            mostrarRegistroExitoso(
-                tipoRegistro
-            );
-
-        }
-
-    )
-
-    .catch(
-
-        function(error) {
-
-            enviandoRegistro =
-                false;
-
-
-            console.error(
-                error
-            );
-
-
-            document
-                .querySelectorAll(
-                    "#tipoRegistroCard button"
-                )
-                .forEach(
-                    (btn, i) => {
-
-                        btn.disabled =
-                            false;
-
-
-                        btn.textContent =
-                            i === 0
-                                ? "ENTRADA"
-                                : "SALIDA";
-
-                    }
-                );
-
-
-            mostrarError(
-
-                "No fue posible enviar el registro. " +
-
-                "Verifique la conexión a internet."
-
-            );
-
-
-            document.getElementById(
-                "tipoRegistroCard"
-            ).classList.remove(
-                "oculto"
-            );
-
-        }
-
+    mostrarEstado(
+        "Revise los datos y seleccione ENTRADA o SALIDA cuando esté listo."
     );
 
 }
 
+
+/* =====================================================
+   ENVIAR REGISTRO CONFIRMADO
+===================================================== */
+
+function confirmarYEnviarRegistro(tipoRegistro) {
+
+    if (enviandoRegistro) {
+        return;
+    }
+
+    if (!registroPendiente) {
+        alert("No existe un registro pendiente.");
+        return;
+    }
+
+    if (!validarFotografia()) {
+        return;
+    }
+
+    enviandoRegistro = true;
+
+    registroPendiente.tipoRegistro = tipoRegistro;
+
+    const ahora = new Date();
+
+    const fecha = ahora.toLocaleDateString("es-MX");
+
+    const hora = ahora.toLocaleTimeString("es-MX", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+    });
+
+    const fechaHora = ahora.toLocaleString("es-MX");
+
+    const datos = {
+        fecha: fecha,
+        hora: hora,
+        fechaHora: fechaHora,
+        nombre: registroPendiente.nombre,
+        numeroEmpleado: registroPendiente.numeroEmpleado,
+        servicio: registroPendiente.servicio,
+        tipoRegistro: registroPendiente.tipoRegistro,
+        posicion: registroPendiente.posicion,
+        latitud: registroPendiente.latitud,
+        longitud: registroPendiente.longitud,
+        precisionGPS: registroPendiente.precisionGPS,
+        servicioDetectado: registroPendiente.servicioDetectado,
+        servicioOrigen: registroPendiente.servicioOrigen,
+        resultado: registroPendiente.resultado,
+        fotoBase64: fotoRegistroBase64,
+        fotoNombre: fotoRegistroNombre
+    };
+
+    mostrarEstado("Guardando registro...");
+
+    const mensaje =
+        document.getElementById("mensajeFinal");
+
+    if (mensaje) {
+        mensaje.className = "card";
+        mensaje.innerHTML =
+            '<div class="info" style="margin-top:0; text-align:center;">' +
+                '<strong style="font-size:18px;">GUARDANDO REGISTRO...</strong>' +
+                '<div class="pequeno" style="margin-top:6px;">No cierre ni recargue la página.</div>' +
+            '</div>';
+        mensaje.classList.remove("oculto");
+    }
+
+    fetch(
+        URL_APPS_SCRIPT,
+        {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+            },
+            body: JSON.stringify(datos)
+        }
+    )
+    .then(function() {
+
+        enviandoRegistro = false;
+
+        /*
+           El registro ya fue enviado. No mostramos otra pantalla con
+           los datos para evitar que el usuario crea que debe registrarlo
+           otra vez. Dejamos un mensaje breve y preparamos el siguiente.
+        */
+        if (mensaje) {
+            mensaje.className = "card exito";
+            mensaje.innerHTML =
+                '<strong style="font-size:18px;">✓ REGISTRO ENVIADO CORRECTAMENTE</strong>' +
+                '<div class="pequeno" style="margin-top:8px;">El registro fue enviado. No es necesario volver a capturarlo.</div>' +
+                '<button type="button" onclick="nuevoRegistro()">NUEVO REGISTRO</button>';
+            mensaje.classList.remove("oculto");
+        }
+
+        /* Limpiar solamente los datos del registro que ya se envió. */
+        registroPendiente = null;
+        fotoRegistroBase64 = "";
+        fotoRegistroNombre = "";
+        limpiarFotografia();
+
+        ocultarTodosLosFormularios();
+        document.getElementById("tipoRegistroCard").classList.add("oculto");
+
+        mostrarEstado(
+            "Registro enviado correctamente. Seleccione NUEVO REGISTRO para continuar."
+        );
+
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth"
+        });
+
+    })
+    .catch(function(error) {
+
+        enviandoRegistro = false;
+
+        console.error(error);
+
+        if (mensaje) {
+            mensaje.classList.add("oculto");
+            mensaje.innerHTML = "";
+        }
+
+        document.getElementById("tipoRegistroCard").classList.remove("oculto");
+
+        mostrarError(
+            "No fue posible enviar el registro. Verifique la conexión a internet."
+        );
+
+    });
+
+}
 
 
 /* =====================================================
    REGISTRO EXITOSO
 ===================================================== */
 
-function mostrarRegistroExitoso(
-    tipoRegistro
-) {
+function mostrarRegistroExitoso(tipoRegistro) {
 
-    const mensaje =
-        document.getElementById(
-            "mensajeFinal"
-        );
+    /*
+       Se conserva la función por compatibilidad con cualquier llamada
+       antigua, pero el flujo actual ya no utiliza una pantalla final
+       con todos los datos. La confirmación ocurre ANTES de enviar.
+    */
+    const mensaje = document.getElementById("mensajeFinal");
 
-    // Conservamos los datos antes de limpiar el registro pendiente.
-    const nombre =
-        registroPendiente?.nombre || "-";
-
-    const numeroEmpleado =
-        registroPendiente?.numeroEmpleado || "-";
-
-    const servicio =
-        registroPendiente?.servicio ||
-        registroPendiente?.servicioDetectado ||
-        "-";
-
-    const posicion =
-        registroPendiente?.posicion || "-";
-
-    const fecha =
-        new Date().toLocaleDateString("es-MX");
-
-    const hora =
-        new Date().toLocaleTimeString("es-MX", {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false
-        });
-
-    mensaje.className =
-        "card exito";
-
-    mensaje.innerHTML =
-
-        "<strong style=\"font-size:18px;\">Registro realizado correctamente.</strong>" +
-
-        "<div class=\"resumenRegistro\">" +
-
-        "<div><strong>Nombre:</strong> " + nombre + "</div>" +
-        "<div><strong>Número de empleado:</strong> " + numeroEmpleado + "</div>" +
-        "<div><strong>Servicio:</strong> " + servicio + "</div>" +
-        "<div><strong>Puesto:</strong> " + posicion + "</div>" +
-        "<div><strong>Registro:</strong> " + tipoRegistro + "</div>" +
-        "<div><strong>Fecha:</strong> " + fecha + "</div>" +
-        "<div><strong>Hora:</strong> " + hora + "</div>" +
-
-        "</div>" +
-
-        "<div class=\"pequeno\">" +
-        "La información fue enviada correctamente." +
-        "</div>" +
-
-        "<button type=\"button\" onclick=\"nuevoRegistro()\">" +
-        "NUEVO REGISTRO" +
-        "</button>";
-
-    mensaje.classList.remove(
-        "oculto"
-    );
-
-    document.getElementById(
-        "tipoRegistroCard"
-    ).classList.add(
-        "oculto"
-    );
-
-    ocultarTodosLosFormularios();
-
-    registroPendiente =
-        null;
-
-    fotoRegistroBase64 =
-        "";
-
-    fotoRegistroNombre =
-        "";
-
-    limpiarFotografia();
-
-    mostrarEstado(
-        "Registro guardado correctamente. Seleccione NUEVO REGISTRO para continuar."
-    );
-
-    window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: "smooth"
-    });
+    if (mensaje) {
+        mensaje.classList.add("oculto");
+        mensaje.innerHTML = "";
+    }
 
 }
-
 
 
 /* =====================================================
@@ -3031,6 +2954,7 @@ function nuevoRegistro() {
 
     if (mensajeFinal) {
         mensajeFinal.classList.add("oculto");
+        mensajeFinal.innerHTML = "";
     }
 
     const servicioCard =
