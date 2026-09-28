@@ -1879,10 +1879,23 @@ function reconocerApoyo() {
         ).value.trim();
 
 
+    const numeroNormalizado =
+        String(numero)
+            .trim()
+            .replace(/\s+/g, "")
+            .replace(/\.0+$/, "");
+
     const coincidencias =
         empleados.filter(
-            e =>
-                e.numero === numero
+            e => {
+                const numeroEmpleado =
+                    String(e.numero)
+                        .trim()
+                        .replace(/\s+/g, "")
+                        .replace(/\.0+$/, "");
+
+                return numeroEmpleado === numeroNormalizado;
+            }
         );
 
 
