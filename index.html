@@ -234,6 +234,43 @@ button:disabled {
     box-shadow: 0 4px 15px rgba(0,0,0,0.20);
 }
 
+/* Selector de inmueble cuando hay servicios cercanos */
+.selectorInmueble {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f4f8fc;
+    border: 1px solid #d7e3ef;
+    border-radius: 12px;
+}
+
+.selectorTitulo {
+    color: #0b315d;
+    font-weight: bold;
+    font-size: 15px;
+    line-height: 1.35;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.btnInmueble {
+    width: 100%;
+    margin-top: 10px;
+    background: #0b5fa5;
+    text-align: left;
+}
+
+.btnInmueble:hover {
+    background: #084b82;
+}
+
+.btnInmueble small {
+    display: block;
+    font-size: 12px;
+    font-weight: normal;
+    opacity: .9;
+    margin-top: 4px;
+}
+
 /* Ocultar */
 .oculto {
     display: none !important;
@@ -327,6 +364,16 @@ button[onclick="enviarRegistro('SALIDA')"]:hover {
             <span id="servicioIdentificado">
                 -
             </span>
+
+        </div>
+
+        <div id="selectorInmueble" class="selectorInmueble oculto">
+
+            <div class="selectorTitulo">
+                SELECCIONA EL INMUEBLE DONDE TE ENCUENTRAS
+            </div>
+
+            <div id="opcionesInmueble"></div>
 
         </div>
 
@@ -1163,16 +1210,14 @@ function identificarServicio(
     lon
 ) {
 
-    let servicioEncontrado =
-        null;
-
-
-    let distanciaMenor =
-        Infinity;
+    const serviciosEnRango = [];
 
 
     servicios.forEach(
         servicio => {
+
+            let distanciaServicio = Infinity;
+
 
             servicio.ubicaciones.forEach(
                 ubicacion => {
@@ -1190,42 +1235,71 @@ function identificarServicio(
 
 
                     if (
-
-                        distancia <=
-                        ubicacion.rango &&
-
-                        distancia <
-                        distanciaMenor
-
+                        distancia <= ubicacion.rango &&
+                        distancia < distanciaServicio
                     ) {
 
-                        distanciaMenor =
-                            distancia;
-
-
-                        servicioEncontrado =
-                            servicio;
+                        distanciaServicio = distancia;
 
                     }
 
                 }
             );
 
+
+            if (distanciaServicio !== Infinity) {
+
+                serviciosEnRango.push({
+
+                    servicio:
+                        servicio,
+
+                    distancia:
+                        distanciaServicio
+
+                });
+
+            }
+
         }
     );
 
 
-    if (
-        servicioEncontrado
-    ) {
+    /* =================================================
+       UN SOLO SERVICIO DENTRO DEL RADIO
+    ================================================= */
+
+    if (serviciosEnRango.length === 1) {
 
         entrarAlServicio(
-            servicioEncontrado
+            serviciosEnRango[0].servicio
         );
 
         return;
 
     }
+
+
+    /* =================================================
+       DOS O MÁS SERVICIOS DENTRO DEL RADIO
+    ================================================= */
+
+    if (serviciosEnRango.length > 1) {
+
+        mostrarSelectorInmueble(
+            serviciosEnRango
+        );
+
+        return;
+
+    }
+
+
+    /* =================================================
+       NINGÚN SERVICIO DENTRO DEL RADIO
+    ================================================= */
+
+    servicioActual = null;
 
 
     mostrarEstado(
@@ -1244,6 +1318,13 @@ function identificarServicio(
         "servicioIdentificado"
     ).textContent =
         "FUERA DE SERVICIO";
+
+
+    document.getElementById(
+        "selectorInmueble"
+    ).classList.add(
+        "oculto"
+    );
 
 
     document.getElementById(
@@ -1268,6 +1349,147 @@ function identificarServicio(
 
 
 /* =====================================================
+   MOSTRAR SELECTOR DE INMUEBLE
+   Solo muestra servicios dentro del radio GPS
+===================================================== */
+
+function mostrarSelectorInmueble(
+    serviciosEnRango
+) {
+
+    servicioActual = null;
+
+
+    document.getElementById(
+        "servicioCard"
+    ).classList.remove(
+        "oculto"
+    );
+
+
+    document.getElementById(
+        "servicioIdentificado"
+    ).textContent =
+        "MÚLTIPLES SERVICIOS EN ESTA UBICACIÓN";
+
+
+    document.getElementById(
+        "tipoRegistro"
+    ).innerHTML = "";
+
+
+    const selector =
+        document.getElementById(
+            "selectorInmueble"
+        );
+
+
+    const opciones =
+        document.getElementById(
+            "opcionesInmueble"
+        );
+
+
+    opciones.innerHTML = "";
+
+
+    serviciosEnRango.sort(
+        (a, b) =>
+            a.distancia - b.distancia
+    );
+
+
+    serviciosEnRango.forEach(
+        item => {
+
+            const servicio =
+                item.servicio;
+
+
+            const boton =
+                document.createElement("button");
+
+
+            boton.type = "button";
+            boton.className = "btnInmueble";
+
+
+            const nombreServicio =
+                servicio.servicio ||
+                servicio.codigo ||
+                "Servicio";
+
+
+            const codigoServicio =
+                servicio.codigo || "";
+
+
+            const distanciaTexto =
+                item.distancia < 1000
+                    ? Math.round(item.distancia) + " m"
+                    : (item.distancia / 1000).toFixed(2) + " km";
+
+
+            boton.innerHTML =
+                escapeHTML(nombreServicio) +
+                "<small>" +
+                escapeHTML(codigoServicio) +
+                " · " +
+                distanciaTexto +
+                " del punto registrado</small>";
+
+
+            boton.onclick = function() {
+
+                entrarAlServicio(
+                    servicio
+                );
+
+            };
+
+
+            opciones.appendChild(
+                boton
+            );
+
+        }
+    );
+
+
+    selector.classList.remove(
+        "oculto"
+    );
+
+
+    ocultarTodosLosFormularios();
+
+
+    mostrarEstado(
+        "Se detectaron varios servicios dentro del radio GPS. Selecciona el inmueble donde te encuentras."
+    );
+
+}
+
+
+
+/* =====================================================
+   SEGURIDAD PARA MOSTRAR TEXTO DE LA BASE EN HTML
+===================================================== */
+
+function escapeHTML(texto) {
+
+    return String(texto)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+
+/* =====================================================
    ENTRAR AL SERVICIO
 ===================================================== */
 
@@ -1282,6 +1504,13 @@ function entrarAlServicio(
     document.getElementById(
         "servicioCard"
     ).classList.remove(
+        "oculto"
+    );
+
+
+    document.getElementById(
+        "selectorInmueble"
+    ).classList.add(
         "oculto"
     );
 
