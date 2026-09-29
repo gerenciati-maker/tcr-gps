@@ -2799,81 +2799,175 @@ function enviarRegistro(
    CONFIRMACIÓN ANTES DE ENVIAR
 ===================================================== */
 
-function mostrarConfirmacionRegistro(tipoRegistro) {
+function confirmarYEnviarRegistro(tipoRegistro) {
+
+    if (enviandoRegistro) {
+        return;
+    }
+
+    if (!registroPendiente) {
+        alert("No existe un registro pendiente.");
+        return;
+    }
+
+    /* ==========================================
+       VALIDAR FOTOGRAFÍA JUSTO ANTES DEL ENVÍO
+    ========================================== */
+
+    if (!fotoRegistroBase64 || fotoRegistroBase64.length < 1000) {
+
+        alert(
+            "La fotografía no está disponible. Tome nuevamente la fotografía."
+        );
+
+        return;
+    }
+
+    enviandoRegistro = true;
+
+    registroPendiente.tipoRegistro = tipoRegistro;
+
+    const ahora = new Date();
+
+    const fecha = ahora.toLocaleDateString("es-MX");
+
+    const hora = ahora.toLocaleTimeString("es-MX", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+    });
+
+    const fechaHora = ahora.toLocaleString("es-MX");
+
+    const datos = {
+
+        fecha: fecha,
+        hora: hora,
+        fechaHora: fechaHora,
+
+        nombre: registroPendiente.nombre,
+        numeroEmpleado: registroPendiente.numeroEmpleado,
+
+        servicio: registroPendiente.servicio,
+
+        tipoRegistro: registroPendiente.tipoRegistro,
+
+        posicion: registroPendiente.posicion,
+
+        latitud: registroPendiente.latitud,
+        longitud: registroPendiente.longitud,
+
+        precisionGPS: registroPendiente.precisionGPS,
+
+        servicioDetectado: registroPendiente.servicioDetectado,
+
+        servicioOrigen: registroPendiente.servicioOrigen,
+
+        resultado: registroPendiente.resultado,
+
+        /* FOTO */
+        fotoBase64: fotoRegistroBase64,
+
+        fotoNombre: fotoRegistroNombre || "foto_registro.jpg"
+    };
+
+    mostrarEstado("Guardando registro...");
 
     const mensaje =
         document.getElementById("mensajeFinal");
 
-    if (!mensaje || !registroPendiente) {
-        return;
+    if (mensaje) {
+
+        mensaje.className = "card";
+
+        mensaje.innerHTML =
+            '<div class="info" style="margin-top:0; text-align:center;">' +
+                '<strong style="font-size:18px;">GUARDANDO REGISTRO...</strong>' +
+                '<div class="pequeno" style="margin-top:6px;">No cierre ni recargue la página.</div>' +
+            '</div>';
+
+        mensaje.classList.remove("oculto");
     }
 
-    const nombre =
-        registroPendiente.nombre || "-";
+    fetch(
+        URL_APPS_SCRIPT,
+        {
+            method: "POST",
 
-    const numeroEmpleado =
-        registroPendiente.numeroEmpleado || "-";
+            mode: "no-cors",
 
-    const servicio =
-        registroPendiente.servicio ||
-        registroPendiente.servicioDetectado ||
-        "-";
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+            },
 
-    const posicion =
-        registroPendiente.posicion || "-";
+            body: JSON.stringify(datos)
+        }
+    )
+    .then(function() {
 
-    const tipo =
-        tipoRegistro || "-";
+        enviandoRegistro = false;
 
-    mensaje.className = "card";
+        if (mensaje) {
 
-    mensaje.innerHTML =
-        '<div class="info" style="margin-top:0;">' +
-            '<strong style="font-size:18px;">VERIFIQUE LOS DATOS ANTES DE REGISTRAR</strong>' +
-            '<div class="pequeno" style="margin-top:6px;">Revise que el nombre y los datos correspondan al guardia correcto. El registro todavía NO ha sido enviado.</div>' +
-        '</div>' +
+            mensaje.className = "card exito";
 
-        '<div class="resumenRegistro" style="margin-top:14px;">' +
-            '<div><strong>Nombre:</strong> ' + escaparHTML(nombre) + '</div>' +
-            '<div><strong>Número de empleado:</strong> ' + escaparHTML(numeroEmpleado) + '</div>' +
-            '<div><strong>Servicio:</strong> ' + escaparHTML(servicio) + '</div>' +
-            '<div><strong>Puesto:</strong> ' + escaparHTML(posicion) + '</div>' +
-            '<div><strong>Registro:</strong> ' + escaparHTML(tipo) + '</div>' +
-        '</div>' +
+            mensaje.innerHTML =
+                '<strong style="font-size:18px;">✓ REGISTRO ENVIADO CORRECTAMENTE</strong>' +
+                '<div class="pequeno" style="margin-top:8px;">El registro fue enviado. No es necesario volver a capturarlo.</div>' +
+                '<button type="button" onclick="nuevoRegistro()">NUEVO REGISTRO</button>';
 
-        '<button type="button" onclick="confirmarYEnviarRegistro(\'' + tipo + '\')">' +
-            'CONFIRMAR Y ENVIAR' +
-        '</button>' +
+            mensaje.classList.remove("oculto");
+        }
 
-        '<button type="button" onclick="cancelarConfirmacionRegistro()" style="background:#64748b; margin-top:8px;">' +
-            'CANCELAR Y CORREGIR' +
-        '</button>';
+        registroPendiente = null;
 
-    mensaje.classList.remove("oculto");
+        fotoRegistroBase64 = "";
 
-    /* Ocultamos únicamente la tarjeta de captura (foto y ENTRADA/SALIDA).
-       La tarjeta del trabajador seleccionado permanece visible arriba para
-       que el usuario pueda seguir comprobando a quién está registrando. */
-    document.getElementById("tipoRegistroCard").classList.add("oculto");
+        fotoRegistroNombre = "";
 
-    mensaje.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
+        limpiarFotografia();
+
+        ocultarTodosLosFormularios();
+
+        document
+            .getElementById("tipoRegistroCard")
+            .classList.add("oculto");
+
+        mostrarEstado(
+            "Registro enviado correctamente. Seleccione NUEVO REGISTRO para continuar."
+        );
+
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth"
+        });
+
+    })
+    .catch(function(error) {
+
+        enviandoRegistro = false;
+
+        console.error(error);
+
+        if (mensaje) {
+
+            mensaje.classList.add("oculto");
+
+            mensaje.innerHTML = "";
+        }
+
+        document
+            .getElementById("tipoRegistroCard")
+            .classList.remove("oculto");
+
+        mostrarError(
+            "No fue posible enviar el registro. Verifique la conexión a internet."
+        );
+
     });
-}
-
-
-function escaparHTML(valor) {
-
-    return String(valor ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
 
 }
-
 
 function cancelarConfirmacionRegistro() {
 
