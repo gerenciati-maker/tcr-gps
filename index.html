@@ -2427,207 +2427,107 @@ function abrirFormulario(
 
 function procesarFotografia(event) {
 
-    const archivo =
-        event.target.files &&
-        event.target.files[0];
+    const archivo = event.target.files && event.target.files[0];
 
+    fotoRegistroBase64 = "";
+    fotoRegistroNombre = "";
 
-    fotoRegistroBase64 =
-        "";
-
-    fotoRegistroNombre =
-        "";
-
-
-    const estado =
-        document.getElementById(
-            "fotoEstado"
-        );
-
-
-    const vista =
-        document.getElementById(
-            "fotoVistaPrevia"
-        );
-
+    const estado = document.getElementById("fotoEstado");
+    const vista = document.getElementById("fotoVistaPrevia");
 
     if (!archivo) {
-
-        estado.textContent =
-            "No se ha seleccionado fotografía.";
-
-
-        vista.classList.add(
-            "oculto"
-        );
-
-
+        if (estado) estado.textContent = "No se ha seleccionado fotografía.";
+        if (vista) vista.classList.add("oculto");
         return;
-
     }
 
-
-    if (
-        !archivo.type.startsWith(
-            "image/"
-        )
-    ) {
-
-        alert(
-            "Seleccione una fotografía válida."
-        );
-
-
-        event.target.value =
-            "";
-
-
+    if (!archivo.type || !archivo.type.startsWith("image/")) {
+        alert("Seleccione una fotografía válida.");
+        event.target.value = "";
         return;
-
     }
 
+    if (estado) estado.textContent = "Procesando fotografía...";
 
-    const lector =
-        new FileReader();
+    const lector = new FileReader();
 
+    lector.onerror = function() {
+        fotoRegistroBase64 = "";
+        fotoRegistroNombre = "";
+        if (estado) estado.textContent = "No fue posible leer la fotografía.";
+        if (vista) vista.classList.add("oculto");
+    };
 
-    lector.onload =
-        function(e) {
+    lector.onload = function(e) {
 
-            const imagen =
-                new Image();
+        const imagen = new Image();
 
+        imagen.onerror = function() {
+            fotoRegistroBase64 = "";
+            fotoRegistroNombre = "";
+            if (estado) estado.textContent = "No fue posible procesar la fotografía.";
+            if (vista) vista.classList.add("oculto");
+        };
 
-            imagen.onload =
-                function() {
+        imagen.onload = function() {
 
-                    const maximo =
-                        1200;
+            /*
+               La foto se reduce antes de enviarla. Esto evita que el POST
+               lleve una fotografía demasiado pesada desde el celular.
+            */
+            const maximo = 900;
+            let ancho = imagen.naturalWidth || imagen.width;
+            let alto = imagen.naturalHeight || imagen.height;
 
+            if (!ancho || !alto) {
+                throw new Error("La fotografía no tiene dimensiones válidas.");
+            }
 
-                    let ancho =
-                        imagen.width;
+            if (ancho > maximo || alto > maximo) {
+                const factor = Math.min(maximo / ancho, maximo / alto);
+                ancho = Math.round(ancho * factor);
+                alto = Math.round(alto * factor);
+            }
 
+            const canvas = document.createElement("canvas");
+            canvas.width = ancho;
+            canvas.height = alto;
 
-                    let alto =
-                        imagen.height;
+            const ctx = canvas.getContext("2d", { alpha:false });
+            ctx.drawImage(imagen, 0, 0, ancho, alto);
 
+            const base64 = canvas.toDataURL("image/jpeg", 0.68);
 
-                    if (
-                        ancho > maximo ||
-                        alto > maximo
-                    ) {
+            if (!base64 || base64.length < 100) {
+                throw new Error("La fotografía quedó vacía.");
+            }
 
-                        const factor =
-                            Math.min(
+            fotoRegistroBase64 = base64;
+            fotoRegistroNombre = archivo.name || "foto_registro.jpg";
 
-                                maximo / ancho,
+            /* Guardarla también dentro del registro pendiente. */
+            if (registroPendiente) {
+                registroPendiente.fotoBase64 = fotoRegistroBase64;
+                registroPendiente.fotoNombre = fotoRegistroNombre;
+            }
 
-                                maximo / alto
+            if (vista) {
+                vista.src = fotoRegistroBase64;
+                vista.classList.remove("oculto");
+            }
 
-                            );
-
-
-                        ancho =
-                            Math.round(
-                                ancho * factor
-                            );
-
-
-                        alto =
-                            Math.round(
-                                alto * factor
-                            );
-
-                    }
-
-
-                    const canvas =
-                        document.createElement(
-                            "canvas"
-                        );
-
-
-                    canvas.width =
-                        ancho;
-
-
-                    canvas.height =
-                        alto;
-
-
-                    const ctx =
-                        canvas.getContext(
-                            "2d"
-                        );
-
-
-                    ctx.drawImage(
-
-                        imagen,
-
-                        0,
-
-                        0,
-
-                        ancho,
-
-                        alto
-
-                    );
-
-
-                    fotoRegistroBase64 =
-                        canvas.toDataURL(
-                            "image/jpeg",
-                            0.72
-                        );
-
-
-                    fotoRegistroNombre =
-                        archivo.name ||
-                        "foto_registro.jpg";
-
-                    /*
-                       GUARDAR TAMBIÉN LA FOTO DENTRO DEL REGISTRO PENDIENTE.
-                       Así la fotografía no se pierde durante la pantalla de
-                       confirmación ni depende únicamente de la variable global.
-                    */
-                    if (registroPendiente) {
-                        registroPendiente.fotoBase64 =
-                            fotoRegistroBase64;
-                        registroPendiente.fotoNombre =
-                            fotoRegistroNombre;
-                    }
-
-
-                    vista.src =
-                        fotoRegistroBase64;
-
-
-                    vista.classList.remove(
-                        "oculto"
-                    );
-
-
-                    estado.textContent =
-                        "Fotografía lista para registrar.";
-
-                };
-
-
-            imagen.src =
-                e.target.result;
+            if (estado) {
+                const kb = Math.round(base64.length / 1024);
+                estado.textContent = "Fotografía lista para registrar (" + kb + " KB).";
+            }
 
         };
 
+        imagen.src = e.target.result;
+    };
 
-    lector.readAsDataURL(
-        archivo
-    );
-
+    lector.readAsDataURL(archivo);
 }
-
 
 
 function validarFotografia() {
@@ -2854,9 +2754,15 @@ function confirmarYEnviarRegistro(tipoRegistro) {
         servicioDetectado: registroPendiente.servicioDetectado,
         servicioOrigen: registroPendiente.servicioOrigen,
         resultado: registroPendiente.resultado,
-        fotoBase64: fotoRegistroBase64,
-        fotoNombre: fotoRegistroNombre
+        fotoBase64: String(fotoRegistroBase64 || registroPendiente.fotoBase64 || ""),
+        fotoNombre: String(fotoRegistroNombre || registroPendiente.fotoNombre || "foto_registro.jpg")
     };
+
+    if (!datos.fotoBase64 || datos.fotoBase64.length < 100) {
+        enviandoRegistro = false;
+        alert("La fotografía no quedó preparada para el envío. Tome la fotografía nuevamente.");
+        return;
+    }
 
     mostrarEstado("Guardando registro...");
 
