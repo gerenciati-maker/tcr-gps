@@ -2588,6 +2588,18 @@ function procesarFotografia(event) {
                         archivo.name ||
                         "foto_registro.jpg";
 
+                    /*
+                       GUARDAR TAMBIÉN LA FOTO DENTRO DEL REGISTRO PENDIENTE.
+                       Así la fotografía no se pierde durante la pantalla de
+                       confirmación ni depende únicamente de la variable global.
+                    */
+                    if (registroPendiente) {
+                        registroPendiente.fotoBase64 =
+                            fotoRegistroBase64;
+                        registroPendiente.fotoNombre =
+                            fotoRegistroNombre;
+                    }
+
 
                     vista.src =
                         fotoRegistroBase64;
@@ -2655,6 +2667,11 @@ function enviarRegistro(
     if (!registroPendiente) {
         alert("No existe un registro pendiente.");
         return;
+    }
+
+    if (!fotoRegistroBase64 && registroPendiente && registroPendiente.fotoBase64) {
+        fotoRegistroBase64 = registroPendiente.fotoBase64;
+        fotoRegistroNombre = registroPendiente.fotoNombre || "foto_registro.jpg";
     }
 
     if (!validarFotografia()) {
@@ -2792,9 +2809,18 @@ function confirmarYEnviarRegistro(tipoRegistro) {
         return;
     }
 
+    if (!fotoRegistroBase64 && registroPendiente.fotoBase64) {
+        fotoRegistroBase64 = registroPendiente.fotoBase64;
+        fotoRegistroNombre = registroPendiente.fotoNombre || "foto_registro.jpg";
+    }
+
     if (!validarFotografia()) {
         return;
     }
+
+    /* Mantener la fotografía ligada al registro que se va a enviar. */
+    registroPendiente.fotoBase64 = fotoRegistroBase64;
+    registroPendiente.fotoNombre = fotoRegistroNombre;
 
     enviandoRegistro = true;
 
