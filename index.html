@@ -1,16 +1,17 @@
-<!DOCTYPE html>
+INDEX  COMPLETO FUNCIONAL 
 
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Torre de Control</title>
+<title>Lista de Asistencia</title>
 
 <style>
+
 /* =====================================================
-   ESTILO AUTORITAS
-   Diseño visual únicamente — la lógica JS permanece intacta
+   ESTILOS
 ===================================================== */
 
 * {
@@ -19,34 +20,1960 @@
 
 body {
     margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    font-family: Arial, Helvetica, sans-serif;
-
-    background: linear-gradient(
-        135deg,
-        #071f3d 0%,
-        #0b315d 50%,
-        #08294d 100%
-    );
-
-    color: #ffffff;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: #222;
 }
 
 .container {
-    width: 100%;
     max-width: 520px;
-    margin: 0 auto;
-    padding: 20px 15px 35px;
+    margin: auto;
+    padding: 20px;
 }
 
-/* Encabezado con el logo que ya tenía el archivo */
-.brandHeader {
+h1 {
     text-align: center;
     margin-bottom: 20px;
-    color: #ffffff;
 }
 
-.brandLogo {
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.12);
+    margin-bottom: 15px;
+}
+
+label {
     display: block;
-    width: min(180px
+    font-weight: bold;
+    margin-top: 15px;
+    margin-bottom: 6px;
+}
+
+input,
+select,
+button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+}
+
+input,
+select {
+    border: 1px solid #ccc;
+    background: white;
+}
+
+button {
+    border: none;
+    background: #1f4e79;
+    color: white;
+    font-weight: bold;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: .9;
+}
+
+.oculto {
+    display: none;
+}
+
+.info {
+    background: #eef4f8;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.exito {
+    background: #e8f5e9;
+    padding: 12px;
+    border-radius: 8px;
+    color: #256029;
+}
+
+.error {
+    background: #fdecea;
+    padding: 12px;
+    border-radius: 8px;
+    color: #a12622;
+}
+
+.origen {
+    margin-top: 12px;
+    padding: 10px;
+    background: #f3f3f3;
+    border-radius: 8px;
+}
+
+.pequeno {
+    font-size: 13px;
+    color: #666;
+    margin-top: 8px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1 id="tituloServicio">LISTA DE ASISTENCIA</h1>
+
+    <div id="estado" class="card">
+        <strong>Iniciando sistema...</strong>
+    </div>
+
+    <div id="servicioCard" class="card oculto">
+
+        <div class="info">
+
+            <strong>Servicio identificado:</strong>
+
+            <span id="servicioIdentificado">
+                -
+            </span>
+
+        </div>
+
+        <div id="tipoRegistro">
+
+            <button onclick="seleccionarPersonal()">
+                PERSONAL DEL SERVICIO
+            </button>
+
+            <button onclick="seleccionarApoyo()">
+                APOYO
+            </button>
+
+            <button onclick="seleccionarAdministrativo()">
+                ADMINISTRATIVO
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- PERSONAL DEL SERVICIO -->
+
+    <div id="personalCard" class="card oculto">
+
+        <label for="personalSelect">
+            Nombre
+        </label>
+
+        <select
+            id="personalSelect"
+            onchange="actualizarNumeroPersonal()"
+        >
+
+            <option value="">
+                Seleccione una persona
+            </option>
+
+        </select>
+
+        <label for="numeroPersonal">
+            Número de empleado
+        </label>
+
+        <input
+            type="text"
+            id="numeroPersonal"
+            readonly
+            placeholder="Número automático"
+        >
+
+        <button onclick="continuarPersonal()">
+            CONTINUAR
+        </button>
+
+    </div>
+
+
+    <!-- APOYO -->
+
+    <div id="apoyoCard" class="card oculto">
+
+        <label for="numeroApoyo">
+            Número de empleado
+        </label>
+
+        <input
+            type="text"
+            id="numeroApoyo"
+            placeholder="Número de empleado"
+            inputmode="numeric"
+            autocomplete="off"
+            oninput="reconocerApoyo()"
+        >
+
+        <label for="nombreApoyo">
+            Nombre
+        </label>
+
+        <input
+            type="text"
+            id="nombreApoyo"
+            placeholder="Nombre automático"
+            autocomplete="off"
+            readonly
+        >
+
+        <div class="origen">
+
+            <strong>
+                Servicio de origen:
+            </strong>
+
+            <span id="servicioOrigen">
+                -
+            </span>
+
+        </div>
+
+        <div id="apoyoDuplicado"></div>
+
+        <button onclick="continuarApoyo()">
+            CONTINUAR
+        </button>
+
+    </div>
+
+
+    <!-- ADMINISTRATIVO -->
+
+    <div id="administrativoCard" class="card oculto">
+
+        <div class="info">
+
+            <strong>
+                Registro administrativo
+            </strong>
+
+            <div class="pequeno">
+
+                El registro se realizará como
+                OFICINAS CENTRALES.
+
+            </div>
+
+        </div>
+
+        <label for="numeroAdministrativo">
+            Número de empleado
+        </label>
+
+        <input
+            type="text"
+            id="numeroAdministrativo"
+            placeholder="Número de empleado"
+            inputmode="numeric"
+            autocomplete="off"
+            oninput="reconocerAdministrativo()"
+        >
+
+        <label for="nombreAdministrativo">
+            Nombre
+        </label>
+
+        <input
+            type="text"
+            id="nombreAdministrativo"
+            placeholder="Nombre automático"
+            readonly
+        >
+
+        <div id="adminResultado"></div>
+
+        <button onclick="continuarAdministrativo()">
+            CONTINUAR
+        </button>
+
+    </div>
+
+
+    <div
+        id="mensajeFinal"
+        class="card oculto"
+    ></div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   CONFIGURACIÓN
+===================================================== */
+
+const ID_ARCHIVO =
+    "1zdYovCmbhHOyMVy-huWqzgB6Q5x1XgL8dghe263TTbU";
+
+const ID_BASE_QR =
+    "1049929211";
+
+const CODIGO_ADMIN =
+    "CENTRAL";
+
+const SERVICIO_CENTRAL =
+    "ID-00167 - OFICINAS CENTRALES";
+
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
+let empleados = [];
+
+let servicios = new Map();
+
+let personalServicio = [];
+
+let servicioActual = null;
+
+let empleadoApoyoActual = null;
+
+let empleadosApoyoDuplicados = [];
+
+let empleadoAdministrativoActual = null;
+
+
+/* =====================================================
+   INICIO
+===================================================== */
+
+window.onload = function() {
+
+    cargarBaseQR();
+
+};
+
+
+/* =====================================================
+   CARGAR BASE QR
+===================================================== */
+
+function cargarBaseQR() {
+
+    const callbackName =
+        "callbackBaseQR_" + Date.now();
+
+    window[callbackName] = function(data) {
+
+        try {
+
+            const filas =
+                data.table.rows;
+
+            const encabezados =
+                data.table.cols.map(
+                    col => col.label
+                );
+
+            const indiceNombre =
+                encabezados.indexOf("Nombre");
+
+            const indiceNumero =
+                encabezados.indexOf(
+                    "No de empleado"
+                );
+
+            const indiceServicio =
+                encabezados.indexOf("Servicio");
+
+            const indiceCodigo =
+                encabezados.indexOf(
+                    "Código servicio"
+                );
+
+            const indiceCoordenadas =
+                encabezados.indexOf(
+                    "Coordenadas"
+                );
+
+            const indiceRango =
+                encabezados.indexOf("Rango");
+
+            const indiceEstatus =
+                encabezados.indexOf("Estatus");
+
+            const indicePosicion =
+                encabezados.indexOf("Posición");
+
+
+            if (
+                indiceNombre === -1 ||
+                indiceNumero === -1 ||
+                indiceServicio === -1 ||
+                indiceCodigo === -1 ||
+                indiceCoordenadas === -1 ||
+                indiceRango === -1 ||
+                indiceEstatus === -1 ||
+                indicePosicion === -1
+            ) {
+
+                mostrarError(
+                    "No se encontraron todas las columnas requeridas en BASE_QR."
+                );
+
+                return;
+
+            }
+
+
+            empleados = filas.map(
+                fila => {
+
+                    const c =
+                        fila.c || [];
+
+                    function valor(indice) {
+
+                        return (
+                            c[indice] &&
+                            c[indice].v != null
+                        )
+                        ?
+                        String(
+                            c[indice].v
+                        ).trim()
+                        :
+                        "";
+
+                    }
+
+                    const coordenadas =
+                        valor(
+                            indiceCoordenadas
+                        );
+
+                    let lat = null;
+                    let lon = null;
+
+                    if (coordenadas) {
+
+                        const partes =
+                            coordenadas.split(",");
+
+                        if (
+                            partes.length >= 2
+                        ) {
+
+                            lat =
+                                parseFloat(
+                                    partes[0].trim()
+                                );
+
+                            lon =
+                                parseFloat(
+                                    partes[1].trim()
+                                );
+
+                        }
+
+                    }
+
+                    return {
+
+                        nombre:
+                            valor(
+                                indiceNombre
+                            ),
+
+                        numero:
+                            valor(
+                                indiceNumero
+                            ),
+
+                        servicio:
+                            valor(
+                                indiceServicio
+                            ),
+
+                        codigoServicio:
+                            valor(
+                                indiceCodigo
+                            ),
+
+                        lat:
+                            lat,
+
+                        lon:
+                            lon,
+
+                        rango:
+                            parseFloat(
+                                valor(
+                                    indiceRango
+                                )
+                            ) || 0,
+
+                        estatus:
+                            valor(
+                                indiceEstatus
+                            ),
+
+                        posicion:
+                            valor(
+                                indicePosicion
+                            ).toUpperCase()
+
+                    };
+
+                }
+
+            ).filter(
+
+                empleado =>
+                    empleado.estatus ===
+                    "ACTIVO"
+
+            );
+
+
+            construirServicios();
+
+            iniciarSistema();
+
+        }
+
+        catch(error) {
+
+            console.error(error);
+
+            mostrarError(
+                "No fue posible procesar la base."
+            );
+
+        }
+
+    };
+
+
+    const script =
+        document.createElement("script");
+
+    script.src =
+
+        "https://docs.google.com/spreadsheets/d/" +
+
+        ID_ARCHIVO +
+
+        "/gviz/tq" +
+
+        "?gid=" +
+
+        ID_BASE_QR +
+
+        "&tqx=out:json;responseHandler:" +
+
+        callbackName;
+
+    script.onerror = function() {
+
+        mostrarError(
+            "No fue posible conectar con Google Sheets."
+        );
+
+    };
+
+    document.body.appendChild(script);
+
+}
+
+
+/* =====================================================
+   CONSTRUIR SERVICIOS
+===================================================== */
+
+function construirServicios() {
+
+    servicios.clear();
+
+    empleados.forEach(
+        empleado => {
+
+            if (
+                !empleado.codigoServicio ||
+                empleado.lat === null ||
+                empleado.lon === null
+            ) {
+
+                return;
+
+            }
+
+            if (
+                !servicios.has(
+                    empleado.codigoServicio
+                )
+            ) {
+
+                servicios.set(
+                    empleado.codigoServicio,
+                    {
+
+                        codigo:
+                            empleado.codigoServicio,
+
+                        servicio:
+                            empleado.servicio,
+
+                        ubicaciones:
+                            []
+
+                    }
+                );
+
+            }
+
+            const servicio =
+                servicios.get(
+                    empleado.codigoServicio
+                );
+
+            servicio.ubicaciones.push({
+
+                lat:
+                    empleado.lat,
+
+                lon:
+                    empleado.lon,
+
+                rango:
+                    empleado.rango
+
+            });
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   INICIAR SISTEMA
+===================================================== */
+
+function iniciarSistema() {
+
+    mostrarEstado(
+        "Obteniendo ubicación..."
+    );
+
+    obtenerGPS();
+
+}
+
+
+/* =====================================================
+   GPS
+===================================================== */
+
+function obtenerGPS() {
+
+    if (
+        !navigator.geolocation
+    ) {
+
+        mostrarError(
+            "Este dispositivo no permite obtener ubicación."
+        );
+
+        return;
+
+    }
+
+    navigator.geolocation.getCurrentPosition(
+
+        function(position) {
+
+            const lat =
+                position.coords.latitude;
+
+            const lon =
+                position.coords.longitude;
+
+            identificarServicio(
+                lat,
+                lon
+            );
+
+        },
+
+        function(error) {
+
+            console.error(error);
+
+            mostrarError(
+
+                "No fue posible obtener tu ubicación. " +
+
+                "Activa el GPS y permite el acceso a la ubicación."
+
+            );
+
+        },
+
+        {
+
+            enableHighAccuracy:
+                true,
+
+            timeout:
+                15000,
+
+            maximumAge:
+                0
+
+        }
+
+    );
+
+}
+
+
+/* =====================================================
+   IDENTIFICAR SERVICIO
+===================================================== */
+
+function identificarServicio(
+    lat,
+    lon
+) {
+
+    let servicioEncontrado =
+        null;
+
+    let distanciaMenor =
+        Infinity;
+
+    servicios.forEach(
+        servicio => {
+
+            servicio.ubicaciones.forEach(
+                ubicacion => {
+
+                    const distancia =
+                        calcularDistancia(
+
+                            lat,
+                            lon,
+
+                            ubicacion.lat,
+                            ubicacion.lon
+
+                        );
+
+                    if (
+
+                        distancia <=
+                        ubicacion.rango &&
+
+                        distancia <
+                        distanciaMenor
+
+                    ) {
+
+                        distanciaMenor =
+                            distancia;
+
+                        servicioEncontrado =
+                            servicio;
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+    if (
+        servicioEncontrado
+    ) {
+
+        entrarAlServicio(
+            servicioEncontrado
+        );
+
+        return;
+
+    }
+
+
+    mostrarEstado(
+        "Ubicación fuera de un servicio registrado."
+    );
+
+
+    document.getElementById(
+        "servicioCard"
+    ).classList.remove(
+        "oculto"
+    );
+
+
+    document.getElementById(
+        "servicioIdentificado"
+    ).textContent =
+        "FUERA DE SERVICIO";
+
+
+    document.getElementById(
+        "tituloServicio"
+    ).textContent =
+        "FUERA DE SERVICIO";
+
+
+    document.getElementById(
+        "tipoRegistro"
+    ).innerHTML =
+
+        '<button onclick="seleccionarAdministrativo()">' +
+
+        'ADMINISTRATIVO' +
+
+        '</button>';
+
+
+    document.getElementById(
+        "administrativoCard"
+    ).classList.remove(
+        "oculto"
+    );
+
+}
+
+
+/* =====================================================
+   ENTRAR AL SERVICIO
+===================================================== */
+
+function entrarAlServicio(
+    servicio
+) {
+
+    servicioActual =
+        servicio;
+
+    document.getElementById(
+        "servicioCard"
+    ).classList.remove(
+        "oculto"
+    );
+
+
+    /*
+       SOLO CÓDIGO DEL SERVICIO
+    */
+
+    document.getElementById(
+        "tituloServicio"
+    ).textContent =
+        servicio.codigo;
+
+
+    document.getElementById(
+        "servicioIdentificado"
+    ).textContent =
+        servicio.codigo;
+
+
+    document.getElementById(
+        "tipoRegistro"
+    ).innerHTML =
+
+        '<button onclick="seleccionarPersonal()">' +
+
+        'PERSONAL DEL SERVICIO' +
+
+        '</button>' +
+
+        '<button onclick="seleccionarApoyo()">' +
+
+        'APOYO' +
+
+        '</button>' +
+
+        '<button onclick="seleccionarAdministrativo()">' +
+
+        'ADMINISTRATIVO' +
+
+        '</button>';
+
+
+    document.getElementById(
+        "tipoRegistro"
+    ).classList.remove(
+        "oculto"
+    );
+
+    ocultarTodosLosFormularios();
+
+    mostrarEstado(
+        "Ubicación validada correctamente."
+    );
+
+}
+
+
+/* =====================================================
+   OCULTAR FORMULARIOS
+===================================================== */
+
+function ocultarTodosLosFormularios() {
+
+    document.getElementById(
+        "personalCard"
+    ).classList.add(
+        "oculto"
+    );
+
+    document.getElementById(
+        "apoyoCard"
+    ).classList.add(
+        "oculto"
+    );
+
+    document.getElementById(
+        "administrativoCard"
+    ).classList.add(
+        "oculto"
+    );
+
+}
+
+
+/* =====================================================
+   PERSONAL DEL SERVICIO
+===================================================== */
+
+function seleccionarPersonal() {
+
+    document.getElementById(
+        "personalCard"
+    ).classList.remove(
+        "oculto"
+    );
+
+    document.getElementById(
+        "apoyoCard"
+    ).classList.add(
+        "oculto"
+    );
+
+    document.getElementById(
+        "administrativoCard"
+    ).classList.add(
+        "oculto"
+    );
+
+    cargarPersonalServicio();
+
+}
+
+
+/* =====================================================
+   CARGAR PERSONAL DEL SERVICIO
+===================================================== */
+
+function cargarPersonalServicio() {
+
+    const select =
+        document.getElementById(
+            "personalSelect"
+        );
+
+    select.innerHTML =
+
+        '<option value="">' +
+
+        'Seleccione una persona' +
+
+        '</option>';
+
+
+    if (
+        !servicioActual
+    ) {
+
+        return;
+
+    }
+
+
+    personalServicio =
+        empleados.filter(
+
+            empleado =>
+
+                empleado.codigoServicio ===
+                servicioActual.codigo &&
+
+                (
+                    empleado.posicion ===
+                    "GUARDIA"
+
+                    ||
+
+                    empleado.posicion ===
+                    "MONITORISTA"
+                )
+
+        );
+
+
+    personalServicio.forEach(
+        (empleado, indice) => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            /*
+               Ya no usamos solamente el número
+               como identificador.
+
+               Usamos el índice del registro.
+            */
+
+            option.value =
+                indice;
+
+            option.textContent =
+                empleado.nombre;
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   ACTUALIZAR NÚMERO PERSONAL
+===================================================== */
+
+function actualizarNumeroPersonal() {
+
+    const indice =
+        document.getElementById(
+            "personalSelect"
+        ).value;
+
+
+    if (
+        indice === ""
+    ) {
+
+        document.getElementById(
+            "numeroPersonal"
+        ).value = "";
+
+        return;
+
+    }
+
+
+    const empleado =
+        personalServicio[
+            Number(indice)
+        ];
+
+
+    if (
+        empleado
+    ) {
+
+        document.getElementById(
+            "numeroPersonal"
+        ).value =
+            empleado.numero;
+
+    }
+
+}
+
+
+/* =====================================================
+   CONTINUAR PERSONAL
+===================================================== */
+
+function continuarPersonal() {
+
+    const indice =
+        document.getElementById(
+            "personalSelect"
+        ).value;
+
+
+    if (
+        indice === ""
+    ) {
+
+        alert(
+            "Seleccione una persona."
+        );
+
+        return;
+
+    }
+
+
+    const empleado =
+        personalServicio[
+            Number(indice)
+        ];
+
+
+    if (
+        !empleado
+    ) {
+
+        alert(
+            "No se encontró la persona seleccionada."
+        );
+
+        return;
+
+    }
+
+
+    abrirFormulario(
+
+        empleado.nombre,
+
+        empleado.numero,
+
+        "PERSONAL",
+
+        empleado.servicio
+
+    );
+
+}
+
+
+/* =====================================================
+   APOYO
+===================================================== */
+
+function seleccionarApoyo() {
+
+    document.getElementById(
+        "apoyoCard"
+    ).classList.remove(
+        "oculto"
+    );
+
+    document.getElementById(
+        "personalCard"
+    ).classList.add(
+        "oculto"
+    );
+
+    document.getElementById(
+        "administrativoCard"
+    ).classList.add(
+        "oculto"
+    );
+
+
+    document.getElementById(
+        "numeroApoyo"
+    ).value = "";
+
+
+    document.getElementById(
+        "nombreApoyo"
+    ).value = "";
+
+
+    document.getElementById(
+        "servicioOrigen"
+    ).textContent = "-";
+
+
+    document.getElementById(
+        "apoyoDuplicado"
+    ).innerHTML = "";
+
+
+    empleadoApoyoActual =
+        null;
+
+
+    empleadosApoyoDuplicados =
+        [];
+
+}
+
+
+/* =====================================================
+   RECONOCER APOYO
+   SOPORTE PARA NÚMEROS DUPLICADOS
+===================================================== */
+
+function reconocerApoyo() {
+
+    const numero =
+        document.getElementById(
+            "numeroApoyo"
+        ).value.trim();
+
+
+    empleadoApoyoActual =
+        null;
+
+
+    empleadosApoyoDuplicados =
+        [];
+
+
+    document.getElementById(
+        "nombreApoyo"
+    ).value = "";
+
+
+    document.getElementById(
+        "servicioOrigen"
+    ).textContent = "-";
+
+
+    document.getElementById(
+        "apoyoDuplicado"
+    ).innerHTML = "";
+
+
+    if (
+        !numero
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+       BUSCAMOS TODAS LAS COINCIDENCIAS
+       Y NO SOLAMENTE LA PRIMERA.
+    */
+
+    const coincidencias =
+        empleados.filter(
+
+            empleado =>
+                empleado.numero ===
+                numero
+
+        );
+
+
+    if (
+        coincidencias.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+       UNA SOLA COINCIDENCIA
+       → SE RECONOCE AUTOMÁTICAMENTE.
+    */
+
+    if (
+        coincidencias.length === 1
+    ) {
+
+        empleadoApoyoActual =
+            coincidencias[0];
+
+
+        document.getElementById(
+            "nombreApoyo"
+        ).value =
+            coincidencias[0].nombre;
+
+
+        document.getElementById(
+            "servicioOrigen"
+        ).textContent =
+            coincidencias[0].servicio;
+
+
+        return;
+
+    }
+
+
+    /*
+       MÁS DE UNA COINCIDENCIA
+       → EL USUARIO DEBE ELEGIR.
+    */
+
+    empleadosApoyoDuplicados =
+        coincidencias;
+
+
+    let html =
+
+        '<div class="info">' +
+
+        '<strong>Se encontraron varias coincidencias.</strong>' +
+
+        '<div class="pequeno">' +
+
+        'Seleccione el servicio de origen correcto.' +
+
+        '</div>' +
+
+        '</div>';
+
+
+    html +=
+
+        '<label for="apoyoCoincidencia">' +
+
+        'Seleccione la persona' +
+
+        '</label>';
+
+
+    html +=
+
+        '<select id="apoyoCoincidencia" ' +
+
+        'onchange="seleccionarApoyoDuplicado()">' +
+
+        '<option value="">' +
+
+        'Seleccione una opción' +
+
+        '</option>';
+
+
+    coincidencias.forEach(
+        (empleado, indice) => {
+
+            html +=
+
+                '<option value="' +
+
+                indice +
+
+                '">' +
+
+                empleado.nombre +
+
+                ' — ' +
+
+                empleado.servicio +
+
+                '</option>';
+
+        }
+    );
+
+
+    html +=
+
+        '</select>';
+
+
+    document.getElementById(
+        "apoyoDuplicado"
+    ).innerHTML =
+        html;
+
+}
+
+
+/* =====================================================
+   SELECCIONAR APOYO DUPLICADO
+===================================================== */
+
+function seleccionarApoyoDuplicado() {
+
+    const indice =
+        document.getElementById(
+            "apoyoCoincidencia"
+        ).value;
+
+
+    if (
+        indice === ""
+    ) {
+
+        empleadoApoyoActual =
+            null;
+
+        document.getElementById(
+            "nombreApoyo"
+        ).value = "";
+
+        document.getElementById(
+            "servicioOrigen"
+        ).textContent = "-";
+
+        return;
+
+    }
+
+
+    const empleado =
+        empleadosApoyoDuplicados[
+            Number(indice)
+        ];
+
+
+    if (
+        !empleado
+    ) {
+
+        empleadoApoyoActual =
+            null;
+
+        return;
+
+    }
+
+
+    empleadoApoyoActual =
+        empleado;
+
+
+    document.getElementById(
+        "nombreApoyo"
+    ).value =
+        empleado.nombre;
+
+
+    document.getElementById(
+        "servicioOrigen"
+    ).textContent =
+        empleado.servicio;
+
+}
+
+
+/* =====================================================
+   CONTINUAR APOYO
+===================================================== */
+
+function continuarApoyo() {
+
+    if (
+        !empleadoApoyoActual
+    ) {
+
+        alert(
+            "Seleccione correctamente al empleado."
+        );
+
+        return;
+
+    }
+
+
+    abrirFormulario(
+
+        empleadoApoyoActual.nombre,
+
+        empleadoApoyoActual.numero,
+
+        "APOYO",
+
+        empleadoApoyoActual.servicio
+
+    );
+
+}
+
+
+/* =====================================================
+   ADMINISTRATIVO
+===================================================== */
+
+function seleccionarAdministrativo() {
+
+    document.getElementById(
+        "administrativoCard"
+    ).classList.remove(
+        "oculto"
+    );
+
+    document.getElementById(
+        "personalCard"
+    ).classList.add(
+        "oculto"
+    );
+
+    document.getElementById(
+        "apoyoCard"
+    ).classList.add(
+        "oculto"
+    );
+
+    document.getElementById(
+        "numeroAdministrativo"
+    ).value = "";
+
+    document.getElementById(
+        "nombreAdministrativo"
+    ).value = "";
+
+    document.getElementById(
+        "adminResultado"
+    ).innerHTML = "";
+
+    empleadoAdministrativoActual =
+        null;
+
+}
+
+
+/* =====================================================
+   RECONOCER ADMINISTRATIVO
+===================================================== */
+
+function reconocerAdministrativo() {
+
+    const numero =
+        document.getElementById(
+            "numeroAdministrativo"
+        ).value.trim();
+
+
+    empleadoAdministrativoActual =
+        null;
+
+
+    document.getElementById(
+        "nombreAdministrativo"
+    ).value = "";
+
+
+    document.getElementById(
+        "adminResultado"
+    ).innerHTML = "";
+
+
+    if (
+        !numero
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+       AHORA BUSCAMOS TODOS LOS ADMINISTRATIVOS
+       CON EL MISMO NÚMERO.
+    */
+
+    const coincidencias =
+        empleados.filter(
+
+            empleado =>
+
+                empleado.numero === numero &&
+
+                empleado.posicion ===
+                "ADMINISTRATIVO"
+
+        );
+
+
+    if (
+        coincidencias.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+       SI SOLO EXISTE UNO,
+       SE RECONOCE AUTOMÁTICAMENTE.
+    */
+
+    if (
+        coincidencias.length === 1
+    ) {
+
+        empleadoAdministrativoActual =
+            coincidencias[0];
+
+
+        document.getElementById(
+            "nombreAdministrativo"
+        ).value =
+            coincidencias[0].nombre;
+
+
+        document.getElementById(
+            "adminResultado"
+        ).innerHTML =
+
+            '<div class="exito">' +
+
+            'Empleado administrativo validado. Registro: CENTRAL.' +
+
+            '</div>';
+
+        return;
+
+    }
+
+
+    /*
+       SI HAY DUPLICADOS,
+       SE PIDE SELECCIÓN.
+    */
+
+    let html =
+
+        '<div class="info">' +
+
+        '<strong>Se encontraron varias coincidencias.</strong>' +
+
+        '<div class="pequeno">' +
+
+        'Seleccione la persona correcta.' +
+
+        '</div>' +
+
+        '</div>';
+
+
+    html +=
+
+        '<label for="adminCoincidencia">' +
+
+        'Seleccione la persona' +
+
+        '</label>';
+
+
+    html +=
+
+        '<select id="adminCoincidencia" ' +
+
+        'onchange="seleccionarAdministrativoDuplicado()">' +
+
+        '<option value="">' +
+
+        'Seleccione una opción' +
+
+        '</option>';
+
+
+    coincidencias.forEach(
+        (empleado, indice) => {
+
+            html +=
+
+                '<option value="' +
+
+                indice +
+
+                '">' +
+
+                empleado.nombre +
+
+                ' — ' +
+
+                empleado.servicio +
+
+                '</option>';
+
+        }
+    );
+
+
+    html +=
+        '</select>';
+
+
+    window.empleadosAdministrativoDuplicados =
+        coincidencias;
+
+
+    document.getElementById(
+        "adminResultado"
+    ).innerHTML =
+        html;
+
+}
+
+
+/* =====================================================
+   SELECCIONAR ADMINISTRATIVO DUPLICADO
+===================================================== */
+
+function seleccionarAdministrativoDuplicado() {
+
+    const indice =
+        document.getElementById(
+            "adminCoincidencia"
+        ).value;
+
+
+    if (
+        indice === ""
+    ) {
+
+        empleadoAdministrativoActual =
+            null;
+
+        document.getElementById(
+            "nombreAdministrativo"
+        ).value = "";
+
+        return;
+
+    }
+
+
+    const empleado =
+        window.empleadosAdministrativoDuplicados[
+            Number(indice)
+        ];
+
+
+    if (
+        !empleado
+    ) {
+
+        empleadoAdministrativoActual =
+            null;
+
+        return;
+
+    }
+
+
+    empleadoAdministrativoActual =
+        empleado;
+
+
+    document.getElementById(
+        "nombreAdministrativo"
+    ).value =
+        empleado.nombre;
+
+
+    document.getElementById(
+        "adminResultado"
+    ).innerHTML =
+
+        '<div class="exito">' +
+
+        'Empleado administrativo validado. Registro: CENTRAL.' +
+
+        '</div>';
+
+}
+
+
+/* =====================================================
+   CONTINUAR ADMINISTRATIVO
+===================================================== */
+
+function continuarAdministrativo() {
+
+    if (
+        !empleadoAdministrativoActual
+    ) {
+
+        alert(
+            "Seleccione correctamente al empleado administrativo."
+        );
+
+        return;
+
+    }
+
+
+    /*
+       ADMINISTRATIVO SIEMPRE SE MANDA
+       A CENTRAL, SIN IMPORTAR GPS.
+    */
+
+    abrirFormulario(
+
+        empleadoAdministrativoActual.nombre,
+
+        empleadoAdministrativoActual.numero,
+
+        "ADMINISTRATIVO",
+
+        SERVICIO_CENTRAL
+
+    );
+
+}
+
+
+/* =====================================================
+   GOOGLE FORMS
+===================================================== */
+
+function abrirFormulario(
+
+    nombre,
+    numero,
+    tipo,
+    servicio
+
+) {
+
+    const url =
+
+        "https://docs.google.com/forms/d/e/" +
+
+        "1FAIpQLSdY4MOdaUuv3wIN0JKWovq3Hu-3tKy_kXAYVtnOyRFZXBDvgQ" +
+
+        "/viewform" +
+
+        "?usp=pp_url" +
+
+        "&entry.737145468=" +
+
+        encodeURIComponent(nombre) +
+
+        "&entry.1351159631=" +
+
+        encodeURIComponent(numero) +
+
+        "&entry.1698343083=" +
+
+        encodeURIComponent(servicio);
+
+
+    window.location.href =
+        url;
+
+}
+
+
+/* =====================================================
+   DISTANCIA
+===================================================== */
+
+function calcularDistancia(
+
+    lat1,
+    lon1,
+    lat2,
+    lon2
+
+) {
+
+    const R =
+        6371000;
+
+    const rad =
+        Math.PI / 180;
+
+    const dLat =
+        (lat2 - lat1) * rad;
+
+    const dLon =
+        (lon2 - lon1) * rad;
+
+    const a =
+
+        Math.sin(dLat / 2) *
+        Math.sin(dLat / 2)
+
+        +
+
+        Math.cos(lat1 * rad) *
+        Math.cos(lat2 * rad) *
+
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+
+    const c =
+        2 *
+        Math.atan2(
+
+            Math.sqrt(a),
+
+            Math.sqrt(1 - a)
+
+        );
+
+    return R * c;
+
+}
+
+
+/* =====================================================
+   MENSAJES
+===================================================== */
+
+function mostrarEstado(texto) {
+
+    const estado =
+        document.getElementById(
+            "estado"
+        );
+
+    estado.className =
+        "card";
+
+    estado.innerHTML =
+
+        "<strong>" +
+
+        texto +
+
+        "</strong>";
+
+}
+
+
+function mostrarError(texto) {
+
+    const estado =
+        document.getElementById(
+            "estado"
+        );
+
+    estado.className =
+        "card error";
+
+    estado.innerHTML =
+
+        "<strong>" +
+
+        texto +
+
+        "</strong>";
+
+}
+
+</script>
+
+</body>
+</html>
