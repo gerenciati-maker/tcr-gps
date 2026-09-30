@@ -2851,7 +2851,7 @@ function confirmarYEnviarRegistro(tipoRegistro) {
         fotoNombre: fotoRegistroNombre
     };
 
-    mostrarEstado("Guardando registro...");
+    mostrarEstado("Enviando registro...");
 
     const mensaje =
         document.getElementById("mensajeFinal");
@@ -2860,11 +2860,22 @@ function confirmarYEnviarRegistro(tipoRegistro) {
         mensaje.className = "card";
         mensaje.innerHTML =
             '<div class="info" style="margin-top:0; text-align:center;">' +
-                '<strong style="font-size:18px;">GUARDANDO REGISTRO...</strong>' +
-                '<div class="pequeno" style="margin-top:6px;">No cierre ni recargue la página.</div>' +
+                '<strong style="font-size:20px;">ENVIANDO REGISTRO...</strong>' +
+                '<div class="pequeno" style="margin-top:8px;">El registro se está enviando. No cierre ni recargue la página.</div>' +
+                '<div id="estadoEnvioTiempo" class="pequeno" style="margin-top:8px;">Espere un momento...</div>' +
             '</div>';
         mensaje.classList.remove("oculto");
     }
+
+    const inicioEnvio = Date.now();
+    const relojEnvio = setInterval(function() {
+        const indicador = document.getElementById("estadoEnvioTiempo");
+        if (!indicador) return;
+        const segundos = Math.floor((Date.now() - inicioEnvio) / 1000);
+        indicador.textContent = segundos < 2
+            ? "Procesando..."
+            : "Procesando, espere " + segundos + " s...";
+    }, 1000);
 
     fetch(
         URL_APPS_SCRIPT,
@@ -2879,6 +2890,7 @@ function confirmarYEnviarRegistro(tipoRegistro) {
     )
     .then(function() {
 
+        clearInterval(relojEnvio);
         enviandoRegistro = false;
 
         /* Mantener un aviso local para evitar una segunda ENTRADA en este dispositivo. */
@@ -2919,6 +2931,7 @@ function confirmarYEnviarRegistro(tipoRegistro) {
     })
     .catch(function(error) {
 
+        clearInterval(relojEnvio);
         enviandoRegistro = false;
 
         console.error(error);
