@@ -2646,327 +2646,93 @@ function validarFotografia() {
    ENVIAR REGISTRO
 ===================================================== */
 
-function enviarRegistro(
-    tipoRegistro
-) {
+function aplicaCandadoVisualLocal() {
+    const posicion = String(
+        registroPendiente && registroPendiente.posicion || ""
+    ).trim().toUpperCase();
 
-    if (enviandoRegistro) {
-        return;
-    }
-
-    if (!registroPendiente) {
-        alert("No existe un registro pendiente.");
-        return;
-    }
-
-    if (!validarFotografia()) {
-        return;
-    }
-
-    /*
-       Primero verificamos el ciclo real en Apps Script.
-       Si ya existe una ENTRADA pendiente, NO se permite enviar otra.
-       La validación ocurre antes de la pantalla de confirmación.
-    */
-    validarCicloAntesDeConfirmar(tipoRegistro);
-
+    return posicion === "GUARDIA" || posicion === "ERI";
 }
 
+function claveCicloLocal() {
+    if (!registroPendiente) return "";
+
+    return "AUTORITAS_CICLO_" +
+        String(registroPendiente.numeroEmpleado || "").trim() + "_" +
+        String(registroPendiente.posicion || "").trim().toUpperCase();
+}
+
+function cicloLocalPendiente() {
+    if (!aplicaCandadoVisualLocal()) return false;
+
+    const clave = claveCicloLocal();
+    if (!clave) return false;
+
+    return localStorage.getItem(clave) === "ENTRADA";
+}
+
+function marcarCicloLocal(tipoRegistro) {
+    if (!aplicaCandadoVisualLocal()) return;
+
+    const clave = claveCicloLocal();
+    if (!clave) return;
+
+    if (String(tipoRegistro).toUpperCase() === "ENTRADA") {
+        localStorage.setItem(clave, "ENTRADA");
+    } else if (String(tipoRegistro).toUpperCase() === "SALIDA") {
+        localStorage.removeItem(clave);
+    }
+}
 
 /* =====================================================
-   VALIDAR CICLO ANTES DE CONFIRMAR
+   ENVIAR REGISTRO
 ===================================================== */
 
-function validarCicloAntesDeConfirmar(tipoRegistro) {
+function enviarRegistro(tipoRegistro) {
 
-    if (validandoCiclo || enviandoRegistro) {
-        return;
-    }
+    if (enviandoRegistro) return;
 
     if (!registroPendiente) {
         alert("No existe un registro pendiente.");
         return;
     }
 
-    validandoCiclo = true;
-    mostrarEstado("Verificando el ciclo de asistencia...");
+    if (!validarFotografia()) return;
 
-    const numero = encodeURIComponent(
-        registroPendiente.numeroEmpleado || ""
-    );
+    const tipo = String(tipoRegistro || "").toUpperCase();
 
-    const posicion = encodeURIComponent(
-        registroPendiente.posicion || ""
-    );
-
-    const servicio = encodeURIComponent(
-        registroPendiente.servicio ||
-        registroPendiente.servicioDetectado ||
-        ""
-    );
-
-    const callback = "validarCicloCallback_" + Date.now();
-    const script = document.createElement("script");
-    let finalizado = false;
-
-    function terminar() {
-        if (finalizado) return;
-        finalizado = true;
-        validandoCiclo = false;
-        try { delete window[callback]; } catch (e) {}
-        if (script.parentNode) {
-            script.parentNode.removeChild(script);
-        }
+    /*
+       Este aviso es solamente visual/local.
+       El candado real sigue estando en Apps Script.
+       ADMINISTRATIVO nunca entra aquí.
+    */
+    if (tipo === "ENTRADA" && cicloLocalPendiente()) {
+        mostrarAlertaCiclo(
+            "⚠️ ESTA ENTRADA NO SE REGISTRÓ",
+            "Ya tienes una entrada pendiente. Primero debes registrar tu SALIDA."
+        );
+        return;
     }
 
-    window[callback] = function(respuesta) {
-
-        try {
-
-            if (!respuesta || respuesta.ok !== true) {
-                mostrarBloqueoCiclo(respuesta);
-                return;
-            }
-
-            const requerido = String(
-                respuesta.siguienteRegistro || ""
-            ).toUpperCase();
-
-            const solicitado = String(
-                tipoRegistro || ""
-            ).toUpperCase();
-
-            if (
-                requerido &&
-                requerido !== "CUALQUIERA" &&
-                requerido !== solicitado
-            ) {
-                mostrarBloqueoCiclo({
-                    ok: false,
-                    codigo: requerido === "SALIDA"
-                        ? "SALIDA_PENDIENTE"
-                        : "ENTRADA_PENDIENTE",
-                    error: requerido === "SALIDA"
-                        ? "YA TIENES UNA ENTRADA REGISTRADA. Primero debes registrar tu SALIDA antes de una nueva ENTRADA."
-                        : "EL SIGUIENTE REGISTRO DEBE SER ENTRADA.",
-                    siguienteRegistro: requerido,
-                    servicioPendiente: respuesta.servicioPendiente || ""
-                });
-                return;
-            }
-
-            mostrarConfirmacionRegistro(tipoRegistro);
-
-        } finally {
-            terminar();
-        }
-    };
-
-    script.src =
-        URL_APPS_SCRIPT +
-        "?action=validar" +
-        "&numero=" + numero +
-        "&posicion=" + posicion +
-        "&servicio=" + servicio +
-        "&callback=" + callback +
-        "&_=" + Date.now();
-
-    script.onerror = function() {
-        terminar();
-        mostrarError(
-            "No fue posible verificar el ciclo de asistencia. Revise su conexión e inténtelo nuevamente. No se envió ningún registro."
-        );
-    };
-
-    document.body.appendChild(script);
-
-    setTimeout(function() {
-        if (!finalizado) {
-            terminar();
-            mostrarError(
-                "El servidor no respondió a tiempo. No se envió ningún registro."
-            );
-        }
-    }, 15000);
+    mostrarConfirmacionRegistro(tipoRegistro);
 }
 
-
-function mostrarBloqueoCiclo(respuesta) {
-
+function mostrarAlertaCiclo(titulo, texto) {
     const mensaje = document.getElementById("mensajeFinal");
-
-    let texto =
-        respuesta && respuesta.error
-            ? respuesta.error
-            : "No se puede realizar este registro porque el ciclo de asistencia no corresponde.";
-
-    const codigo =
-        respuesta && respuesta.codigo
-            ? String(respuesta.codigo).toUpperCase()
-            : "";
-
-    /* Mensaje principal mucho más visible para evitar que el personal
-       crea que la ENTRADA sí se registró. */
-    if (codigo === "SALIDA_PENDIENTE" ||
-        (respuesta && String(respuesta.siguienteRegistro || "").toUpperCase() === "SALIDA")) {
-        texto = "Ya tienes una ENTRADA pendiente. Primero debes registrar tu SALIDA.";
-    }
-
-    const servicioPendiente =
-        respuesta && respuesta.servicioPendiente
-            ? "<div class=\"pequeno\" style=\"margin-top:8px;\"><strong>Servicio pendiente:</strong> " +
-              escaparHTML(respuesta.servicioPendiente) +
-              "</div>"
-            : "";
 
     if (mensaje) {
         mensaje.className = "card";
         mensaje.innerHTML =
-            '<div class="error" style="margin-top:0; text-align:center; border:2px solid #b91c1c;">' +
-                '<strong style="display:block; font-size:22px;">⚠️ ESTA ENTRADA NO SE REGISTRÓ</strong>' +
-                '<div style="margin-top:10px; font-size:17px; font-weight:700;">' +
-                    escaparHTML(texto) +
-                '</div>' +
-                servicioPendiente +
-                '<div style="margin-top:12px; font-weight:700;">No se guardó ningún registro nuevo.</div>' +
-            '</div>' +
-            '<button type="button" onclick="cerrarBloqueoCiclo()">CORREGIR REGISTRO</button>';
-
+            '<div style="background:#b91c1c;color:#fff;border-radius:12px;padding:18px;text-align:center;">' +
+                '<strong style="display:block;font-size:22px;margin-bottom:8px;">' + titulo + '</strong>' +
+                '<div style="font-size:17px;line-height:1.4;">' + texto + '</div>' +
+            '</div>';
         mensaje.classList.remove("oculto");
-        mensaje.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+        alert(titulo + "\n\n" + texto);
     }
 
-    const tipoCard = document.getElementById("tipoRegistroCard");
-    if (tipoCard) {
-        tipoCard.classList.remove("oculto");
-    }
-
-    mostrarEstado("Registro no realizado. Debe completar el ciclo de asistencia.");
-}
-
-
-function cerrarBloqueoCiclo() {
-
-    const mensaje = document.getElementById("mensajeFinal");
-
-    if (mensaje) {
-        mensaje.classList.add("oculto");
-        mensaje.innerHTML = "";
-    }
-
-    const tipoCard = document.getElementById("tipoRegistroCard");
-    if (tipoCard) {
-        tipoCard.classList.remove("oculto");
-    }
-
-    mostrarEstado(
-        "Seleccione el registro correcto para continuar."
-    );
-}
-
-
-/* =====================================================
-   CONFIRMACIÓN ANTES DE ENVIAR
-===================================================== */
-
-function mostrarConfirmacionRegistro(tipoRegistro) {
-
-    const mensaje =
-        document.getElementById("mensajeFinal");
-
-    if (!mensaje || !registroPendiente) {
-        return;
-    }
-
-    const nombre =
-        registroPendiente.nombre || "-";
-
-    const numeroEmpleado =
-        registroPendiente.numeroEmpleado || "-";
-
-    const servicio =
-        registroPendiente.servicio ||
-        registroPendiente.servicioDetectado ||
-        "-";
-
-    const posicion =
-        registroPendiente.posicion || "-";
-
-    const tipo =
-        tipoRegistro || "-";
-
-    mensaje.className = "card";
-
-    mensaje.innerHTML =
-        '<div class="info" style="margin-top:0;">' +
-            '<strong style="font-size:18px;">VERIFIQUE LOS DATOS ANTES DE REGISTRAR</strong>' +
-            '<div class="pequeno" style="margin-top:6px;">Revise que el nombre y los datos correspondan al guardia correcto. El registro todavía NO ha sido enviado.</div>' +
-        '</div>' +
-
-        '<div class="resumenRegistro" style="margin-top:14px;">' +
-            '<div><strong>Nombre:</strong> ' + escaparHTML(nombre) + '</div>' +
-            '<div><strong>Número de empleado:</strong> ' + escaparHTML(numeroEmpleado) + '</div>' +
-            '<div><strong>Servicio:</strong> ' + escaparHTML(servicio) + '</div>' +
-            '<div><strong>Puesto:</strong> ' + escaparHTML(posicion) + '</div>' +
-            '<div><strong>Registro:</strong> ' + escaparHTML(tipo) + '</div>' +
-        '</div>' +
-
-        '<button type="button" onclick="confirmarYEnviarRegistro(\'' + tipo + '\')">' +
-            'CONFIRMAR Y ENVIAR' +
-        '</button>' +
-
-        '<button type="button" onclick="cancelarConfirmacionRegistro()" style="background:#64748b; margin-top:8px;">' +
-            'CANCELAR Y CORREGIR' +
-        '</button>';
-
-    mensaje.classList.remove("oculto");
-
-    /* Ocultamos únicamente la tarjeta de captura (foto y ENTRADA/SALIDA).
-       La tarjeta del trabajador seleccionado permanece visible arriba para
-       que el usuario pueda seguir comprobando a quién está registrando. */
-    document.getElementById("tipoRegistroCard").classList.add("oculto");
-
-    mensaje.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-    });
-}
-
-
-function escaparHTML(valor) {
-
-    return String(valor ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-
-}
-
-
-function cancelarConfirmacionRegistro() {
-
-    if (enviandoRegistro) {
-        return;
-    }
-
-    const mensaje =
-        document.getElementById("mensajeFinal");
-
-    if (mensaje) {
-        mensaje.classList.add("oculto");
-        mensaje.innerHTML = "";
-    }
-
-    document.getElementById(
-        "tipoRegistroCard"
-    ).classList.remove("oculto");
-
-    mostrarEstado(
-        "Revise los datos y seleccione ENTRADA o SALIDA cuando esté listo."
-    );
-
+    mostrarEstado("No se realizó el registro. Primero debe completar el ciclo de asistencia.");
 }
 
 
@@ -3054,6 +2820,9 @@ function confirmarYEnviarRegistro(tipoRegistro) {
     .then(function() {
 
         enviandoRegistro = false;
+
+        /* Mantener un aviso local para evitar una segunda ENTRADA en este dispositivo. */
+        marcarCicloLocal(tipoRegistro);
 
         /*
            El registro ya fue enviado. No mostramos otra pantalla con
