@@ -2643,6 +2643,66 @@ function validarFotografia() {
 
 
 /* =====================================================
+   CONFIRMACIÓN ANTES DE ENVIAR
+===================================================== */
+
+function mostrarConfirmacionRegistro(tipoRegistro) {
+
+    const mensaje = document.getElementById("mensajeFinal");
+
+    if (!mensaje || !registroPendiente) {
+        return;
+    }
+
+    const nombre = registroPendiente.nombre || "-";
+    const numeroEmpleado = registroPendiente.numeroEmpleado || "-";
+    const servicio = registroPendiente.servicio || registroPendiente.servicioDetectado || "-";
+    const posicion = registroPendiente.posicion || "-";
+    const tipo = tipoRegistro || "-";
+
+    mensaje.className = "card";
+    mensaje.innerHTML =
+        '<div class="info" style="margin-top:0;">' +
+            '<strong style="font-size:18px;">VERIFIQUE LOS DATOS ANTES DE REGISTRAR</strong>' +
+            '<div class="pequeno" style="margin-top:6px;">Revise que el nombre y los datos correspondan al empleado correcto. El registro todavía NO ha sido enviado.</div>' +
+        '</div>' +
+        '<div class="resumenRegistro" style="margin-top:14px;">' +
+            '<div><strong>Nombre:</strong> ' + escaparHTML(nombre) + '</div>' +
+            '<div><strong>Número de empleado:</strong> ' + escaparHTML(numeroEmpleado) + '</div>' +
+            '<div><strong>Servicio:</strong> ' + escaparHTML(servicio) + '</div>' +
+            '<div><strong>Puesto:</strong> ' + escaparHTML(posicion) + '</div>' +
+            '<div><strong>Registro:</strong> ' + escaparHTML(tipo) + '</div>' +
+        '</div>' +
+        '<button type="button" onclick="confirmarYEnviarRegistro(\'' + tipo + '\')">CONFIRMAR Y ENVIAR</button>' +
+        '<button type="button" onclick="cancelarConfirmacionRegistro()" style="background:#64748b; margin-top:8px;">CANCELAR Y CORREGIR</button>';
+
+    mensaje.classList.remove("oculto");
+    document.getElementById("tipoRegistroCard").classList.add("oculto");
+    mensaje.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function escaparHTML(valor) {
+    return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function cancelarConfirmacionRegistro() {
+    if (enviandoRegistro) return;
+    const mensaje = document.getElementById("mensajeFinal");
+    if (mensaje) {
+        mensaje.classList.add("oculto");
+        mensaje.innerHTML = "";
+    }
+    document.getElementById("tipoRegistroCard").classList.remove("oculto");
+    mostrarEstado("Revise los datos y seleccione ENTRADA o SALIDA cuando esté listo.");
+}
+
+
+/* =====================================================
    ENVIAR REGISTRO
 ===================================================== */
 
