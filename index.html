@@ -1321,43 +1321,67 @@ function mostrarOpcionesServicios(
 
     if (servicioIdentificado) {
         servicioIdentificado.textContent =
-            "SE ENCONTRARON VARIOS SERVICIOS EN ESTA UBICACIÓN";
+            "SE ENCONTRARON VARIOS SERVICIOS";
     }
 
 
     tipoRegistro.innerHTML =
-        '<div class="pequeno" style="margin-bottom:12px;">' +
-            'Seleccione el servicio en el que realizará el registro:' +
+        '<div class="error" style="margin-top:12px;">' +
+            '<strong>SELECCIONE EL SERVICIO</strong>' +
+            '<div class="pequeno">Se detectaron varios servicios en esta ubicación. Seleccione dónde realizará el registro.</div>' +
         '</div>';
 
 
+    const select =
+        document.createElement("select");
+
+    select.style.marginTop = "8px";
+
+
+    const base =
+        document.createElement("option");
+
+    base.value = "";
+    base.textContent = "Seleccione un servicio";
+    select.appendChild(base);
+
+
     listaServicios.forEach(
-        servicio => {
+        (servicio, indice) => {
 
-            const boton =
-                document.createElement("button");
+            const option =
+                document.createElement("option");
 
-            boton.type = "button";
-
-            boton.textContent =
+            option.value = String(indice);
+            option.textContent =
                 servicio.codigo ||
                 servicio.servicio ||
                 "SERVICIO";
 
-            boton.onclick = function() {
-
-                entrarAlServicio(
-                    servicio
-                );
-
-            };
-
-            tipoRegistro.appendChild(
-                boton
-            );
+            select.appendChild(option);
 
         }
     );
+
+
+    select.onchange =
+        function() {
+
+            if (this.value === "") {
+                return;
+            }
+
+            const servicio =
+                listaServicios[Number(this.value)];
+
+            if (servicio) {
+                entrarAlServicio(servicio);
+            }
+
+        };
+
+
+    tipoRegistro.appendChild(select);
 
 
     mostrarEstado(
@@ -1365,7 +1389,6 @@ function mostrarOpcionesServicios(
     );
 
 }
-
 
 /* =====================================================
    ENTRAR AL SERVICIO
