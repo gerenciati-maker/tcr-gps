@@ -1165,9 +1165,11 @@ function identificarServicio(
     lon
 ) {
 
+    const serviciosEncontrados =
+        new Map();
+
     let servicioEncontrado =
         null;
-
 
     let distanciaMenor =
         Infinity;
@@ -1192,21 +1194,28 @@ function identificarServicio(
 
 
                     if (
-
                         distancia <=
-                        ubicacion.rango &&
-
-                        distancia <
-                        distanciaMenor
-
+                        ubicacion.rango
                     ) {
 
-                        distanciaMenor =
-                            distancia;
+                        serviciosEncontrados.set(
+                            servicio.codigo,
+                            servicio
+                        );
 
 
-                        servicioEncontrado =
-                            servicio;
+                        if (
+                            distancia <
+                            distanciaMenor
+                        ) {
+
+                            distanciaMenor =
+                                distancia;
+
+                            servicioEncontrado =
+                                servicio;
+
+                        }
 
                     }
 
@@ -1215,6 +1224,26 @@ function identificarServicio(
 
         }
     );
+
+
+    /*
+       Si las coordenadas/rangos coinciden con más de un servicio,
+       NO elegimos uno automáticamente. Mostramos las opciones para
+       que el usuario seleccione el servicio correcto.
+    */
+    if (
+        serviciosEncontrados.size > 1
+    ) {
+
+        mostrarOpcionesServicios(
+            Array.from(
+                serviciosEncontrados.values()
+            )
+        );
+
+        return;
+
+    }
 
 
     if (
@@ -1267,6 +1296,75 @@ function identificarServicio(
 
 }
 
+
+function mostrarOpcionesServicios(
+    listaServicios
+) {
+
+    const servicioCard =
+        document.getElementById("servicioCard");
+
+    const servicioIdentificado =
+        document.getElementById("servicioIdentificado");
+
+    const tipoRegistro =
+        document.getElementById("tipoRegistro");
+
+
+    if (!servicioCard || !tipoRegistro) {
+        return;
+    }
+
+
+    servicioCard.classList.remove("oculto");
+
+
+    if (servicioIdentificado) {
+        servicioIdentificado.textContent =
+            "SE ENCONTRARON VARIOS SERVICIOS EN ESTA UBICACIÓN";
+    }
+
+
+    tipoRegistro.innerHTML =
+        '<div class="pequeno" style="margin-bottom:12px;">' +
+            'Seleccione el servicio en el que realizará el registro:' +
+        '</div>';
+
+
+    listaServicios.forEach(
+        servicio => {
+
+            const boton =
+                document.createElement("button");
+
+            boton.type = "button";
+
+            boton.textContent =
+                servicio.codigo ||
+                servicio.servicio ||
+                "SERVICIO";
+
+            boton.onclick = function() {
+
+                entrarAlServicio(
+                    servicio
+                );
+
+            };
+
+            tipoRegistro.appendChild(
+                boton
+            );
+
+        }
+    );
+
+
+    mostrarEstado(
+        "Se detectaron varios servicios en esta ubicación. Seleccione el correcto."
+    );
+
+}
 
 
 /* =====================================================
