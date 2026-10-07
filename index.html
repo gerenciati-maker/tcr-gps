@@ -696,6 +696,10 @@ let enviandoRegistro = false;
 
 let validandoCiclo = false;
 
+/* Estado exclusivo del flujo APOYO. No modifica el ciclo principal. */
+let apoyoOrigenPendiente = null;
+let finalizandoServicioOrigen = false;
+
 
 
 /* =====================================================
@@ -2597,7 +2601,14 @@ function abrirFormulario(
             servicioOrigen,
 
         resultado:
-            "REGISTRADO"
+            "REGISTRADO",
+
+        /* APOYO tiene un ciclo independiente del servicio de origen. */
+        esApoyo:
+            tipo === "APOYO",
+
+        esFinalizacionOrigen:
+            false
 
     };
 
@@ -3072,7 +3083,11 @@ function confirmarYEnviarRegistro(tipoRegistro) {
         servicioOrigen: registroPendiente.servicioOrigen,
         resultado: registroPendiente.resultado,
         fotoBase64: fotoRegistroBase64,
-        fotoNombre: fotoRegistroNombre
+        fotoNombre: fotoRegistroNombre,
+
+        /* Solo informa al Code.gs qué ciclo corresponde al registro. */
+        modoApoyo: !!registroPendiente.esApoyo,
+        finalizarServicioOrigen: !!registroPendiente.esFinalizacionOrigen
     };
 
     mostrarEstado("Enviando registro...");
@@ -3119,6 +3134,62 @@ function confirmarYEnviarRegistro(tipoRegistro) {
 
         /* Mantener un aviso local para evitar una segunda ENTRADA en este dispositivo. */
         marcarCicloLocal(tipoRegistro);
+
+        /* =====================================================
+           FLUJO APOYO: al cerrar APOYO no se cierra el origen.
+           Se conserva el origen para que el usuario decida si
+           continúa o finaliza ese ciclo posteriormente.
+        ===================================================== */
+        if (registroPendiente && registroPendiente.esApoyo && String(tipoRegistro).toUpperCase() === "SALIDA") {
+
+            apoyoOrigenPendiente = {
+                nombre: registroPendiente.nombre,
+                numeroEmpleado: registroPendiente.numeroEmpleado,
+                servicioOrigen: registroPendiente.servicioOrigen,
+                posicion: registroPendiente.posicion
+            };
+
+            registroPendiente = null;
+            fotoRegistroBase64 = "";
+            fotoRegistroNombre = "";
+            limpiarFotografia();
+
+            ocultarTodosLosFormularios();
+            document.getElementById("tipoRegistroCard").classList.add("oculto");
+
+            mostrarResultadoApoyoFinalizado();
+
+            return;
+        }
+
+        /* Finalización del servicio de origen. */
+        if (registroPendiente && registroPendiente.esFinalizacionOrigen) {
+
+            const origenFinalizado = registroPendiente.servicioOrigen || registroPendiente.servicio || "-";
+
+            apoyoOrigenPendiente = null;
+            finalizandoServicioOrigen = false;
+
+            if (mensaje) {
+                mensaje.className = "card exito";
+                mensaje.innerHTML =
+                    '<strong style="font-size:20px;">⚠️ SERVICIO DE ORIGEN FINALIZADO</strong>' +
+                    '<div style="font-size:18px;margin-top:10px;">' + escaparHTML(origenFinalizado) + '</div>' +
+                    '<div class="pequeno" style="margin-top:8px;">Salida registrada correctamente.</div>' +
+                    '<button type="button" onclick="nuevoRegistro()">NUEVO REGISTRO</button>';
+                mensaje.classList.remove("oculto");
+            }
+
+            registroPendiente = null;
+            fotoRegistroBase64 = "";
+            fotoRegistroNombre = "";
+            limpiarFotografia();
+            ocultarTodosLosFormularios();
+            document.getElementById("tipoRegistroCard").classList.add("oculto");
+            mostrarEstado("Servicio de origen finalizado correctamente.");
+            window.scrollTo({top: document.body.scrollHeight, behavior:"smooth"});
+            return;
+        }
 
         /*
            El registro ya fue enviado. No mostramos otra pantalla con
@@ -3177,6 +3248,105 @@ function confirmarYEnviarRegistro(tipoRegistro) {
 
 
 /* =====================================================
+   APOYO FINALIZADO
+===================================================== */
+
+function mostrarResultadoApoyoFinalizado() {
+
+    const mensaje = document.getElementById("mensajeFinal");
+
+    if (!mensaje || !apoyoOrigenPendiente) {
+        return;
+    }
+
+    const origen = escaparHTML(
+        apoyoOrigenPendiente.servicioOrigen || "-"
+    );
+
+    mensaje.className = "card exito";
+    mensaje.innerHTML =
+        '<strong style="font-size:20px;">APOYO FINALIZADO</strong>' +
+        '<div class="pequeno" style="margin-top:8px;">Servicio de origen: <strong>' + origen + '</strong></div>' +
+        '<div class="pequeno" style="margin-top:8px;">¿Qué deseas hacer?</div>' +
+        '<button type="button" onclick="continuarEnServicioOrigen()">CONTINUAR EN SERVICIO DE ORIGEN</button>' +
+        '<button type="button" onclick="prepararFinalizarServicioOrigen()" style="background:#b91c1c;margin-top:8px;">FINALIZAR SERVICIO DE ORIGEN</button>';
+
+    mensaje.classList.remove("oculto");
+    mensaje.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function continuarEnServicioOrigen() {
+
+    if (!apoyoOrigenPendiente) {
+        return;
+    }
+
+    const origen = apoyoOrigenPendiente.servicioOrigen || "-";
+
+    apoyoOrigenPendiente = null;
+
+    const mensaje = document.getElementById("mensajeFinal");
+
+    if (mensaje) {
+        mensaje.className = "card exito";
+        mensaje.innerHTML =
+            '<strong style="font-size:20px;">✓ SERVICIO DE ORIGEN ACTIVO</strong>' +
+            '<div style="font-size:18px;margin-top:10px;">' + escaparHTML(origen) + '</div>' +
+            '<div class="pequeno" style="margin-top:8px;"><strong>Ciclo abierto</strong></div>' +
+            '<div class="pequeno" style="margin-top:8px;">No es necesario registrar una nueva entrada.</div>' +
+            '<button type="button" onclick="nuevoRegistro()">CONTINUAR</button>';
+        mensaje.classList.remove("oculto");
+    }
+
+    mostrarEstado("Servicio de origen activo. El ciclo permanece abierto.");
+}
+
+function prepararFinalizarServicioOrigen() {
+
+    if (!apoyoOrigenPendiente) {
+        return;
+    }
+
+    finalizandoServicioOrigen = true;
+
+    registroPendiente = {
+        nombre: apoyoOrigenPendiente.nombre,
+        numeroEmpleado: apoyoOrigenPendiente.numeroEmpleado,
+        servicio: apoyoOrigenPendiente.servicioOrigen,
+        tipoRegistro: "SALIDA",
+        posicion: apoyoOrigenPendiente.posicion,
+        latitud: ubicacionActual.latitud,
+        longitud: ubicacionActual.longitud,
+        precisionGPS: ubicacionActual.precisionGPS,
+        servicioDetectado: apoyoOrigenPendiente.servicioOrigen,
+        servicioOrigen: apoyoOrigenPendiente.servicioOrigen,
+        resultado: "REGISTRADO",
+        esApoyo: false,
+        esFinalizacionOrigen: true
+    };
+
+    const mensaje = document.getElementById("mensajeFinal");
+    if (mensaje) {
+        mensaje.classList.add("oculto");
+        mensaje.innerHTML = "";
+    }
+
+    document.getElementById("apoyoCard").classList.add("oculto");
+    document.getElementById("personalCard").classList.add("oculto");
+    document.getElementById("administrativoCard").classList.add("oculto");
+    document.getElementById("tipoRegistroCard").classList.remove("oculto");
+
+    const botones = document.querySelectorAll("#tipoRegistroCard > button");
+    if (botones.length >= 2) {
+        botones[0].style.display = "none";
+        botones[1].textContent = "SALIDA DE SERVICIO DE ORIGEN";
+    }
+
+    mostrarEstado("Tome la fotografía para registrar la salida de " + (apoyoOrigenPendiente.servicioOrigen || "origen") + ".");
+    window.scrollTo({top: document.body.scrollHeight, behavior:"smooth"});
+}
+
+/* =====================================================
    REGISTRO EXITOSO
 ===================================================== */
 
@@ -3226,6 +3396,16 @@ function nuevoRegistro() {
     }
 
     /* Restaurar los botones de selección sin volver a identificar GPS. */
+    /* Restaurar botones originales del registro. */
+    const botonesRegistro = document.querySelectorAll("#tipoRegistroCard > button");
+    if (botonesRegistro.length >= 2) {
+        botonesRegistro[0].style.display = "";
+        botonesRegistro[0].textContent = "ENTRADA";
+        botonesRegistro[1].style.display = "";
+        botonesRegistro[1].textContent = "SALIDA";
+    }
+    finalizandoServicioOrigen = false;
+
     if (tipoRegistro) {
         if (servicioActual) {
             tipoRegistro.innerHTML =
@@ -3330,6 +3510,8 @@ function nuevoRegistro() {
     empleadoApoyoActual =
         null;
 
+    apoyoOrigenPendiente =
+        null;
 
     empleadoAdministrativoActual =
         null;
